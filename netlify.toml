@@ -1,0 +1,13 @@
+# Netlify configuration for the Forkcast Next.js app.
+# Connect this repo in Netlify → it auto-installs the Next.js runtime and
+# deploys SSR + API routes. No extra setup needed.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

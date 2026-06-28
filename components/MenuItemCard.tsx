@@ -1,0 +1,153 @@
+"use client";
+
+import { useState } from "react";
+import { Check, Flame, Plus } from "lucide-react";
+import type { MenuItem } from "@/lib/types";
+import { useUser } from "@/lib/store";
+import { deriveTags, fitScore } from "@/lib/nutrition";
+import { SmartImage } from "./SmartImage";
+import { FitBadge } from "./FitBadge";
+import { categoryImg } from "@/lib/images";
+import { cls, money } from "@/lib/format";
+
+const TAG_LABEL: Record<string, string> = {
+  "high-protein": "High protein",
+  "low-carb": "Low carb",
+  "high-fiber": "High fiber",
+  "under-500": "Under 500 cal",
+  vegan: "Vegan",
+  vegetarian: "Vegetarian",
+  "gluten-free": "Gluten-free",
+};
+
+export function MenuItemCard({
+  item,
+  restaurantSlug,
+  restaurantName,
+  seed = 0,
+}: {
+  item: MenuItem;
+  restaurantSlug: string;
+  restaurantName: string;
+  seed?: number;
+}) {
+  const { targets, profile, logMeal } = useUser();
+  const [added, setAdded] = useState(false);
+
+  const fit = targets ? fitScore(item, targets, profile!.goal) : null;
+  const tags = deriveTags(item).filter((t) => TAG_LABEL[t]);
+
+  const handleLog = () => {
+    logMeal({
+      restaurantSlug,
+      restaurantName,
+      itemId: item.id,
+      name: item.name,
+      calories: item.calories,
+      protein: item.protein,
+      carbs: item.carbs,
+      fat: item.fat,
+      fiber: item.fiber,
+      sodium: item.sodium,
+      sugar: item.sugar,
+      source: "planned",
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2200);
+  };
+
+  return (
+    <div className="group flex gap-4 rounded-2xl border border-black/5 bg-white p-3 transition-shadow hover:card-shadow sm:p-4">
+      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28">
+        <SmartImage
+          src={categoryImg(item.category, seed)}
+          alt={item.name}
+          label={item.name}
+          className="h-full w-full object-cover"
+        />
+        {fit && (
+          <div className="absolute -right-1 -top-1">
+            <FitBadge score={fit.score} size="sm" />
+          </div>
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="truncate font-semibold text-ink">{item.name}</h3>
+            <p className="mt-0.5 line-clamp-2 text-sm text-ink/55">{item.description}</p>
+          </div>
+          <span className="shrink-0 font-semibold text-ink">{money(item.price)}</span>
+        </div>
+
+        {/* macros */}
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+          <span className="inline-flex items-center gap-1 font-semibold text-ink">
+            <Flame className="h-3.5 w-3.5 text-amber-accent" />
+            {item.calories} cal
+          </span>
+          <Macro label="P" value={item.protein} color="text-brand-700" />
+          <Macro label="C" value={item.carbs} color="text-sky-600" />
+          <Macro label="F" value={item.fat} color="text-amber-600" />
+          <span className="text-ink/40">·</span>
+          <span className="text-ink/50">{item.fiber}g fiber</span>
+        </div>
+
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+          {tags.slice(0, 3).map((t) => (
+            <span
+              key={t}
+              className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700"
+            >
+              {TAG_LABEL[t]}
+            </span>
+          ))}
+          {fit && fit.warnings[0] && (
+            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+              {fit.warnings[0]}
+            </span>
+          )}
+        </div>
+
+        <div className="mt-3 flex items-center justify-between">
+          {fit ? (
+            <p className="truncate text-xs text-ink/50">
+              {fit.reasons.length ? fit.reasons.join(" · ") : "Tap to add to today"}
+            </p>
+          ) : (
+            <p className="text-xs text-ink/40">Set up your profile for a Fit Score</p>
+          )}
+          <button
+            onClick={handleLog}
+            className={cls(
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition",
+              added
+                ? "bg-brand-600 text-white"
+                : "bg-brand-50 text-brand-700 hover:bg-brand-100",
+            )}
+          >
+            {added ? (
+              <>
+                <Check className="h-4 w-4" /> Added
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4" /> Log it
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Macro({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className={cls("font-bold", color)}>{label}</span>
+      <span className="text-ink/70">{value}g</span>
+    </span>
+  );
+}
