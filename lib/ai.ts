@@ -6,8 +6,12 @@
 //
 // PRODUCTION: flip `USE_REAL_AI` to true. `analyzeMealPhoto` will POST the image
 // to /api/analyze, which calls Claude (Anthropic) vision with a structured
-// tool-use schema to return calories + macros. The rest of the app is unchanged
-// — this file is the single integration seam.
+// schema to return calories + macros. The rest of the app is unchanged — this
+// file is the single integration seam.
+//
+// NOTE: the /api/analyze route was removed so the app could be statically
+// exported to GitHub Pages. Restore it from docs/snippets/analyze-route.ts.txt
+// when deploying to an SSR host (Netlify/Vercel/Node).
 // ---------------------------------------------------------------------------
 
 export interface MealEstimate {

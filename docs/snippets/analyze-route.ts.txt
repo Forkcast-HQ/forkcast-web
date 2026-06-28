@@ -1,0 +1,61 @@
+// Restore this as app/api/analyze/route.ts when running on an SSR host
+// (Netlify/Vercel/Node). It was removed from the repo only so the app can be
+// statically exported to GitHub Pages (static export disallows POST routes).
+//
+// Today it returns a mock; uncomment the Claude block + install @anthropic-ai/sdk
+// + set ANTHROPIC_API_KEY to go live. lib/ai.ts already posts here when
+// USE_REAL_AI = true.
+
+import { NextResponse } from "next/server";
+
+const MOCK = {
+  name: "Grilled chicken & quinoa bowl",
+  confidence: 0.9,
+  calories: 560,
+  protein: 44,
+  carbs: 52,
+  fat: 18,
+  fiber: 9,
+  sodium: 680,
+  sugar: 7,
+  items: ["grilled chicken breast", "quinoa", "roasted vegetables", "tahini"],
+};
+
+export async function POST(_req: Request) {
+  return NextResponse.json(MOCK);
+
+  /* ---- REAL IMPLEMENTATION (Claude Opus 4.8 vision + structured output) ----
+  import Anthropic from "@anthropic-ai/sdk";
+  const client = new Anthropic(); // reads ANTHROPIC_API_KEY
+
+  const form = await _req.formData();
+  const file = form.get("image") as File;
+  const b64 = Buffer.from(await file.arrayBuffer()).toString("base64");
+  const mediaType = file.type === "image/png" ? "image/png" : "image/jpeg";
+
+  const NUTRITION_SCHEMA = {
+    type: "object", additionalProperties: false,
+    properties: {
+      name: { type: "string" }, confidence: { type: "number" },
+      calories: { type: "integer" }, protein: { type: "integer" },
+      carbs: { type: "integer" }, fat: { type: "integer" },
+      fiber: { type: "integer" }, sodium: { type: "integer" },
+      sugar: { type: "integer" }, items: { type: "array", items: { type: "string" } },
+    },
+    required: ["name","confidence","calories","protein","carbs","fat","fiber","sodium","sugar","items"],
+  };
+
+  const res = await client.messages.create({
+    model: "claude-opus-4-8",
+    max_tokens: 1024,
+    thinking: { type: "adaptive" },
+    output_config: { format: { type: "json_schema", schema: NUTRITION_SCHEMA } },
+    messages: [{ role: "user", content: [
+      { type: "image", source: { type: "base64", media_type: mediaType, data: b64 } },
+      { type: "text", text: "Identify this restaurant meal and estimate its nutrition (calories, protein, carbs, fat, fiber in g; sodium in mg; sugar in g) for the portion shown. List the main components. Be realistic about portion size." },
+    ] }],
+  });
+  const json = res.content.find((b) => b.type === "text")?.text ?? "{}";
+  return NextResponse.json(JSON.parse(json));
+  ---------------------------------------------------------------------------- */
+}

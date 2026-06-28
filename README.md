@@ -4,6 +4,8 @@
 
 > The core insight: passive menu calorie labels barely change behavior (~24 cal/order), and every nutrition app makes you log *after* you've eaten. Forkcast steers you to the right dish *before* you order — and gets restaurants to pay to be the recommendation.
 
+**🔗 Live demo:** https://seymurhh.github.io/forkcast-live/ (static build on GitHub Pages — source & business docs stay in this private repo).
+
 ---
 
 ## Quick start
@@ -67,6 +69,16 @@ docs/           business plan, financial model, architecture, research dossier
 ```
 
 ---
+
+## Deploying
+
+The live demo is a **static export** published to GitHub Pages. To redeploy after changes:
+
+```bash
+bash scripts/deploy-pages.sh   # builds + pushes to the public forkcast-live repo
+```
+
+For an SSR host (Netlify/Vercel) instead, restore `app/api/analyze/route.ts` from `docs/snippets/`, then connect this repo (`netlify.toml` is included).
 
 ## Turning on real AI
 
