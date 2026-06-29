@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Flame, Plus } from "lucide-react";
+import { Check, Flame, Plus, MapPin } from "lucide-react";
 import type { MenuItem } from "@/lib/types";
 import { useUser } from "@/lib/store";
 import { deriveTags, fitScore } from "@/lib/nutrition";
@@ -25,11 +25,13 @@ export function MenuItemCard({
   restaurantSlug,
   restaurantName,
   seed = 0,
+  showRestaurant = true,
 }: {
   item: MenuItem;
   restaurantSlug: string;
   restaurantName: string;
   seed?: number;
+  showRestaurant?: boolean;
 }) {
   const { targets, profile, logMeal } = useUser();
   const [added, setAdded] = useState(false);
@@ -75,7 +77,13 @@ export function MenuItemCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="truncate font-semibold text-ink">{item.name}</h3>
+            {showRestaurant && (
+              <p className="flex items-center gap-1 truncate text-[11px] font-semibold uppercase tracking-wide text-brand-700">
+                <MapPin className="h-3 w-3 shrink-0" />
+                {restaurantName}
+              </p>
+            )}
+            <h3 className="truncate font-display text-base font-bold text-ink">{item.name}</h3>
             <p className="mt-0.5 line-clamp-2 text-sm text-ink/55">{item.description}</p>
           </div>
           <span className="shrink-0 font-semibold text-ink">{money(item.price)}</span>

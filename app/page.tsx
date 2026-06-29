@@ -34,7 +34,7 @@ export default function Home() {
             </span>
             <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-6xl text-balance">
               Know what you&apos;ll eat,{" "}
-              <span className="text-brand-600">before you sit down.</span>
+              <span className="italic text-brand-600">before you sit down.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-ink/65">
               Forkcast turns your height, weight and goals into a daily plan — then

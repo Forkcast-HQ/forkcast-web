@@ -17,9 +17,9 @@ export interface MapItem {
 }
 
 function pin(fit: number, partner: boolean) {
-  const color = fit > 0 ? fitColor(fit) : "#0b1f17";
+  const color = fit > 0 ? fitColor(fit) : "#577353";
   const label = fit > 0 ? String(fit) : "";
-  const ring = partner ? "box-shadow:0 0 0 3px rgba(16,185,129,0.35), 0 4px 10px rgba(0,0,0,0.25);" : "box-shadow:0 4px 10px rgba(0,0,0,0.25);";
+  const ring = partner ? "box-shadow:0 0 0 3px rgba(194,75,44,0.40), 0 4px 10px rgba(0,0,0,0.25);" : "box-shadow:0 4px 10px rgba(0,0,0,0.25);";
   return L.divIcon({
     className: "",
     html: `<div style="width:34px;height:34px;border-radius:50%;background:${color};border:2px solid #fff;${ring}display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;font-family:var(--font-display,sans-serif)">${label || "•"}</div>`,

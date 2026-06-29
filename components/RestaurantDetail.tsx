@@ -143,7 +143,7 @@ export function RestaurantDetail({ slug }: { slug: string }) {
 
             <div className="space-y-4">
               {menu.map(({ m }, i) => (
-                <MenuItemCard key={m.id} item={m} restaurantSlug={restaurant.slug} restaurantName={restaurant.name} seed={i} />
+                <MenuItemCard key={m.id} item={m} restaurantSlug={restaurant.slug} restaurantName={restaurant.name} seed={i} showRestaurant={false} />
               ))}
               {menu.length === 0 && <p className="py-10 text-center text-ink/50">No dishes match that filter.</p>}
             </div>

@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/auth";
 import { UserProvider } from "@/lib/store";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { TodayBar } from "@/components/TodayBar";
 
 export const metadata: Metadata = {
   title: "Forkcast — Know before you go",
@@ -25,6 +26,7 @@ export default function RootLayout({
             <Navbar />
             <main>{children}</main>
             <Footer />
+            <TodayBar />
           </UserProvider>
         </AuthProvider>
       </body>

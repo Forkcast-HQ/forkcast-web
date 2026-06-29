@@ -172,7 +172,7 @@ export default function Discover() {
                 className="w-full rounded-xl border border-black/10 bg-white py-2.5 pl-10 pr-4 text-sm outline-none focus:border-brand-500"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <SlidersHorizontal className="h-4 w-4 text-ink/40" />
               {(["fit", "distance", "rating"] as Sort[]).map((s) => (
                 <button
