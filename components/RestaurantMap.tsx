@@ -1,9 +1,28 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import Link from "next/link";
 import { fitColor } from "@/lib/nutrition";
+
+// Leaflet renders blank/gray if its container had no size at init (common with
+// dynamic mounts + flex/grid). Force a resize once mounted and on window resize.
+function Resizer() {
+  const map = useMap();
+  useEffect(() => {
+    const fix = () => map.invalidateSize();
+    const t1 = setTimeout(fix, 150);
+    const t2 = setTimeout(fix, 600);
+    window.addEventListener("resize", fix);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener("resize", fix);
+    };
+  }, [map]);
+  return null;
+}
 
 export interface MapItem {
   slug: string;
@@ -44,6 +63,7 @@ export default function RestaurantMap({
       style={{ height: "100%", width: "100%" }}
       className="z-0"
     >
+      <Resizer />
       <TileLayer
         attribution='&copy; OpenStreetMap &copy; CARTO'
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"

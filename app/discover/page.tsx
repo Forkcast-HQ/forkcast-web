@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Search, SlidersHorizontal, Sparkles, ArrowRight, Map as MapIcon, List, Star, Clock } from "lucide-react";
@@ -28,6 +28,13 @@ export default function Discover() {
   const [sort, setSort] = useState<Sort>(profile ? "fit" : "rating");
   const [dietOnly, setDietOnly] = useState(false);
   const [view, setView] = useState<View>("list");
+
+  // Honor ?view=map deep links (and shareable map view).
+  useEffect(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("view") === "map") {
+      setView("map");
+    }
+  }, []);
 
   // best-fit dish per restaurant (for sort + headline)
   const bestFitOf = useMemo(() => {
