@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Forkcast — Next Steps</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;0,900&family=Inter:wght@400;500;600;700&display=swap');
+  :root{ --cream:#f7f4ec; --ink:#20160f; --muted:#6b5d52; --terra:#c24b2c; --sage:#6f8f6a; --line:rgba(32,22,15,.12);
+    --serif:"Fraunces",Georgia,serif; --sans:"Inter",-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+  *{box-sizing:border-box}
+  @page{ size:Letter; margin:0.7in 0.75in; }
+  html,body{margin:0;padding:0}
+  body{ font-family:var(--sans); color:var(--ink); background:#fff; font-size:11pt; line-height:1.5; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  header{ border-bottom:3px solid var(--terra); padding-bottom:.16in; margin-bottom:.22in; }
+  .mark{ font-family:var(--serif); font-weight:900; font-size:20pt } .mark span{ color:var(--terra) }
+  .tag{ color:var(--muted); font-size:10pt; margin-top:2px }
+  h1{ font-family:var(--serif); font-size:22pt; margin:.1in 0 .04in; }
+  h2{ font-family:var(--serif); font-size:14pt; margin:.26in 0 .06in; color:var(--ink); border-left:4px solid var(--terra); padding-left:.12in; }
+  p{ margin:.06in 0; color:#33271d }
+  .muted{ color:var(--muted) }
+  ul{ margin:.06in 0 .06in .04in; padding-left:.24in } li{ margin:.05in 0 }
+  .focus{ background:var(--cream); border:1px solid var(--line); border-radius:12px; padding:.18in .22in; margin:.1in 0; }
+  .pill{ display:inline-block; background:#fbeee8; color:var(--terra); border-radius:999px; padding:1px 10px; font-weight:700; font-size:9.5pt }
+  table{ width:100%; border-collapse:collapse; margin:.1in 0; font-size:10.5pt }
+  th,td{ text-align:left; padding:.08in .1in; border-bottom:1px solid var(--line) }
+  th{ color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-size:9pt }
+  td:last-child{ text-align:right; font-weight:700; color:var(--terra) }
+  .oneline{ margin-top:.24in; padding:.14in .18in; background:var(--ink); color:#fff; border-radius:12px; font-size:11.5pt }
+  .oneline b{ color:#fff }
+  footer{ margin-top:.3in; border-top:1px solid var(--line); padding-top:.1in; color:var(--muted); font-size:9pt; display:flex; justify-content:space-between }
+</style>
+</head>
+<body>
+  <header>
+    <div class="mark">Fork<span>cast</span></div>
+    <div class="tag">Next Steps — brief living roadmap · updated June 28, 2026</div>
+  </header>
+
+  <h1>Where we are, and what’s next.</h1>
+
+  <h2>Where we are now (done)</h2>
+  <ul>
+    <li><b>Working, investor-ready demo</b> (live: seymurhh.github.io/forkcast-live) — accounts, onboarding, BMI/TDEE/macros, Fit-Score discovery + map, dashboard, photo logging.</li>
+    <li><b>Strategy package</b> — business plan, financial model, system architecture, research dossier (private).</li>
+    <li><b>Private source repo + one-command deploy.</b></li>
+  </ul>
+  <p class="muted">What we do <b>not</b> have yet: real users, real restaurants, a pitch deck distributed, or external validation. That’s the gap the next steps close.</p>
+
+  <h2>The next step — single focus for ~4 weeks</h2>
+  <div class="focus">
+    <p style="margin-top:0"><b>Turn the demo into proof.</b> Get evidence diners want this and restaurants will play — before writing more code or raising.</p>
+    <ul>
+      <li><b>20 user interviews</b> (Boston/Cambridge, Harvard network first) → one-page “what we heard.”</li>
+      <li><b>Demand signal:</b> add a real <b>waitlist</b> to the live site; drive ~200 signups via TikTok/IG + campus channels.</li>
+      <li><b>5–10 restaurant conversations</b> in one dense neighborhood → ≥3 verbal “I’d try it.”</li>
+      <li>Build the <b>pitch deck</b> (10–13 slides) from the business plan. <span class="pill">drafted</span></li>
+    </ul>
+  </div>
+
+  <h2>Then — next ~90 days (in order)</h2>
+  <ul>
+    <li><b>Beachhead data layer</b> — real chain nutrition (USDA + Nutritionix) for ~50 real Boston restaurants.</li>
+    <li><b>MVP backend</b> — real auth + database; turn on real Claude photo analysis (SSR host).</li>
+    <li><b>First 10 restaurants + 100 active users</b> in one neighborhood; track <b>D30 retention (&gt;35%)</b> and <b>CAC</b>.</li>
+    <li><b>Apply for non-dilutive grants</b> — NIH/NIDDK &amp; USDA-NIFA SBIR (verify post-Apr-2026 solicitation dates).</li>
+  </ul>
+
+  <h2>Funding track (in parallel)</h2>
+  <ul>
+    <li><b>Now:</b> deck + clean data room (docs we have).</li>
+    <li><b>Month 1–2:</b> warm pre-seed intros (health-/food-tech, Harvard/MIT); apply to an accelerator.</li>
+    <li><b>Target:</b> ~$1.0–1.5M pre-seed SAFE, gated on validation + SBIR top-up.</li>
+  </ul>
+
+  <h2>Numbers that unlock the raise</h2>
+  <table>
+    <tr><th>Metric</th><th>Target</th></tr>
+    <tr><td>D30 retention</td><td>&gt; 35%</td></tr>
+    <tr><td>Featured / committed restaurants</td><td>10+ live · 150+ pipeline</td></tr>
+    <tr><td>Active users (1 metro)</td><td>100 → 1,000</td></tr>
+    <tr><td>LTV : CAC</td><td>≥ 3:1 · payback 6–9 mo</td></tr>
+  </table>
+
+  <h2>Housekeeping (this week)</h2>
+  <ul>
+    <li>Decide on the public deploy repo (delete + recreate for a 100%-clean history, or keep scrubbed version).</li>
+    <li>Trademark-check “Forkcast”; buy a domain (e.g. forkcast.app) and point the live site at it.</li>
+    <li>Recruit 1–2 advisors: a registered dietitian and a fast-casual operator.</li>
+  </ul>
+
+  <div class="oneline"><b>One line:</b> the product is built — the next job is <b>validation + a deck + first restaurants</b>, not more features.</div>
+
+  <footer><span>Forkcast — Confidential</span><span>Seymur Hasanov · shasanov@seas.harvard.edu</span></footer>
+</body>
+</html>
