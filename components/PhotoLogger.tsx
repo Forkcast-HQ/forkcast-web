@@ -1,12 +1,38 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera, Check, Loader2, Sparkles, X } from "lucide-react";
-import { analyzeMealPhoto, type MealEstimate } from "@/lib/ai";
+import { Camera, Check, Loader2, Sparkles, X, AlertTriangle } from "lucide-react";
+import { analyzeMealPhoto, mockEstimate, type MealEstimate } from "@/lib/ai";
 import { useUser } from "@/lib/store";
 import { cls } from "@/lib/format";
 
 type Status = "idle" | "analyzing" | "review";
+
+// Downscale to a max edge + JPEG so uploads are small and within model limits.
+function resizeImage(file: File, maxEdge = 1024, quality = 0.82): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("canvas unsupported"));
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => reject(new Error("could not load image"));
+      img.src = reader.result as string;
+    };
+    reader.onerror = () => reject(new Error("could not read file"));
+    reader.readAsDataURL(file);
+  });
+}
 
 export function PhotoLogger() {
   const { logMeal } = useUser();
@@ -15,16 +41,29 @@ export function PhotoLogger() {
   const [preview, setPreview] = useState<string | null>(null);
   const [estimate, setEstimate] = useState<MealEstimate | null>(null);
   const [justLogged, setJustLogged] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   const handleFile = async (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => setPreview(reader.result as string);
-    reader.readAsDataURL(file);
-
     setStatus("analyzing");
     setEstimate(null);
-    const result = await analyzeMealPhoto(file);
-    setEstimate(result);
+    setErr(null);
+    let dataUrl: string;
+    try {
+      dataUrl = await resizeImage(file);
+    } catch {
+      dataUrl = await new Promise((res) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result as string);
+        r.readAsDataURL(file);
+      });
+    }
+    setPreview(dataUrl);
+    try {
+      setEstimate(await analyzeMealPhoto(dataUrl));
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "AI analysis failed");
+      setEstimate(await mockEstimate(dataUrl));
+    }
     setStatus("review");
   };
 
@@ -32,6 +71,7 @@ export function PhotoLogger() {
     setStatus("idle");
     setPreview(null);
     setEstimate(null);
+    setErr(null);
     if (inputRef.current) inputRef.current.value = "";
   };
 
@@ -125,10 +165,21 @@ export function PhotoLogger() {
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="font-semibold text-ink">{estimate.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-ink">{estimate.name}</p>
+                        <span className={cls("rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide", estimate.source === "ai" ? "bg-brand-600 text-white" : "bg-black/[0.06] text-ink/55")}>
+                          {estimate.source === "ai" ? "Groq AI" : "estimate"}
+                        </span>
+                      </div>
                       <p className="text-xs text-ink/50">
                         {Math.round(estimate.confidence * 100)}% confidence · not quite right? Retake below.
                       </p>
+                      {err && (
+                        <p className="mt-1 flex items-start gap-1 text-xs text-amber-700">
+                          <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
+                          <span>AI unavailable — showing a sample estimate. ({err})</span>
+                        </p>
+                      )}
                     </div>
                     <button onClick={reset} className="rounded-full p-1 text-ink/40 hover:bg-black/5">
                       <X className="h-4 w-4" />

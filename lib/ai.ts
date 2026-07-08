@@ -1,17 +1,12 @@
 // ---------------------------------------------------------------------------
 // Forkcast AI layer (swappable).
 //
-// TODAY: realistic, deterministic mock so the demo is fully functional with no
-// API keys. The estimates are drawn from a curated library of real dishes.
+// REAL AI: when NEXT_PUBLIC_USE_REAL_AI=true, analyzeMealPhoto POSTs the photo
+// to /api/analyze, which calls a vision model (Groq Llama-4 today) server-side
+// and returns calories + macros. Requires a server (next dev, Netlify, Vercel)
+// — not the static GitHub Pages build, which falls back to the mock below.
 //
-// PRODUCTION: flip `USE_REAL_AI` to true. `analyzeMealPhoto` will POST the image
-// to /api/analyze, which calls Claude (Anthropic) vision with a structured
-// schema to return calories + macros. The rest of the app is unchanged — this
-// file is the single integration seam.
-//
-// NOTE: the /api/analyze route was removed so the app could be statically
-// exported to GitHub Pages. Restore it from docs/snippets/analyze-route.ts.txt
-// when deploying to an SSR host (Netlify/Vercel/Node).
+// MOCK: deterministic, realistic estimates so the demo works with no key.
 // ---------------------------------------------------------------------------
 
 export interface MealEstimate {
@@ -25,9 +20,10 @@ export interface MealEstimate {
   sodium: number;
   sugar: number;
   items: string[]; // detected components
+  source?: "ai" | "mock";
 }
 
-const USE_REAL_AI = false;
+export const USE_REAL_AI = process.env.NEXT_PUBLIC_USE_REAL_AI === "true";
 
 // Curated, realistic estimates the mock can return.
 const LIBRARY: MealEstimate[] = [
@@ -41,8 +37,7 @@ const LIBRARY: MealEstimate[] = [
   { name: "Margherita pizza (2 slices)", confidence: 0.82, calories: 620, protein: 26, carbs: 76, fat: 24, fiber: 4, sodium: 1220, sugar: 8, items: ["pizza dough", "mozzarella", "tomato", "basil"] },
 ];
 
-function hashFile(file: File): number {
-  const s = `${file.name}-${file.size}-${file.type}`;
+function hashStr(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
   return Math.abs(h);
@@ -50,20 +45,12 @@ function hashFile(file: File): number {
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export async function analyzeMealPhoto(file: File): Promise<MealEstimate> {
-  if (USE_REAL_AI) {
-    const body = new FormData();
-    body.append("image", file);
-    const res = await fetch("/api/analyze", { method: "POST", body });
-    if (!res.ok) throw new Error("analysis failed");
-    return (await res.json()) as MealEstimate;
-  }
-
-  // --- MOCK ---
-  await delay(1300 + (hashFile(file) % 700)); // feels like real inference
-  const base = LIBRARY[hashFile(file) % LIBRARY.length];
-  // small deterministic jitter so repeated uploads vary a little
-  const j = (hashFile(file) % 11) - 5; // -5..5
+// Deterministic realistic estimate (no key needed). `seed` = the image data URL.
+export async function mockEstimate(seed: string): Promise<MealEstimate> {
+  const h = hashStr(seed);
+  await delay(1100 + (h % 700)); // feels like inference
+  const base = LIBRARY[h % LIBRARY.length];
+  const j = (h % 11) - 5;
   const scale = 1 + j / 100;
   return {
     ...base,
@@ -71,7 +58,32 @@ export async function analyzeMealPhoto(file: File): Promise<MealEstimate> {
     protein: Math.round(base.protein * scale),
     carbs: Math.round(base.carbs * scale),
     fat: Math.round(base.fat * scale),
+    source: "mock",
   };
+}
+
+// Real analysis via the server route. `image` is a (downscaled) JPEG data URL.
+// Throws with a readable message on failure so the UI can surface it.
+export async function analyzeMealPhoto(image: string): Promise<MealEstimate> {
+  if (!USE_REAL_AI) return mockEstimate(image);
+
+  const res = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image }),
+  });
+  if (!res.ok) {
+    let msg = `Analysis failed (${res.status})`;
+    try {
+      const e = await res.json();
+      if (e?.error) msg = e.error;
+    } catch {
+      /* ignore */
+    }
+    throw new Error(msg);
+  }
+  const data = (await res.json()) as MealEstimate;
+  return { ...data, source: "ai" };
 }
 
 // AI coaching one-liner for the dashboard. Mock heuristic now; a real Claude

@@ -11,9 +11,16 @@ OUT="$ROOT/out"
 PAGES_REPO="https://github.com/Seymurhh/forkcast-live.git"
 BASE="/forkcast-live"
 
+# Static export cannot include server route handlers (POST /api/analyze).
+# Stash app/api for the export build, then restore it (SSR/dev keep it).
+API_DIR="$ROOT/app/api"; API_STASH="$ROOT/.api-stash"
+restore_api(){ [ -d "$API_STASH" ] && mv "$API_STASH" "$API_DIR" 2>/dev/null || true; }
+trap restore_api EXIT
+[ -d "$API_DIR" ] && mv "$API_DIR" "$API_STASH"
+
 echo "Building static export..."
 rm -rf "$ROOT/.next" "$OUT"
-STATIC_EXPORT=true PAGES_BASE_PATH="$BASE" "$ROOT/node_modules/.bin/next" build "$ROOT"
+STATIC_EXPORT=true PAGES_BASE_PATH="$BASE" NEXT_PUBLIC_USE_REAL_AI=false "$ROOT/node_modules/.bin/next" build "$ROOT"
 touch "$OUT/.nojekyll"
 
 echo "Publishing compiled app to $PAGES_REPO ..."

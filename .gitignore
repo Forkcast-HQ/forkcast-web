@@ -10,3 +10,6 @@ next-env.d.ts
 
 # TS build info
 *.tsbuildinfo
+
+# transient deploy stash
+.api-stash
