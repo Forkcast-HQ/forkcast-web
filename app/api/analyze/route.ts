@@ -8,7 +8,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const DEFAULT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+// Maverick = most accurate vision model on Groq; override via GROQ_MODEL.
+const DEFAULT_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
 
 const PROMPT = `You are a nutrition estimator. Look at this meal photo and estimate its nutrition for the portion actually shown.
 Return ONLY a JSON object (no prose, no code fences) with exactly these keys:
