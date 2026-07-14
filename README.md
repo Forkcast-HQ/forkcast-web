@@ -44,6 +44,15 @@ Everything is interactive and persists locally (profile, logged meals, weight) �
 - **[SYSTEM_ARCHITECTURE.md](docs/SYSTEM_ARCHITECTURE.md)** — full architecture (with diagram), the nutrition-layer moat, tech stack, build roadmap.
 - **[RESEARCH.md](docs/RESEARCH.md)** — the cited evidence base behind every number (CDC, USDA ERS, AHRQ, peer-reviewed, company filings), fact-checked.
 
+### July 14, 2026 Codex delivery
+
+- **[DELIVERY_2026-07-14_CODEX.md](docs/DELIVERY_2026-07-14_CODEX.md)** — dated delivery record and verification summary.
+- **[COMPETITIVE_AND_PRODUCT_AUDIT.md](docs/COMPETITIVE_AND_PRODUCT_AUDIT.md)** — competitive positioning, product gaps, and prioritized roadmap.
+- **[NIW_PRODUCT_EVIDENCE_PLAN.md](docs/NIW_PRODUCT_EVIDENCE_PLAN.md)** — product-evidence plan for building a professional, independently verifiable NIW record.
+- **[FABLE_5_PROMPT.md](docs/FABLE_5_PROMPT.md)** — structured Fable 5 handoff prompt covering the completed work and near-term design direction.
+
+> The NIW material is an evidence-development and product-planning aid, not legal advice. Immigration filings should be reviewed by qualified counsel.
+
 ---
 
 ## How it works (in one breath)
