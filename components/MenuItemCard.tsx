@@ -6,7 +6,7 @@ import { Check, Flame, Plus, MapPin, ShoppingBag } from "lucide-react";
 import type { MenuItem } from "@/lib/types";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
-import { deriveTags, fitScore } from "@/lib/nutrition";
+import { conditionWarnings, deriveTags, fitScore } from "@/lib/nutrition";
 import { getRestaurant } from "@/data/restaurants";
 import { flyToBasket } from "@/lib/fly";
 import { SmartImage } from "./SmartImage";
@@ -52,6 +52,11 @@ export function MenuItemCard({
   const fit = targets ? fitScore(item, targets, profile!.goal) : null;
   const tags = deriveTags(item).filter((t) => TAG_LABEL[t]);
   const verified = getRestaurant(restaurantSlug)?.partner ?? false;
+
+  // Personal advisories: allergens (from menu text — never a guarantee) + conditions
+  const itemText = `${item.name} ${item.description} ${item.tags.join(" ")}`.toLowerCase();
+  const allergenHits = (profile?.avoid ?? []).filter((a) => itemText.includes(a.toLowerCase()));
+  const condWarns = conditionWarnings(item, profile?.conditions);
 
   const handleLog = () => {
     logMeal({
@@ -143,7 +148,17 @@ export function MenuItemCard({
               {TAG_LABEL[t]}
             </span>
           ))}
-          {fit && fit.warnings[0] && (
+          {allergenHits.map((a) => (
+            <span key={a} className="rounded-full border border-brand-600 bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700" title="From menu text — always confirm with the restaurant">
+              May contain {a.toLowerCase()}
+            </span>
+          ))}
+          {condWarns.slice(0, 1).map((w) => (
+            <span key={w} className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+              {w}
+            </span>
+          ))}
+          {fit && fit.warnings[0] && !condWarns.length && (
             <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
               {fit.warnings[0]}
             </span>

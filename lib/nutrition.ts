@@ -50,28 +50,46 @@ export function bmi(weightKg: number, heightCm: number): number {
   return weightKg / (m * m);
 }
 
+// CDC adult BMI categories (screening tool, not a diagnosis):
+// Underweight <18.5 · Healthy 18.5–24.9 · Overweight 25–29.9 ·
+// Obesity Class 1 30–34.9 · Class 2 35–39.9 · Class 3 ≥40.
 export interface BmiInfo {
   value: number;
-  category: "Underweight" | "Healthy" | "Overweight" | "Obese";
+  category:
+    | "Underweight"
+    | "Healthy weight"
+    | "Overweight"
+    | "Obesity — Class 1"
+    | "Obesity — Class 2"
+    | "Obesity — Class 3";
   color: string; // tailwind text/bg friendly hex
 }
 
+export const BMI_SCREENING_NOTE =
+  "BMI is a screening measure, not a diagnosis — it doesn't account for muscle mass, bone density, or body composition. Discuss results with a healthcare provider.";
+
 export function bmiInfo(weightKg: number, heightCm: number): BmiInfo {
   const value = bmi(weightKg, heightCm);
-  let category: BmiInfo["category"] = "Healthy";
+  let category: BmiInfo["category"] = "Healthy weight";
   let color = "#4a7c59"; // muted tones — Modernist palette-adjacent
   if (value < 18.5) {
     category = "Underweight";
     color = "#605d5d";
   } else if (value < 25) {
-    category = "Healthy";
+    category = "Healthy weight";
     color = "#4a7c59";
   } else if (value < 30) {
     category = "Overweight";
     color = "#e0853a";
-  } else {
-    category = "Obese";
+  } else if (value < 35) {
+    category = "Obesity — Class 1";
+    color = "#c94b39";
+  } else if (value < 40) {
+    category = "Obesity — Class 2";
     color = "#ae1800";
+  } else {
+    category = "Obesity — Class 3";
+    color = "#7c1405";
   }
   return { value: Math.round(value * 10) / 10, category, color };
 }
@@ -206,6 +224,46 @@ export function fitScore(item: MenuItem, targets: DailyTargets, goal: Goal): Fit
 
 export function clamp01(x: number) {
   return Math.max(0, Math.min(1, x));
+}
+
+// ---- Condition-aware advisories -----------------------------------
+// Dietary advisories for self-reported conditions (from the design handoff).
+// These are informational flags, not medical advice — thresholds follow
+// common dietary guidance (e.g., sodium limits for hypertension).
+export const CONDITIONS = [
+  "Hypertension",
+  "Type 2 diabetes",
+  "High cholesterol",
+  "Heart disease",
+  "Kidney disease",
+] as const;
+
+export const COMMON_ALLERGENS = [
+  "Peanut",
+  "Tree nut",
+  "Shellfish",
+  "Fish",
+  "Dairy",
+  "Egg",
+  "Soy",
+  "Sesame",
+  "Wheat",
+] as const;
+
+export function conditionWarnings(item: MenuItem, conditions: string[] | undefined): string[] {
+  if (!conditions?.length) return [];
+  const out: string[] = [];
+  const has = (c: string) => conditions.includes(c);
+  if ((has("Hypertension") || has("Heart disease") || has("Kidney disease")) && item.sodium > 800) {
+    out.push("High sodium for your profile");
+  }
+  if (has("Type 2 diabetes") && item.sugar > 15) {
+    out.push("High sugar for your profile");
+  }
+  if ((has("High cholesterol") || has("Heart disease")) && item.fat > 28) {
+    out.push("High fat for your profile");
+  }
+  return out;
 }
 
 // Derived attribute tags for a dish (used for filter chips / badges)

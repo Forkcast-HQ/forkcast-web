@@ -42,6 +42,8 @@ export function PhotoLogger() {
   const [estimate, setEstimate] = useState<MealEstimate | null>(null);
   const [justLogged, setJustLogged] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // Correctable copy of the estimate — the AI is a starting point, never the record.
+  const [edit, setEdit] = useState<{ name: string; calories: string; protein: string; carbs: string; fat: string } | null>(null);
 
   const handleFile = async (file: File) => {
     setStatus("analyzing");
@@ -58,12 +60,21 @@ export function PhotoLogger() {
       });
     }
     setPreview(dataUrl);
+    let est: MealEstimate;
     try {
-      setEstimate(await analyzeMealPhoto(dataUrl));
+      est = await analyzeMealPhoto(dataUrl);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "AI analysis failed");
-      setEstimate(await mockEstimate(dataUrl));
+      est = await mockEstimate(dataUrl);
     }
+    setEstimate(est);
+    setEdit({
+      name: est.name,
+      calories: String(est.calories),
+      protein: String(est.protein),
+      carbs: String(est.carbs),
+      fat: String(est.fat),
+    });
     setStatus("review");
   };
 
@@ -71,23 +82,41 @@ export function PhotoLogger() {
     setStatus("idle");
     setPreview(null);
     setEstimate(null);
+    setEdit(null);
     setErr(null);
     if (inputRef.current) inputRef.current.value = "";
   };
 
+  const num = (s: string, fb: number) => {
+    const n = parseFloat(s);
+    return Number.isFinite(n) && n >= 0 ? Math.round(n) : fb;
+  };
+
   const confirm = () => {
-    if (!estimate) return;
+    if (!estimate || !edit) return;
+    const calories = num(edit.calories, estimate.calories);
+    // Scale minor nutrients with the calorie correction (proportional estimate).
+    const ratio = estimate.calories > 0 ? calories / estimate.calories : 1;
+    const changed =
+      edit.name.trim() !== estimate.name ||
+      calories !== estimate.calories ||
+      num(edit.protein, estimate.protein) !== estimate.protein ||
+      num(edit.carbs, estimate.carbs) !== estimate.carbs ||
+      num(edit.fat, estimate.fat) !== estimate.fat;
     logMeal({
-      name: estimate.name,
-      calories: estimate.calories,
-      protein: estimate.protein,
-      carbs: estimate.carbs,
-      fat: estimate.fat,
-      fiber: estimate.fiber,
-      sodium: estimate.sodium,
-      sugar: estimate.sugar,
+      name: edit.name.trim() || estimate.name,
+      calories,
+      protein: num(edit.protein, estimate.protein),
+      carbs: num(edit.carbs, estimate.carbs),
+      fat: num(edit.fat, estimate.fat),
+      fiber: Math.round(estimate.fiber * ratio),
+      sodium: Math.round(estimate.sodium * ratio),
+      sugar: Math.round(estimate.sugar * ratio),
       source: "photo",
       photo: preview ?? undefined,
+      confidence: "estimated",
+      userConfidence: changed ? "modified" : undefined,
+      note: changed ? "AI estimate corrected by you" : undefined,
     });
     reset();
     setJustLogged(true);
@@ -161,18 +190,23 @@ export function PhotoLogger() {
                 </div>
               )}
 
-              {status === "review" && estimate && (
+              {status === "review" && estimate && edit && (
                 <div>
                   <div className="flex items-start justify-between gap-2">
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold text-ink">{estimate.name}</p>
-                        <span className={cls("rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide", estimate.source === "ai" ? "bg-brand-600 text-white" : "bg-black/[0.06] text-ink/55")}>
-                          {estimate.source === "ai" ? "Groq AI" : "estimate"}
+                        <input
+                          value={edit.name}
+                          onChange={(e) => setEdit({ ...edit, name: e.target.value })}
+                          className="w-full rounded-lg border border-transparent bg-transparent px-1 py-0.5 font-semibold text-ink hover:border-neutral-300 focus:border-brand-600 focus:bg-white focus:outline-none"
+                          aria-label="Meal name — edit if the AI got it wrong"
+                        />
+                        <span className={cls("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide", estimate.source === "ai" ? "bg-brand-600 text-white" : "bg-black/[0.06] text-ink/55")}>
+                          {estimate.source === "ai" ? "AI estimate" : "sample"}
                         </span>
                       </div>
                       <p className="text-xs text-ink/50">
-                        {Math.round(estimate.confidence * 100)}% confidence · not quite right? Retake below.
+                        {Math.round(estimate.confidence * 100)}% confidence · <strong>tap any value to correct it</strong> — you decide what gets logged.
                       </p>
                       {err && (
                         <p className="mt-1 flex items-start gap-1 text-xs text-amber-700">
@@ -187,14 +221,14 @@ export function PhotoLogger() {
                   </div>
 
                   <div className="mt-3 grid grid-cols-4 gap-2 text-center">
-                    <Stat label="Cal" value={estimate.calories} />
-                    <Stat label="Protein" value={`${estimate.protein}g`} />
-                    <Stat label="Carbs" value={`${estimate.carbs}g`} />
-                    <Stat label="Fat" value={`${estimate.fat}g`} />
+                    <EditStat label="Cal" value={edit.calories} onChange={(v) => setEdit({ ...edit, calories: v })} />
+                    <EditStat label="Protein" unit="g" value={edit.protein} onChange={(v) => setEdit({ ...edit, protein: v })} />
+                    <EditStat label="Carbs" unit="g" value={edit.carbs} onChange={(v) => setEdit({ ...edit, carbs: v })} />
+                    <EditStat label="Fat" unit="g" value={edit.fat} onChange={(v) => setEdit({ ...edit, fat: v })} />
                   </div>
 
                   <p className="mt-3 text-xs text-ink/50">
-                    Detected: {estimate.items.join(", ")}
+                    Detected: {estimate.items.join(", ")} — wrong? Fix the name and values above; corrections are recorded with the entry.
                   </p>
 
                   <div className="mt-4 flex gap-2">
@@ -221,11 +255,20 @@ export function PhotoLogger() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string | number }) {
+function EditStat({ label, value, unit, onChange }: { label: string; value: string; unit?: string; onChange: (v: string) => void }) {
   return (
-    <div className="rounded-lg bg-black/[0.03] py-2">
-      <p className="font-display text-lg font-bold text-ink">{value}</p>
-      <p className="text-[11px] uppercase tracking-wide text-ink/45">{label}</p>
-    </div>
+    <label className="block cursor-text rounded-lg bg-black/[0.03] py-2 transition focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-600/40">
+      <span className="relative inline-flex items-baseline justify-center">
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          inputMode="numeric"
+          className="w-14 bg-transparent text-center font-display text-lg font-bold text-ink focus:outline-none"
+          aria-label={`${label} — editable`}
+        />
+        {unit && <span className="text-xs text-ink/40">{unit}</span>}
+      </span>
+      <span className="block text-[11px] uppercase tracking-wide text-ink/45">{label}</span>
+    </label>
   );
 }

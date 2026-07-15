@@ -8,6 +8,9 @@ import { useAuth } from "@/lib/auth";
 import { useUser } from "@/lib/store";
 import {
   ACTIVITY_LABELS,
+  BMI_SCREENING_NOTE,
+  COMMON_ALLERGENS,
+  CONDITIONS,
   GOAL_LABELS,
   bmiInfo,
   computeTargets,
@@ -41,6 +44,8 @@ export default function Profile() {
   const [activity, setActivity] = useState<ActivityLevel>("moderate");
   const [goal, setGoal] = useState<Goal>("lose");
   const [dietary, setDietary] = useState<string[]>([]);
+  const [avoid, setAvoid] = useState<string[]>([]);
+  const [conditions, setConditions] = useState<string[]>([]);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -56,6 +61,8 @@ export default function Profile() {
       setActivity(profile.activity);
       setGoal(profile.goal);
       setDietary(profile.dietary || []);
+      setAvoid(profile.avoid || []);
+      setConditions(profile.conditions || []);
       const inches = cmToIn(profile.heightCm);
       setFt(String(Math.floor(inches / 12)));
       setInch(String(Math.round(inches % 12)));
@@ -68,8 +75,8 @@ export default function Profile() {
   const weightKg = lbToKg(clampNum(lb, 70, 600, 175));
   const ageNum = clampNum(age, 14, 100, 30);
   const draft: HealthProfile = useMemo(
-    () => ({ name, sex, age: ageNum, heightCm, weightKg, activity, goal, dietary, avoid: [], createdAt: profile?.createdAt ?? Date.now() }),
-    [name, sex, ageNum, heightCm, weightKg, activity, goal, dietary, profile?.createdAt],
+    () => ({ name, sex, age: ageNum, heightCm, weightKg, activity, goal, dietary, avoid, conditions, createdAt: profile?.createdAt ?? Date.now() }),
+    [name, sex, ageNum, heightCm, weightKg, activity, goal, dietary, avoid, conditions, profile?.createdAt],
   );
   const targets = computeTargets(draft);
   const bmi = bmiInfo(weightKg, heightCm);
@@ -129,12 +136,19 @@ export default function Profile() {
               </select>
             </Field>
             <Field label="Dietary preferences">
-              <div className="flex flex-wrap gap-2">
-                {DIETS.map((d) => {
-                  const on = dietary.includes(d);
-                  return <button key={d} type="button" onClick={() => setDietary((c) => (on ? c.filter((x) => x !== d) : [...c, d]))} className={cls("rounded-full border px-3.5 py-1.5 text-sm font-medium transition", on ? "border-brand-500 bg-brand-600 text-white" : "border-black/10 bg-white text-ink/70 hover:border-black/20")}>{d}</button>;
-                })}
-              </div>
+              <ChipGroup options={DIETS} value={dietary} onChange={setDietary} />
+            </Field>
+            <Field label="Allergies — dishes that may contain these get flagged">
+              <ChipGroup options={[...COMMON_ALLERGENS]} value={avoid} onChange={setAvoid} />
+              <p className="mt-2 text-xs text-ink/45">
+                Flags are advisories from menu text — never a guarantee. Always confirm allergens directly with the restaurant.
+              </p>
+            </Field>
+            <Field label="Health conditions — adds sodium / sugar / fat advisories to dishes">
+              <ChipGroup options={[...CONDITIONS]} value={conditions} onChange={setConditions} />
+              <p className="mt-2 text-xs text-ink/45">
+                Self-reported, stored only on your device, and used solely to flag dishes. Informational — not medical advice.
+              </p>
             </Field>
             <button onClick={save} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
               {saved ? <><Check className="h-4 w-4" /> Saved</> : <><Save className="h-4 w-4" /> Save changes</>}
@@ -162,12 +176,16 @@ export default function Profile() {
             </div>
             <div className="space-y-5 p-6">
               <div className="flex items-center gap-4">
-                <MacroRing value={bmi.value} max={40} size={100} color={bmi.color} centerTop="BMI" centerMain={String(bmi.value)} centerSub={bmi.category} />
-                <div className="rounded-2xl bg-brand-50 px-4 py-3 text-center">
-                  <p className="font-display text-3xl font-extrabold text-brand-700">{targets.calories}</p>
-                  <p className="text-xs text-brand-700/70">kcal / day</p>
+                <MacroRing value={bmi.value} max={45} size={100} color={bmi.color} centerTop="BMI" centerMain={String(bmi.value)} centerSub="" />
+                <div>
+                  <p className="text-sm font-bold" style={{ color: bmi.color }}>{bmi.category}</p>
+                  <div className="mt-1.5 rounded-2xl bg-brand-50 px-4 py-2.5 text-center">
+                    <p className="font-display text-2xl font-extrabold text-brand-700">{targets.calories}</p>
+                    <p className="text-xs text-brand-700/70">kcal / day</p>
+                  </div>
                 </div>
               </div>
+              <p className="text-[11px] leading-relaxed text-ink/45">{BMI_SCREENING_NOTE}</p>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 {[["Protein", `${targets.protein}g`, "#059669"], ["Carbs", `${targets.carbs}g`, "#0284c7"], ["Fat", `${targets.fat}g`, "#d97706"], ["Fiber", `${targets.fiber}g`, "#65a30d"]].map(([l, v, c]) => (
                   <div key={l} className="flex items-center justify-between rounded-lg bg-black/[0.03] px-3 py-2">
@@ -183,6 +201,30 @@ export default function Profile() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ChipGroup({ options, value, onChange }: { options: string[]; value: string[]; onChange: (v: string[]) => void }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((d) => {
+        const on = value.includes(d);
+        return (
+          <button
+            key={d}
+            type="button"
+            aria-pressed={on}
+            onClick={() => onChange(on ? value.filter((x) => x !== d) : [...value, d])}
+            className={cls(
+              "rounded-full border px-3.5 py-1.5 text-sm font-medium transition",
+              on ? "border-brand-500 bg-brand-600 text-white" : "border-black/10 bg-white text-ink/70 hover:border-black/20",
+            )}
+          >
+            {d}
+          </button>
+        );
+      })}
     </div>
   );
 }

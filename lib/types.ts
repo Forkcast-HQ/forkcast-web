@@ -20,6 +20,7 @@ export interface HealthProfile {
   // Optional preferences
   dietary: string[]; // e.g. ["vegetarian", "gluten-free"]
   avoid: string[]; // allergens / dislikes
+  conditions?: string[]; // self-reported conditions (advisory flags only)
   createdAt: number;
 }
 

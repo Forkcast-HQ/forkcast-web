@@ -12,7 +12,7 @@ import { ArrowLeft, BadgeCheck, Check, Flame, Plus, ShieldAlert, ShoppingBag } f
 import { getRestaurant } from "@/data/restaurants";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
-import { fitScore } from "@/lib/nutrition";
+import { conditionWarnings, fitScore } from "@/lib/nutrition";
 import { correctionsFor } from "@/lib/bus";
 import { flyToBasket } from "@/lib/fly";
 import type { MenuCorrection } from "@/lib/types";
@@ -52,6 +52,9 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
 
   const fit = targets && profile ? fitScore(item, targets, profile.goal) : null;
   const range = restaurant.partner ? RANGE_VERIFIED : RANGE_ESTIMATED;
+  const itemText = `${item.name} ${item.description} ${item.tags.join(" ")}`.toLowerCase();
+  const allergenHits = (profile?.avoid ?? []).filter((a) => itemText.includes(a.toLowerCase()));
+  const condWarns = conditionWarnings(item, profile?.conditions);
   const consumed = hydrated ? consumedToday() : null;
   const remaining = targets && consumed ? Math.max(0, targets.calories - consumed.calories) : null;
   const budgetPct = remaining !== null && remaining > 0 ? Math.round(((item.calories * portion) / remaining) * 100) : null;
@@ -121,6 +124,14 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
             <div className="mt-4">
               <p className="kicker text-ink/45">Why this {fit.score >= 65 ? "fits" : "scores " + fit.score}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
+                {allergenHits.map((a) => (
+                  <span key={a} className="rounded-full border-2 border-brand-600 bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700" title="From menu text — always confirm with the restaurant">
+                    ⚠ May contain {a.toLowerCase()}
+                  </span>
+                ))}
+                {condWarns.map((w) => (
+                  <span key={w} className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">{w}</span>
+                ))}
                 {fit.reasons.map((r) => (
                   <span key={r} className="rounded-full border border-brand-600 bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">{r}</span>
                 ))}

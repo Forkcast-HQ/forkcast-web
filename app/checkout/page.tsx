@@ -17,7 +17,7 @@ import type { Fulfillment } from "@/lib/types";
 
 const OPTIONS: { key: Fulfillment; label: string; desc: string; icon: React.ReactNode }[] = [
   { key: "pickup", label: "Pickup", desc: "Free · collect at the restaurant", icon: <Store className="h-5 w-5" /> },
-  { key: "delivery", label: "Delivery", desc: `${money(DELIVERY_FEE)} fee · via delivery partner`, icon: <Bike className="h-5 w-5" /> },
+  { key: "delivery", label: "Delivery", desc: `${money(DELIVERY_FEE)} fee · via delivery partner ($5–7/order, validated with restaurant owners)`, icon: <Bike className="h-5 w-5" /> },
   { key: "partner", label: "Order through restaurant", desc: "Handoff to the restaurant's own checkout", icon: <Handshake className="h-5 w-5" /> },
 ];
 
