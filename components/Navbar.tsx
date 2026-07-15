@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Menu, X, LayoutDashboard, User, LogOut, ChevronDown, ShoppingBag, ReceiptText } from "lucide-react";
+import { Menu, X, LayoutDashboard, User, LogOut, ChevronDown, ShoppingBag, ReceiptText, ClipboardList } from "lucide-react";
 import { Logo } from "./Logo";
 import { Avatar } from "./Avatar";
 import { useAuth } from "@/lib/auth";
@@ -117,6 +117,7 @@ export function Navbar() {
                   </div>
                   <MenuLink href="/dashboard" icon={<LayoutDashboard className="h-4 w-4" />}>Dashboard</MenuLink>
                   <MenuLink href="/orders" icon={<ReceiptText className="h-4 w-4" />}>Orders</MenuLink>
+                  <MenuLink href="/log" icon={<ClipboardList className="h-4 w-4" />}>Meal log</MenuLink>
                   <MenuLink href="/profile" icon={<User className="h-4 w-4" />}>Profile &amp; settings</MenuLink>
                   <button
                     onClick={() => {

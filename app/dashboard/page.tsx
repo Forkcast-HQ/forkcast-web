@@ -204,7 +204,12 @@ export default function Dashboard() {
         </div>
 
         <div className="rounded-2xl border border-black/5 bg-white p-6">
-          <h2 className="font-display text-lg font-bold text-ink">Logged today</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold text-ink">Logged today</h2>
+            <Link href="/log" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-900">
+              Full log <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
           {today.length === 0 ? (
             <p className="mt-4 text-sm text-ink/50">Nothing logged yet. Snap a photo or add a dish from a restaurant.</p>
           ) : (
