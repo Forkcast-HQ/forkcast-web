@@ -26,6 +26,8 @@ export function Footer() {
             title="Company"
             links={[
               ["For restaurants", "/for-restaurants"],
+              ["Partner terminal (demo)", "/partner"],
+              ["Impact & evidence", "/impact"],
               ["The opportunity", "/business"],
               ["Architecture", "/how-it-works#architecture"],
             ]}

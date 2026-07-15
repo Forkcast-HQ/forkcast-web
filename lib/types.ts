@@ -122,6 +122,38 @@ export interface OrderItem {
 
 export type OrderStatus = "sent" | "accepted" | "preparing" | "ready";
 
+// Cross-surface sync (design-handoff protocol; localStorage is the prototype
+// transport — replace with a real backend channel in production)
+export interface LiveOrderBus {
+  orderId: string;
+  ref: string;
+  slug: string;
+  restName: string;
+  customer: string;
+  placedAt: number;
+  fulfill: Fulfillment;
+  items: { itemId: string; name: string; qty: number; price: number; calories: number; note?: string }[];
+  flags: string[]; // allergy / diet notices for the kitchen
+  status: OrderStatus;
+  prepMin?: number;
+  claimed: boolean; // a terminal has taken over status updates
+  ts: number;
+}
+
+// Versioned, timestamped menu correction (never silent)
+export interface MenuCorrection {
+  id: string;
+  slug: string;
+  itemId: string;
+  dishName: string;
+  field: "calories" | "protein" | "carbs" | "fat" | "fiber" | "sodium" | "sugar";
+  oldValue: number;
+  newValue: number;
+  version: number;
+  correctedAt: number;
+  source: "restaurant-demo"; // demo terminal on this device — no restaurant is authorized yet
+}
+
 export interface Order {
   id: string;
   ref: string; // human order reference, e.g. "F-1042"

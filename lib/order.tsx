@@ -23,6 +23,8 @@ import type { CartLine, Fulfillment, Order, OrderItem, OrderStatus } from "./typ
 import { getRestaurant } from "@/data/restaurants";
 import { uid } from "./format";
 import { useAuth } from "./auth";
+import { useUser } from "./store";
+import { readBus, writeBus } from "./bus";
 
 export const DELIVERY_FEE = 5.99;
 export const MA_MEALS_TAX = 0.07; // Massachusetts meals tax
@@ -32,7 +34,12 @@ const SIM_ACCEPT_MS = 8_000;
 const SIM_PREP_MS = 25_000;
 const SIM_READY_MS = 55_000;
 
+// Live status: if a partner terminal has claimed this order on the sync bus,
+// its updates drive the timeline. Otherwise fall back to the labeled
+// time-based simulation.
 export function orderStatus(o: Order, now = Date.now()): OrderStatus {
+  const bus = readBus();
+  if (bus && bus.orderId === o.id && bus.claimed) return bus.status;
   const age = now - o.placedAt;
   if (age >= SIM_READY_MS) return "ready";
   if (age >= SIM_PREP_MS) return "preparing";
@@ -77,6 +84,7 @@ const Ctx = createContext<OrderStoreValue | null>(null);
 
 export function OrderProvider({ children }: { children: React.ReactNode }) {
   const { user, hydrated: authHydrated } = useAuth();
+  const { profile } = useUser();
   const userId = user?.id ?? null;
 
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -218,9 +226,43 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       setOrders((prev) => [...prev, order]);
       setCart([]);
       setNow(Date.now());
+
+      // Publish to the sync bus so a partner terminal can claim it.
+      // Kitchen flags: profile allergens / dietary preferences vs item text.
+      const flags: string[] = [];
+      const menuById = new Map(r.menu.map((m) => [m.id, m]));
+      for (const it of items) {
+        const m = menuById.get(it.itemId);
+        const text = `${it.name} ${m?.description ?? ""} ${(m?.tags ?? []).join(" ")}`.toLowerCase();
+        for (const a of profile?.avoid ?? []) {
+          if (text.includes(a.toLowerCase())) {
+            flags.push(`${a} allergy on the customer's profile — ${it.name} may contain ${a.toLowerCase()}. Confirm before preparing.`);
+          }
+        }
+        for (const d of profile?.dietary ?? []) {
+          if (!(m?.tags ?? []).map((t) => t.toLowerCase()).includes(d.toLowerCase())) {
+            flags.push(`Customer prefers ${d} — ${it.name} is not tagged ${d}. Preference conflict acknowledged by the customer.`);
+          }
+        }
+        if (it.note) flags.push(`Request for ${it.name}: "${it.note}"`);
+      }
+      writeBus({
+        orderId: order.id,
+        ref: order.ref,
+        slug,
+        restName: r.name,
+        customer: profile?.name || user?.name || "Forkcast diner",
+        placedAt: order.placedAt,
+        fulfill,
+        items: items.map((it) => ({ itemId: it.itemId, name: it.name, qty: it.qty, price: it.price, calories: it.calories, note: it.note })),
+        flags,
+        status: "sent",
+        claimed: false,
+        ts: Date.now(),
+      });
       return order;
     },
-    [cart, cartItems],
+    [cart, cartItems, profile, user],
   );
 
   const markLogged = useCallback((orderId: string, dismissed = false) => {

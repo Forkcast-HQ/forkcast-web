@@ -5,7 +5,7 @@
 // nutrient rows with bars and ± range, source/confidence line, allergen
 // disclaimer, budget line, add-to-order.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, BadgeCheck, Check, Flame, Plus, ShieldAlert, ShoppingBag } from "lucide-react";
@@ -13,6 +13,8 @@ import { getRestaurant } from "@/data/restaurants";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
 import { fitScore } from "@/lib/nutrition";
+import { correctionsFor } from "@/lib/bus";
+import type { MenuCorrection } from "@/lib/types";
 import { FitBadge } from "@/components/FitBadge";
 import { SmartImage } from "@/components/SmartImage";
 import { categoryImg } from "@/lib/images";
@@ -31,6 +33,11 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
   const { addToCart } = useOrder();
   const [inCart, setInCart] = useState(false);
   const [logged, setLogged] = useState(false);
+  const [corrections, setCorrections] = useState<MenuCorrection[]>([]);
+
+  useEffect(() => {
+    setCorrections(correctionsFor(slug, id));
+  }, [slug, id]);
 
   if (!restaurant || !item) {
     return (
@@ -203,13 +210,32 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
             </p>
           </div>
 
-          {/* Correction history — honest empty state until real corrections exist */}
+          {/* Correction history — versioned, timestamped, never silent */}
           <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
             <p className="kicker text-ink/45">Correction history</p>
-            <p className="mt-1.5 text-xs text-ink/55">
-              No corrections recorded for this dish yet. When a restaurant or diner corrects a value, each change is
-              logged here with a timestamp and version — never silently.
-            </p>
+            {corrections.length === 0 ? (
+              <p className="mt-1.5 text-xs text-ink/55">
+                No corrections recorded for this dish yet. When a restaurant or diner corrects a value, each change is
+                logged here with a timestamp and version — never silently.
+              </p>
+            ) : (
+              <>
+                <ul className="mt-2 space-y-1.5">
+                  {corrections.map((c) => (
+                    <li key={c.id} className="rounded-lg bg-black/[0.03] px-3 py-2 text-xs text-ink/70">
+                      {c.field}: {c.oldValue.toLocaleString()} → <strong>{c.newValue.toLocaleString()}</strong>
+                      <span className="ml-1 text-ink/45">
+                        · v{c.version} · {new Date(c.correctedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })} · restaurant (demo)
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-2 text-[10px] text-ink/45">
+                  Demo corrections recorded on this device via the partner terminal. In production, approved corrections
+                  update the published values.
+                </p>
+              </>
+            )}
           </div>
         </aside>
       </div>
