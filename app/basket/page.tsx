@@ -14,7 +14,7 @@ import { money, cls, pct } from "@/lib/format";
 export default function BasketPage() {
   const router = useRouter();
   const { targets, consumedToday, hydrated: userHydrated } = useUser();
-  const { hydrated, cartItems, cartTotals, changeQty, clearCart, cartRestaurantSlug } = useOrder();
+  const { hydrated, cartItems, cartTotals, changeQty, setLineNote, clearCart, cartRestaurantSlug } = useOrder();
 
   if (!hydrated || !userHydrated) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
 
@@ -70,19 +70,33 @@ export default function BasketPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-3">
           {items.map((it) => (
-            <div key={it.itemId} className="flex items-center gap-4 rounded-2xl border border-black/5 bg-white p-4">
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-ink">{it.name}</p>
-                <p className="mt-0.5 text-xs text-ink/50">
-                  {it.calories} cal · {it.protein}g P · {it.carbs}g C · {it.fat}g F
+            <div key={it.itemId} className="rounded-2xl border border-black/5 bg-white p-4">
+              <div className="flex items-center gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-ink">{it.name}</p>
+                  <p className="mt-0.5 text-xs text-ink/50">
+                    {it.calories} cal · {it.protein}g P · {it.carbs}g C · {it.fat}g F
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <QtyBtn onClick={() => changeQty(it.itemId, -1)}><Minus className="h-4 w-4" /></QtyBtn>
+                  <span className="w-6 text-center font-bold tabular-nums text-ink">{it.qty}</span>
+                  <QtyBtn onClick={() => changeQty(it.itemId, 1)}><Plus className="h-4 w-4" /></QtyBtn>
+                </div>
+                <span className="w-16 text-right font-semibold text-ink">{money(it.price * it.qty)}</span>
+              </div>
+              <input
+                value={it.line.note ?? ""}
+                onChange={(e) => setLineNote(it.itemId, e.target.value)}
+                placeholder="Substitution or request — e.g. dressing on the side, no feta"
+                className="mt-3 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm text-ink placeholder:text-ink/35 focus:border-brand-600 focus:outline-none"
+              />
+              {it.line.note && (
+                <p className="mt-1.5 text-[11px] text-ink/45">
+                  Sent to the restaurant with the order. Substitutions can change nutrition — you can adjust the logged
+                  portion after the meal.
                 </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <QtyBtn onClick={() => changeQty(it.itemId, -1)}><Minus className="h-4 w-4" /></QtyBtn>
-                <span className="w-6 text-center font-bold tabular-nums text-ink">{it.qty}</span>
-                <QtyBtn onClick={() => changeQty(it.itemId, 1)}><Plus className="h-4 w-4" /></QtyBtn>
-              </div>
-              <span className="w-16 text-right font-semibold text-ink">{money(it.price * it.qty)}</span>
+              )}
             </div>
           ))}
 

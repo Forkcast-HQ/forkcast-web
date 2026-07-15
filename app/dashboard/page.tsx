@@ -86,12 +86,14 @@ export default function Dashboard() {
     });
   }, [weights, profile]);
 
+  // Next best meals nearby — top-3 shortlist (design handoff: dashboard spec)
   const recommended = useMemo(() => {
-    if (!targets || !profile) return null;
-    const best = allMenuItems()
+    if (!targets || !profile) return [];
+    return allMenuItems()
       .map((m) => ({ m, fit: fitScore(m, targets, profile.goal).score }))
-      .sort((a, b) => b.fit - a.fit)[0];
-    return best?.m ?? null;
+      .sort((a, b) => b.fit - a.fit)
+      .slice(0, 3)
+      .map((x) => x.m);
   }, [targets, profile]);
 
   if (!authHydrated || !hydrated) {
@@ -138,6 +140,9 @@ export default function Dashboard() {
               <Flame className="h-4 w-4" /> {days}-day streak
             </span>
           )}
+          <Link href="/orders" className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-5 py-2.5 text-sm font-semibold text-ink hover:border-ink">
+            <ShoppingBag className="h-4 w-4" /> Orders
+          </Link>
           <Link href="/discover" className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">
             <Sparkles className="h-4 w-4" /> Find a meal
           </Link>
@@ -145,7 +150,7 @@ export default function Dashboard() {
       </div>
 
       {/* Coach */}
-      <div className="mt-6 flex items-start gap-3 rounded-2xl border border-brand-200 bg-gradient-to-r from-brand-50 to-white p-4">
+      <div className="mt-6 flex items-start gap-3 rounded-2xl border border-brand-200 bg-brand-50 p-4">
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-600 text-white"><Sparkles className="h-4 w-4" /></span>
         <p className="text-sm text-ink/80"><span className="font-semibold text-brand-700">Coach:</span> {tip}</p>
       </div>
@@ -159,8 +164,8 @@ export default function Dashboard() {
             <div className="w-full flex-1 space-y-4">
               <MacroBar label="Protein" value={consumed!.protein} max={targets.protein} color="#ec3013" />
               <MacroBar label="Carbs" value={consumed!.carbs} max={targets.carbs} color="#7d7979" />
-              <MacroBar label="Fat" value={consumed!.fat} max={targets.fat} color="#d97706" />
-              <MacroBar label="Fiber" value={consumed!.fiber} max={targets.fiber} color="#65a30d" />
+              <MacroBar label="Fat" value={consumed!.fat} max={targets.fat} color="#e0853a" />
+              <MacroBar label="Fiber" value={consumed!.fiber} max={targets.fiber} color="#4a7c59" />
               <div className="flex justify-between pt-1 text-xs text-ink/50">
                 <span>Sodium {consumed!.sodium}mg</span>
                 <span>Sugar {consumed!.sugar}g</span>
@@ -187,8 +192,12 @@ export default function Dashboard() {
             <Sparkles className="h-5 w-5 text-brand-600" />
             <h2 className="font-display text-lg font-bold text-ink">Recommended for the rest of your day</h2>
           </div>
-          {recommended ? (
-            <MenuItemCard item={recommended} restaurantSlug={(recommended as any).restaurantSlug} restaurantName={(recommended as any).restaurantName} />
+          {recommended.length ? (
+            <div className="space-y-3">
+              {recommended.map((m, i) => (
+                <MenuItemCard key={m.id} item={m} restaurantSlug={(m as any).restaurantSlug} restaurantName={(m as any).restaurantName} seed={i} />
+              ))}
+            </div>
           ) : (
             <p className="text-sm text-ink/50">Set your goals to get recommendations.</p>
           )}

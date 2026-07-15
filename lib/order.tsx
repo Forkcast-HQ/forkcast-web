@@ -62,6 +62,7 @@ interface OrderStoreValue {
   cartCount: number;
   addToCart: (slug: string, itemId: string) => void;
   changeQty: (itemId: string, delta: number) => void;
+  setLineNote: (itemId: string, note: string) => void;
   clearCart: () => void;
   placeOrder: (fulfill: Fulfillment) => Order | null;
   markLogged: (orderId: string, dismissed?: boolean) => void;
@@ -143,6 +144,12 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = useCallback(() => setCart([]), []);
 
+  const setLineNote = useCallback((itemId: string, note: string) => {
+    setCart((prev) =>
+      prev.map((l) => (l.itemId === itemId ? { ...l, note: note || undefined } : l)),
+    );
+  }, []);
+
   const cartItems = useCallback((): (OrderItem & { line: CartLine })[] => {
     return cart.flatMap((line) => {
       const r = getRestaurant(line.slug);
@@ -155,6 +162,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
           name: m.name,
           price: m.price,
           qty: line.qty,
+          note: line.note,
           calories: m.calories,
           protein: m.protein,
           carbs: m.carbs,
@@ -226,7 +234,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const reorder = useCallback((orderId: string) => {
     setOrders((prev) => {
       const o = prev.find((x) => x.id === orderId);
-      if (o) setCart(o.items.map((it) => ({ slug: o.slug, itemId: it.itemId, qty: it.qty })));
+      if (o) setCart(o.items.map((it) => ({ slug: o.slug, itemId: it.itemId, qty: it.qty, note: it.note })));
       return prev;
     });
   }, []);
@@ -249,6 +257,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       cartCount,
       addToCart,
       changeQty,
+      setLineNote,
       clearCart,
       placeOrder,
       markLogged,
@@ -258,7 +267,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       cartTotals,
       now,
     }),
-    [cart, orders, hydrated, cartRestaurantSlug, cartCount, addToCart, changeQty, clearCart, placeOrder, markLogged, reorder, activeOrder, cartItems, cartTotals, now],
+    [cart, orders, hydrated, cartRestaurantSlug, cartCount, addToCart, changeQty, setLineNote, clearCart, placeOrder, markLogged, reorder, activeOrder, cartItems, cartTotals, now],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

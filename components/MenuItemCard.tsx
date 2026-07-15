@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Check, Flame, Plus, MapPin, ShoppingBag } from "lucide-react";
 import type { MenuItem } from "@/lib/types";
 import { useUser } from "@/lib/store";
@@ -71,7 +72,11 @@ export function MenuItemCard({
 
   return (
     <article className="interactive-card group flex gap-3 rounded-2xl border border-black/[0.07] bg-white p-3 sm:gap-4 sm:p-4">
-      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28">
+      <Link
+        href={`/restaurant/${restaurantSlug}/dish/${item.id}`}
+        className="relative block h-24 w-24 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28"
+        aria-label={`${item.name} — details`}
+      >
         <SmartImage
           src={categoryImg(item.category, seed)}
           alt={item.name}
@@ -83,7 +88,7 @@ export function MenuItemCard({
             <FitBadge score={fit.score} size="sm" />
           </div>
         )}
-      </div>
+      </Link>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
@@ -94,7 +99,11 @@ export function MenuItemCard({
                 {restaurantName}
               </p>
             )}
-            <h3 className="truncate font-display text-[1.05rem] font-bold text-ink">{item.name}</h3>
+            <h3 className="truncate font-display text-[1.05rem] font-bold text-ink">
+              <Link href={`/restaurant/${restaurantSlug}/dish/${item.id}`} className="hover:text-brand-700">
+                {item.name}
+              </Link>
+            </h3>
             <p className="mt-0.5 line-clamp-2 text-sm text-ink/55">{item.description}</p>
           </div>
           <span className="shrink-0 font-semibold text-ink">{money(item.price)}</span>

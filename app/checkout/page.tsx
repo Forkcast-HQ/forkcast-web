@@ -106,9 +106,12 @@ export default function CheckoutPage() {
             <h2 className="font-display text-lg font-bold text-ink">Summary</h2>
             <div className="mt-4 space-y-2 text-sm">
               {items.map((it) => (
-                <div key={it.itemId} className="flex justify-between gap-3 text-ink/70">
-                  <span className="min-w-0 truncate">{it.qty}× {it.name}</span>
-                  <span className="shrink-0 tabular-nums">{money(it.price * it.qty)}</span>
+                <div key={it.itemId}>
+                  <div className="flex justify-between gap-3 text-ink/70">
+                    <span className="min-w-0 truncate">{it.qty}× {it.name}</span>
+                    <span className="shrink-0 tabular-nums">{money(it.price * it.qty)}</span>
+                  </div>
+                  {it.note && <p className="text-xs italic text-ink/45">“{it.note}”</p>}
                 </div>
               ))}
               <div className="border-t border-black/5 pt-2" />

@@ -100,9 +100,12 @@ function OrderView({ order, now }: { order: Order; now: number }) {
 
           <div className="mt-6 border-t border-black/5 pt-4 text-sm text-ink/60">
             {order.items.map((it) => (
-              <div key={it.itemId} className="flex justify-between py-1">
-                <span>{it.qty}× {it.name}</span>
-                <span className="tabular-nums">{it.calories * it.qty} cal</span>
+              <div key={it.itemId} className="py-1">
+                <div className="flex justify-between">
+                  <span>{it.qty}× {it.name}</span>
+                  <span className="tabular-nums">{it.calories * it.qty} cal</span>
+                </div>
+                {it.note && <p className="text-xs italic text-ink/45">“{it.note}”</p>}
               </div>
             ))}
             <div className="mt-2 flex justify-between border-t border-black/5 pt-2 font-semibold text-ink">
@@ -169,7 +172,7 @@ function LogCard({ order }: { order: Order }) {
         orderRef: order.ref,
         portion: f,
         confidence,
-        note: note.trim() || undefined,
+        note: [it.note && `Sub: ${it.note}`, note.trim()].filter(Boolean).join(" · ") || undefined,
       });
     });
     markLogged(order.id);

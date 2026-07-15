@@ -100,6 +100,7 @@ export interface CartLine {
   slug: string; // restaurant slug (one restaurant per basket)
   itemId: string;
   qty: number;
+  note?: string; // substitution / preparation request
 }
 
 export interface OrderItem {
@@ -107,6 +108,8 @@ export interface OrderItem {
   name: string;
   price: number;
   qty: number;
+  note?: string; // substitution / preparation request
+
   calories: number;
   protein: number;
   carbs: number;
