@@ -128,17 +128,28 @@ function OrderView({ order, now }: { order: Order; now: number }) {
   );
 }
 
+const USER_CONFIDENCE = [
+  { key: "as-served" as const, label: "Ate as served", hint: "Values apply as-is" },
+  { key: "modified" as const, label: "Modified", hint: "Substitutions or additions changed it" },
+  { key: "unsure" as const, label: "Not sure", hint: "Shared, mixed, or hard to judge" },
+];
+
 function LogCard({ order }: { order: Order }) {
   const router = useRouter();
-  const { logMeal } = useUser();
+  const { logMeal, targets, consumedToday } = useUser();
   const { markLogged } = useOrder();
   const [portions, setPortions] = useState<Record<string, number>>(
     () => Object.fromEntries(order.items.map((it) => [it.itemId, 1])),
   );
   const [note, setNote] = useState("");
+  const [userConf, setUserConf] = useState<"as-served" | "modified" | "unsure">(
+    order.items.some((it) => it.note) ? "modified" : "as-served",
+  );
 
   const bump = (id: string, d: number) =>
     setPortions((p) => ({ ...p, [id]: Math.max(0, Math.min(2, Math.round(((p[id] ?? 1) + d) * 4) / 4)) }));
+
+  const setPortion = (id: string, v: number) => setPortions((p) => ({ ...p, [id]: v }));
 
   const totals = useMemo(() => {
     return order.items.reduce(
@@ -149,6 +160,9 @@ function LogCard({ order }: { order: Order }) {
       { cal: 0, p: 0 },
     );
   }, [order.items, portions]);
+
+  const consumed = consumedToday();
+  const afterRemaining = targets ? Math.round(targets.calories - consumed.calories - totals.cal) : null;
 
   const confirm = () => {
     const confidence = order.partner ? "partner-verified" : "estimated";
@@ -172,6 +186,7 @@ function LogCard({ order }: { order: Order }) {
         orderRef: order.ref,
         portion: f,
         confidence,
+        userConfidence: userConf,
         note: [it.note && `Sub: ${it.note}`, note.trim()].filter(Boolean).join(" · ") || undefined,
       });
     });
@@ -209,29 +224,74 @@ function LogCard({ order }: { order: Order }) {
                 <p className="min-w-0 truncate text-sm font-semibold text-ink">{it.qty > 1 ? `${it.qty}× ` : ""}{it.name}</p>
                 <span className="shrink-0 text-xs tabular-nums text-ink/50">{Math.round(it.calories * it.qty * f)} cal</span>
               </div>
+              {it.note && <p className="mt-1 text-xs italic text-ink/45">Sub: “{it.note}”</p>}
               <div className="mt-2 flex items-center gap-2">
                 <span className="text-xs text-ink/50">Portion eaten</span>
                 <div className="ml-auto flex items-center gap-1.5">
-                  <button onClick={() => bump(it.itemId, -0.25)} className="grid h-7 w-7 place-items-center rounded-full bg-black/5 text-ink/70 hover:bg-black/10"><Minus className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => bump(it.itemId, -0.25)} aria-label="Less" className="grid h-7 w-7 place-items-center rounded-full bg-black/5 text-ink/70 hover:bg-black/10"><Minus className="h-3.5 w-3.5" /></button>
                   <span className="w-12 text-center text-sm font-bold tabular-nums text-ink">{f === 0 ? "none" : `${f}×`}</span>
-                  <button onClick={() => bump(it.itemId, 0.25)} className="grid h-7 w-7 place-items-center rounded-full bg-black/5 text-ink/70 hover:bg-black/10"><Plus className="h-3.5 w-3.5" /></button>
+                  <button onClick={() => bump(it.itemId, 0.25)} aria-label="More" className="grid h-7 w-7 place-items-center rounded-full bg-black/5 text-ink/70 hover:bg-black/10"><Plus className="h-3.5 w-3.5" /></button>
                 </div>
+              </div>
+              <div className="mt-2 flex gap-1.5">
+                {[{ v: 0, l: "None" }, { v: 0.5, l: "Half" }, { v: 1, l: "All" }, { v: 1.5, l: "1.5×" }].map((p) => (
+                  <button
+                    key={p.v}
+                    onClick={() => setPortion(it.itemId, p.v)}
+                    className={cls(
+                      "flex-1 rounded-full border px-2 py-1 text-[11px] font-bold transition",
+                      f === p.v ? "border-ink bg-ink text-white" : "border-neutral-300 bg-white text-ink/60 hover:border-ink/50",
+                    )}
+                  >
+                    {p.l}
+                  </button>
+                ))}
               </div>
             </div>
           );
         })}
       </div>
 
+      {/* Diner confidence — recorded with the entry (evidence metadata) */}
+      <div className="mt-4">
+        <p className="kicker text-ink/45">How close is this to what you ate?</p>
+        <div className="mt-2 flex gap-1.5">
+          {USER_CONFIDENCE.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => setUserConf(c.key)}
+              title={c.hint}
+              className={cls(
+                "flex-1 rounded-xl border-2 px-2 py-2 text-xs font-bold transition",
+                userConf === c.key ? "border-ink bg-black/[0.03] text-ink" : "border-neutral-300 bg-white text-ink/55 hover:border-ink/40",
+              )}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <input
         value={note}
         onChange={(e) => setNote(e.target.value)}
-        placeholder="Substitutions or changes (optional)"
+        placeholder="Anything else that changed (optional)"
         className="mt-3 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-ink placeholder:text-ink/35 focus:border-brand-500 focus:outline-none"
       />
 
-      <div className="mt-3 flex items-baseline justify-between text-sm">
-        <span className="text-ink/55">Will log</span>
-        <span className="font-bold tabular-nums text-ink">{Math.round(totals.cal)} cal · {Math.round(totals.p)}g protein</span>
+      <div className="mt-3 space-y-1 border-t border-black/5 pt-3 text-sm">
+        <div className="flex items-baseline justify-between">
+          <span className="text-ink/55">Will log</span>
+          <span className="font-bold tabular-nums text-ink">{Math.round(totals.cal)} cal · {Math.round(totals.p)}g protein</span>
+        </div>
+        {afterRemaining !== null && (
+          <div className="flex items-baseline justify-between text-xs">
+            <span className="text-ink/45">Day after logging</span>
+            <span className={cls("font-semibold tabular-nums", afterRemaining < 0 ? "text-amber-700" : "text-ink/70")}>
+              {afterRemaining < 0 ? `${Math.abs(afterRemaining)} cal over budget` : `${afterRemaining} cal left`}
+            </span>
+          </div>
+        )}
       </div>
 
       <button onClick={confirm} className="mt-3 w-full rounded-full bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700">

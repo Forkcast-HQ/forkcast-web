@@ -89,6 +89,7 @@ export interface LoggedMeal {
   orderRef?: string; // e.g. "F-1042"
   portion?: number; // fraction consumed, 1 = full serving
   confidence?: "partner-verified" | "estimated"; // nutrition-data confidence
+  userConfidence?: "as-served" | "modified" | "unsure"; // diner's own confidence in the entry
   note?: string; // substitutions / user corrections
 }
 

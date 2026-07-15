@@ -221,6 +221,7 @@ export default function Dashboard() {
                       {m.source === "order" && m.orderRef ? ` · Order ${m.orderRef}` : ""}
                       {m.confidence ? ` · ${m.confidence === "partner-verified" ? "verified" : "estimated"}` : ""}
                       {m.portion && m.portion !== 1 ? ` · ${m.portion}× portion` : ""}
+                      {m.userConfidence && m.userConfidence !== "as-served" ? ` · ${m.userConfidence === "modified" ? "modified" : "low confidence"}` : ""}
                     </p>
                   </div>
                   <button onClick={() => removeMeal(m.id)} className="rounded-lg p-1.5 text-ink/30 transition hover:bg-red-50 hover:text-red-500">
