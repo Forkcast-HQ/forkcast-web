@@ -92,16 +92,14 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const [loadedFor, setLoadedFor] = useState<string | null | undefined>(undefined);
   const [now, setNow] = useState(() => Date.now());
 
+  // Guests get a persistent basket too ("guest" key) — otherwise any full
+  // page load wipes an unauthenticated basket and checkout bounces to empty.
+  const storeId = userId ?? "guest";
+
   useEffect(() => {
     if (!authHydrated) return;
-    if (!userId) {
-      setCart([]);
-      setOrders([]);
-      setLoadedFor(null);
-      return;
-    }
     try {
-      const raw = localStorage.getItem(ordersKey(userId));
+      const raw = localStorage.getItem(ordersKey(storeId));
       const p: PersistShape | null = raw ? JSON.parse(raw) : null;
       setCart(p?.cart ?? []);
       setOrders(p?.orders ?? []);
@@ -109,17 +107,17 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       setCart([]);
       setOrders([]);
     }
-    setLoadedFor(userId);
-  }, [userId, authHydrated]);
+    setLoadedFor(storeId);
+  }, [storeId, authHydrated]);
 
   useEffect(() => {
-    if (!authHydrated || !userId || loadedFor !== userId) return;
+    if (!authHydrated || loadedFor !== storeId) return;
     try {
-      localStorage.setItem(ordersKey(userId), JSON.stringify({ cart, orders }));
+      localStorage.setItem(ordersKey(storeId), JSON.stringify({ cart, orders }));
     } catch {
       /* ignore */
     }
-  }, [cart, orders, userId, authHydrated, loadedFor]);
+  }, [cart, orders, storeId, authHydrated, loadedFor]);
 
   // Tick while any order is still progressing or awaiting log confirmation.
   const hasLive = orders.some(

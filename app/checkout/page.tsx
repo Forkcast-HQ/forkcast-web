@@ -26,14 +26,29 @@ export default function CheckoutPage() {
   const { hydrated, cartItems, cartTotals, cartRestaurantSlug, placeOrder } = useOrder();
   const [fulfill, setFulfill] = useState<Fulfillment>("pickup");
   const [payMethod, setPayMethod] = useState<"Forkcast Pay" | "Card">("Forkcast Pay");
+  const [placed, setPlaced] = useState(false);
 
   if (!hydrated) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
 
   const items = cartItems();
   const rest = cartRestaurantSlug ? getRestaurant(cartRestaurantSlug) : null;
   if (!items.length || !rest) {
-    router.replace("/basket");
-    return <Shell><p className="py-20 text-center text-ink/40">Redirecting…</p></Shell>;
+    // placeOrder clears the basket — don't let the empty-basket state race
+    // the navigation to the tracking page.
+    if (placed) {
+      return <Shell><p className="py-20 text-center text-ink/40">Order placed — opening tracking…</p></Shell>;
+    }
+    return (
+      <Shell>
+        <div className="py-20 text-center">
+          <h1 className="font-display text-2xl font-bold text-ink">Nothing to check out</h1>
+          <p className="mt-2 text-ink/55">Your basket is empty.</p>
+          <Link href="/discover" className="mt-6 inline-flex items-center rounded-full bg-brand-600 px-5 py-2.5 font-semibold text-white hover:bg-brand-700">
+            Discover restaurants
+          </Link>
+        </div>
+      </Shell>
+    );
   }
 
   const t = cartTotals();
@@ -43,7 +58,10 @@ export default function CheckoutPage() {
 
   const submit = () => {
     const order = placeOrder(fulfill);
-    if (order) router.push("/order");
+    if (order) {
+      setPlaced(true);
+      router.push("/order");
+    }
   };
 
   return (
