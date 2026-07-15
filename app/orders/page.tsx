@@ -43,7 +43,7 @@ export default function OrdersPage() {
                     <p className="flex flex-wrap items-center gap-2 font-semibold text-ink">
                       {o.ref} · {o.restaurantName}
                       {live && <span className="animate-pulse rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700">Live · {status}</span>}
-                      {o.logged && <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">Logged to day</span>}
+                      {o.logged && <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700">Logged to day</span>}
                       {o.dismissedLog && <span className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] font-semibold text-ink/50">Not logged</span>}
                     </p>
                     <p className="mt-1 text-xs text-ink/50">

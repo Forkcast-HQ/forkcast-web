@@ -91,7 +91,27 @@ export function RestaurantDetail({ slug }: { slug: string }) {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <p className="max-w-3xl text-lg leading-relaxed text-ink/65">{restaurant.blurb}</p>
+        {/* Provenance line — nutrition-data source + confidence (design handoff) */}
+        <div className="flex flex-wrap items-center gap-2 border-b-2 border-ink/40 pb-4">
+          {restaurant.partner ? (
+            <>
+              <span className="inline-flex items-center gap-1 rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white">
+                <BadgeCheck className="h-3.5 w-3.5" /> Partner-verified menu data
+              </span>
+              <span className="text-xs text-ink/55">Nutrition reviewed with the restaurant · corrections are versioned and timestamped</span>
+            </>
+          ) : (
+            <>
+              <span className="rounded-full border border-neutral-400 px-2.5 py-1 text-[11px] font-bold text-ink/70">
+                Estimated from menu
+              </span>
+              <span className="text-xs text-ink/55">Values carry a ± range · not yet verified by this restaurant</span>
+            </>
+          )}
+          <span className="ml-auto text-xs text-ink/45">Allergens: always confirm with the restaurant</span>
+        </div>
+
+        <p className="mt-5 max-w-3xl text-lg leading-relaxed text-ink/65">{restaurant.blurb}</p>
         <div className="mt-3 flex max-w-3xl items-start gap-2 text-xs leading-relaxed text-ink/45">
           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-600" />
           <p>This pilot listing uses demonstration menu and nutrition data. Confirm current ingredients, allergens, pricing, and availability with the restaurant.</p>

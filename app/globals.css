@@ -1,48 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;0,900;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,700&display=swap');
 @import "tailwindcss";
 
+/*
+  Forkcast — Modernist design system (from the Claude Design handoff).
+  Canonical tokens: _ds/modernist/styles.css in design_handoff_forkcast/.
+  Ground #f3f2f2 · ink #201e1d · accent #ec3013 · accent-700 #ae1800 (accent
+  body text) · warm neutral ramp · Archivo everywhere (headings 800) ·
+  2px dividers · 12–16px radii (deliberate override of the DS zero-radius
+  rule) · pill tags · kickers 10px uppercase +0.1em.
+*/
+
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-display: "Fraunces", Georgia, "Times New Roman", ui-serif, serif;
+  --font-sans: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Archivo", system-ui, sans-serif;
 
-  /* Brand = terracotta (Warm Editorial) */
-  --color-brand-50: #fcf3ef;
-  --color-brand-100: #f9e3d9;
-  --color-brand-200: #f2c6b3;
-  --color-brand-300: #e9a488;
-  --color-brand-400: #e58661;
-  --color-brand-500: #e2613e;
-  --color-brand-600: #c24b2c;
-  --color-brand-700: #9e3b24;
-  --color-brand-800: #7c2f1f;
-  --color-brand-900: #58241a;
-  --color-brand-950: #2a1810;
+  /* Brand = Modernist accent ramp (red). brand-600 is the primary accent. */
+  --color-brand-50: #fff2ef;
+  --color-brand-100: #ffe0d9;
+  --color-brand-200: #ffc4b8;
+  --color-brand-300: #ff9783;
+  --color-brand-400: #ff563c;
+  --color-brand-500: #ff563c;
+  --color-brand-600: #ec3013;
+  --color-brand-700: #ae1800;
+  --color-brand-800: #7c1405;
+  --color-brand-900: #4d170e;
+  --color-brand-950: #201e1d;
 
-  /* Secondary = sage */
-  --color-sage-50: #f1f4ef;
-  --color-sage-100: #e3ebde;
-  --color-sage-200: #c8d6c0;
-  --color-sage-300: #a7bd9d;
-  --color-sage-400: #87a37b;
-  --color-sage-500: #6f8f6a;
-  --color-sage-600: #577353;
-  --color-sage-700: #455c42;
+  /* Secondary (was sage) = warm neutral ramp */
+  --color-sage-50: #f8f4f4;
+  --color-sage-100: #eae7e7;
+  --color-sage-200: #d7d3d3;
+  --color-sage-300: #bab6b6;
+  --color-sage-400: #9b9797;
+  --color-sage-500: #7d7979;
+  --color-sage-600: #605d5d;
+  --color-sage-700: #444141;
 
-  --color-amber-accent: #e0853a;
-  --color-ink: #20160f;
-  --color-cream: #f7f4ec;
+  /* Neutral ramp (direct Modernist tokens) */
+  --color-neutral-100: #f8f4f4;
+  --color-neutral-200: #eae7e7;
+  --color-neutral-300: #d7d3d3;
+  --color-neutral-400: #bab6b6;
+  --color-neutral-500: #9b9797;
+  --color-neutral-600: #7d7979;
+  --color-neutral-700: #605d5d;
+  --color-neutral-800: #444141;
+  --color-neutral-900: #2d2b2b;
+
+  --color-amber-accent: #e0853a; /* warnings/over-budget — accent red stays "good fit" */
+  --color-ink: #201e1d;
+  --color-cream: #f3f2f2;
 }
 
 :root {
-  --bg: #f7f4ec;
-  --surface: #fffdf8;
+  --bg: #f3f2f2;
+  --surface: #f8f4f4;
   --surface-strong: #ffffff;
-  --line: rgb(32 22 15 / 0.09);
-  --shadow-soft: 0 1px 2px rgb(32 22 15 / 0.04), 0 18px 48px -30px rgb(32 22 15 / 0.32);
+  --line: rgb(32 30 29 / 0.1);
+  --divider: rgb(32 30 29 / 0.4); /* 2px section dividers */
+  --shadow-soft: 0 1px 2px rgb(45 43 43 / 0.06), 0 12px 32px -24px rgb(45 43 43 / 0.28);
 }
 
 * {
-  border-color: rgb(0 0 0 / 0.08);
+  border-color: rgb(32 30 29 / 0.1);
 }
 
 html {
@@ -50,12 +71,10 @@ html {
 }
 
 body {
-  background:
-    radial-gradient(circle at 8% 0%, rgb(226 97 62 / 0.075), transparent 26rem),
-    radial-gradient(circle at 92% 18%, rgb(111 143 106 / 0.07), transparent 30rem),
-    var(--bg);
+  background: var(--bg); /* flat ground — no wellness gradients */
   color: var(--color-ink);
   font-family: var(--font-sans);
+  font-weight: 500;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -71,8 +90,8 @@ button:disabled,
 }
 
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 3px solid rgb(194 75 44 / 0.34);
-  outline-offset: 3px;
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
 }
 
 .skip-link {
@@ -82,7 +101,7 @@ button:disabled,
   z-index: 100;
   transform: translateY(-200%);
   border-radius: 999px;
-  background: var(--color-brand-950);
+  background: var(--color-ink);
   color: white;
   padding: 0.65rem 1rem;
   font-size: 0.875rem;
@@ -96,14 +115,28 @@ button:disabled,
 
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+/* Kicker — 10px uppercase, wide tracking (Modernist) */
+.kicker {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* 2px section divider */
+.divider-2 {
+  border-bottom: 2px solid var(--divider);
 }
 
 /* Shared form input */
 .field {
   width: 100%;
   border-radius: 0.875rem;
-  border: 1px solid rgb(0 0 0 / 0.12);
+  border: 1px solid var(--color-neutral-300);
   background: #fff;
   padding: 0.7rem 0.95rem;
   font-size: 0.95rem;
@@ -112,38 +145,38 @@ button:disabled,
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .field:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgb(16 185 129 / 0.15);
+  border-color: var(--color-brand-600);
+  box-shadow: 0 0 0 3px rgb(236 48 19 / 0.14);
 }
 .field::placeholder {
-  color: rgb(0 0 0 / 0.35);
+  color: rgb(32 30 29 / 0.35);
 }
 
 ::selection {
   background: var(--color-brand-200);
-  color: var(--color-brand-950);
+  color: var(--color-ink);
 }
 
-/* Subtle, premium scrollbar */
+/* Subtle scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: rgb(0 0 0 / 0.15); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: rgb(0 0 0 / 0.25); }
+::-webkit-scrollbar-thumb { background: rgb(32 30 29 / 0.16); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(32 30 29 / 0.28); }
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
   .glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: saturate(180%) blur(12px);
+    background: rgba(243, 242, 242, 0.82);
+    backdrop-filter: saturate(160%) blur(12px);
   }
   .card-shadow {
-    box-shadow: 0 1px 2px rgb(11 31 23 / 0.04), 0 8px 24px -12px rgb(11 31 23 / 0.12);
+    box-shadow: 0 1px 2px rgb(45 43 43 / 0.05), 0 8px 24px -14px rgb(45 43 43 / 0.16);
   }
   .card-shadow-lg {
-    box-shadow: 0 2px 4px rgb(11 31 23 / 0.05), 0 24px 48px -20px rgb(11 31 23 / 0.22);
+    box-shadow: 0 2px 4px rgb(45 43 43 / 0.06), 0 24px 48px -22px rgb(45 43 43 / 0.24);
   }
   .surface-card {
     border: 1px solid var(--line);
-    background: color-mix(in srgb, var(--surface-strong) 94%, transparent);
+    background: var(--surface-strong);
     box-shadow: var(--shadow-soft);
   }
   .interactive-card {
@@ -151,13 +184,13 @@ button:disabled,
   }
   .interactive-card:hover {
     transform: translateY(-3px);
-    border-color: rgb(194 75 44 / 0.22);
-    box-shadow: 0 16px 44px -24px rgb(32 22 15 / 0.38);
+    border-color: rgb(236 48 19 / 0.3);
+    box-shadow: 0 16px 44px -24px rgb(45 43 43 / 0.3);
   }
   .hero-grid {
     background-image:
-      linear-gradient(to right, rgb(0 0 0 / 0.025) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(0 0 0 / 0.025) 1px, transparent 1px);
+      linear-gradient(to right, rgb(32 30 29 / 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(32 30 29 / 0.03) 1px, transparent 1px);
     background-size: 32px 32px;
   }
   .animate-rise {
@@ -187,21 +220,17 @@ button:disabled,
     opacity: 1;
     transform: none;
   }
+  /* Flat accent text (Modernist: no gradients) */
   .gradient-text {
-    background: linear-gradient(120deg, var(--color-brand-600), var(--color-brand-400) 60%, var(--color-amber-accent));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--color-brand-700);
   }
+  /* Flat ground (Modernist: no mesh gradients) */
   .mesh {
-    background:
-      radial-gradient(40rem 40rem at 80% -10%, rgba(226, 97, 62, 0.20), transparent 60%),
-      radial-gradient(34rem 34rem at -10% 20%, rgba(111, 143, 106, 0.18), transparent 55%),
-      radial-gradient(30rem 30rem at 50% 120%, rgba(224, 133, 58, 0.12), transparent 60%);
+    background: var(--surface);
   }
   .ring-pulse { animation: ringPulse 2.4s ease-in-out infinite; }
   .shimmer {
-    background: linear-gradient(100deg, rgba(0,0,0,0.04) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 70%);
+    background: linear-gradient(100deg, rgba(32,30,29,0.05) 30%, rgba(32,30,29,0.09) 50%, rgba(32,30,29,0.05) 70%);
     background-size: 200% 100%;
     animation: shimmer 1.4s infinite;
   }
@@ -223,7 +252,7 @@ button:disabled,
 /* Leaflet polish */
 .leaflet-container {
   font-family: var(--font-sans);
-  background: #e8ece6;
+  background: #eae7e7;
 }
 .leaflet-container .leaflet-control-attribution {
   font-size: 9px;
@@ -231,7 +260,7 @@ button:disabled,
 }
 .leaflet-popup-content-wrapper {
   border-radius: 14px;
-  box-shadow: 0 8px 28px -10px rgba(11, 31, 23, 0.3);
+  box-shadow: 0 8px 28px -10px rgba(45, 43, 43, 0.3);
 }
 .leaflet-popup-content { margin: 12px 14px; }
 

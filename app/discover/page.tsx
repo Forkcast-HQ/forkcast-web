@@ -28,6 +28,10 @@ export default function Discover() {
   const [sort, setSort] = useState<Sort>(profile ? "fit" : "rating");
   const [dietOnly, setDietOnly] = useState(false);
   const [view, setView] = useState<View>("list");
+  const [attrs, setAttrs] = useState<string[]>([]);
+
+  const toggleAttr = (key: string) =>
+    setAttrs((prev) => (prev.includes(key) ? prev.filter((a) => a !== key) : [...prev, key]));
 
   // Honor ?view=map deep links (and shareable map view).
   useEffect(() => {
@@ -70,13 +74,31 @@ export default function Discover() {
         r.menu.some((m) => m.tags.some((t) => wanted.includes(t))),
       );
     }
+    // Dish-attribute chips (from the design handoff): restaurant qualifies if
+    // any dish passes ALL selected attributes (partner is restaurant-level).
+    if (attrs.length) {
+      list = list.filter((r) => {
+        if (attrs.includes("partner") && !r.partner) return false;
+        const dishAttrs = attrs.filter((a) => a !== "partner");
+        if (!dishAttrs.length) return true;
+        return r.menu.some((m) =>
+          dishAttrs.every((a) =>
+            a === "high-protein" ? m.protein >= 25 || (m.protein * 4) / Math.max(1, m.calories) >= 0.3
+            : a === "under-500" ? m.calories <= 500
+            : a === "low-sodium" ? m.sodium <= 600
+            : a === "high-fiber" ? m.fiber >= 6
+            : true,
+          ),
+        );
+      });
+    }
     list.sort((a, b) => {
       if (sort === "fit") return (bestFitOf.get(b.slug) ?? 0) - (bestFitOf.get(a.slug) ?? 0);
       if (sort === "distance") return a.distanceMi - b.distanceMi;
       return b.rating - a.rating;
     });
     return list;
-  }, [q, cuisine, sort, dietOnly, bestFitOf, profile]);
+  }, [q, cuisine, sort, dietOnly, attrs, bestFitOf, profile]);
 
   const mapItems = useMemo(
     () =>
@@ -105,37 +127,41 @@ export default function Discover() {
   const consumed = hydrated ? consumedToday() : null;
   const remaining =
     targets && consumed ? Math.max(0, targets.calories - consumed.calories) : null;
-  const hasFilters = Boolean(q.trim() || cuisine || dietOnly);
+  const hasFilters = Boolean(q.trim() || cuisine || dietOnly || attrs.length);
 
   const clearFilters = () => {
     setQ("");
     setCuisine(null);
     setDietOnly(false);
+    setAttrs([]);
   };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      {/* Personalized header */}
-      {hydrated && profile && targets ? (
-        <div className="surface-card flex flex-col gap-5 overflow-hidden rounded-3xl bg-gradient-to-r from-brand-50 via-white to-sage-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+      {/* Budget summary — Modernist "Left today" strip (from the design handoff) */}
+      {hydrated && profile && targets && consumed ? (
+        <div className="surface-card flex flex-col gap-6 rounded-3xl p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">
-              {GOAL_LABELS[profile.goal]} plan · Boston
-            </p>
-            <h1 className="mt-1 font-display text-2xl font-bold text-ink">
-              {profile.name ? `${profile.name.split(" ")[0]}, ` : ""}here&apos;s what fits today
+            <p className="kicker text-brand-700">{GOAL_LABELS[profile.goal]} plan · Boston</p>
+            <div className="mt-1.5 flex items-baseline gap-2">
+              <span className="font-display text-[38px] font-extrabold leading-none tabular-nums text-ink">{remaining}</span>
+              <span className="text-sm font-semibold text-ink/50">cal left today · of {targets.calories}</span>
+            </div>
+            <h1 className="mt-2 text-sm font-medium text-ink/60">
+              {profile.name ? `${profile.name.split(" ")[0]}, ` : ""}restaurants below are ranked for what&apos;s left of your day
             </h1>
           </div>
           <div className="flex items-center gap-6">
-            <div className="text-center">
-              <p className="font-display text-3xl font-extrabold text-brand-700">{remaining}</p>
-              <p className="text-xs text-ink/55">calories left today</p>
+            <div className="flex gap-4">
+              <MacroMini label="Protein" value={consumed.protein} target={targets.protein} />
+              <MacroMini label="Carbs" value={consumed.carbs} target={targets.carbs} />
+              <MacroMini label="Fat" value={consumed.fat} target={targets.fat} />
             </div>
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 rounded-full border border-brand-300 bg-white px-4 py-2 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:border-ink"
             >
-              My dashboard <ArrowRight className="h-4 w-4" />
+              Dashboard <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
@@ -226,6 +252,21 @@ export default function Discover() {
             </div>
           </div>
 
+          {/* Dish-attribute chips (design handoff set) */}
+          <div className="mt-3 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Dish attribute filters">
+            {[
+              { key: "partner", label: "Partner-verified" },
+              { key: "high-protein", label: "High protein" },
+              { key: "under-500", label: "Under 500 kcal" },
+              { key: "low-sodium", label: "Low sodium" },
+              { key: "high-fiber", label: "High fiber" },
+            ].map((a) => (
+              <Chip key={a.key} active={attrs.includes(a.key)} onClick={() => toggleAttr(a.key)}>
+                {attrs.includes(a.key) ? "✓ " : ""}{a.label}
+              </Chip>
+            ))}
+          </div>
+
           <div className="mt-3 flex items-center gap-3">
             <div className="-mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 pb-1" aria-label="Cuisine filters">
               <Chip active={!cuisine} onClick={() => setCuisine(null)}>All</Chip>
@@ -298,6 +339,21 @@ export default function Discover() {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function MacroMini({ label, value, target }: { label: string; value: number; target: number }) {
+  const p = Math.min(100, Math.round((value / Math.max(1, target)) * 100));
+  return (
+    <div className="w-16">
+      <div className="flex items-baseline justify-between">
+        <span className="kicker text-ink/45">{label}</span>
+      </div>
+      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-neutral-200">
+        <div className="h-full rounded-full bg-brand-600" style={{ width: `${p}%` }} />
+      </div>
+      <p className="mt-0.5 text-[10px] tabular-nums text-ink/50">{Math.round(value)}/{target}g</p>
     </div>
   );
 }

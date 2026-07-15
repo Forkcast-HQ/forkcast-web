@@ -5,7 +5,7 @@ export function MacroRing({
   max,
   size = 132,
   stroke = 13,
-  color = "#059669",
+  color = "#ec3013",
   track = "rgba(0,0,0,0.08)",
   centerTop,
   centerMain,
@@ -62,7 +62,7 @@ export function MacroBar({
   value,
   max,
   unit = "g",
-  color = "#059669",
+  color = "#ec3013",
 }: {
   label: string;
   value: number;

@@ -35,12 +35,12 @@ export function CartBar() {
         {awaitingLog && order && (
           <Link
             href="/order"
-            className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/95 p-3 pl-4 shadow-[0_8px_30px_-8px_rgba(32,22,15,0.25)] backdrop-blur transition hover:bg-emerald-100"
+            className="flex items-center gap-3 rounded-2xl border border-brand-200 bg-brand-50/95 p-3 pl-4 shadow-[0_8px_30px_-8px_rgba(32,22,15,0.25)] backdrop-blur transition hover:bg-brand-100"
           >
-            <ClipboardCheck className="h-5 w-5 shrink-0 text-emerald-700" />
+            <ClipboardCheck className="h-5 w-5 shrink-0 text-brand-700" />
             <div className="min-w-0 flex-1 text-sm">
-              <span className="font-semibold text-emerald-900">Order {order.ref} accepted — log this meal?</span>
-              <span className="ml-1 text-emerald-800/70">Confirm portions to add it to today.</span>
+              <span className="font-semibold text-brand-900">Order {order.ref} accepted — log this meal?</span>
+              <span className="ml-1 text-brand-800/70">Confirm portions to add it to today.</span>
             </div>
           </Link>
         )}

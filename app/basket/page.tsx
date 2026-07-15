@@ -112,7 +112,7 @@ export default function BasketPage() {
 
           {/* Balance check */}
           {targets && (
-            <div className={cls("rounded-2xl border p-4 text-sm", over ? "border-amber-200 bg-amber-50 text-amber-800" : "border-emerald-200 bg-emerald-50 text-emerald-800")}>
+            <div className={cls("rounded-2xl border p-4 text-sm", over ? "border-amber-200 bg-amber-50 text-amber-800" : "border-brand-200 bg-brand-50 text-brand-800")}>
               <p className="flex items-start gap-2 font-medium">
                 {over && <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />}
                 {over

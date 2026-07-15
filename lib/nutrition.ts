@@ -59,19 +59,19 @@ export interface BmiInfo {
 export function bmiInfo(weightKg: number, heightCm: number): BmiInfo {
   const value = bmi(weightKg, heightCm);
   let category: BmiInfo["category"] = "Healthy";
-  let color = "#10b981";
+  let color = "#4a7c59"; // muted tones — Modernist palette-adjacent
   if (value < 18.5) {
     category = "Underweight";
-    color = "#3b82f6";
+    color = "#605d5d";
   } else if (value < 25) {
     category = "Healthy";
-    color = "#10b981";
+    color = "#4a7c59";
   } else if (value < 30) {
     category = "Overweight";
-    color = "#f59e0b";
+    color = "#e0853a";
   } else {
     category = "Obese";
-    color = "#ef4444";
+    color = "#ae1800";
   }
   return { value: Math.round(value * 10) / 10, category, color };
 }
@@ -219,9 +219,10 @@ export function deriveTags(item: MenuItem): string[] {
   return Array.from(t);
 }
 
+// Modernist DS: accent red = strong fit, warm neutrals = weaker fit.
 export function fitColor(score: number): string {
-  if (score >= 80) return "#059669";
-  if (score >= 65) return "#10b981";
-  if (score >= 50) return "#f59e0b";
-  return "#ef4444";
+  if (score >= 80) return "#dd2b0f";
+  if (score >= 65) return "#ec3013";
+  if (score >= 50) return "#7d7979";
+  return "#9b9797";
 }

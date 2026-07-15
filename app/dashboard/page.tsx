@@ -157,8 +157,8 @@ export default function Dashboard() {
           <div className="mt-6 flex flex-col items-center gap-8 sm:flex-row">
             <MacroRing value={consumed!.calories} max={targets.calories} size={170} stroke={16} centerTop="Calories" centerMain={String(consumed!.calories)} centerSub={`${remaining} left`} />
             <div className="w-full flex-1 space-y-4">
-              <MacroBar label="Protein" value={consumed!.protein} max={targets.protein} color="#059669" />
-              <MacroBar label="Carbs" value={consumed!.carbs} max={targets.carbs} color="#0284c7" />
+              <MacroBar label="Protein" value={consumed!.protein} max={targets.protein} color="#ec3013" />
+              <MacroBar label="Carbs" value={consumed!.carbs} max={targets.carbs} color="#7d7979" />
               <MacroBar label="Fat" value={consumed!.fat} max={targets.fat} color="#d97706" />
               <MacroBar label="Fiber" value={consumed!.fiber} max={targets.fiber} color="#65a30d" />
               <div className="flex justify-between pt-1 text-xs text-ink/50">
@@ -202,7 +202,7 @@ export default function Dashboard() {
             <ul className="mt-4 space-y-3">
               {today.slice().reverse().map((m) => (
                 <li key={m.id} className="flex items-center gap-3">
-                  <span className={cls("grid h-9 w-9 shrink-0 place-items-center rounded-lg", m.source === "photo" ? "bg-brand-50 text-brand-600" : m.source === "order" ? "bg-emerald-50 text-emerald-600" : "bg-black/5 text-ink/50")}>
+                  <span className={cls("grid h-9 w-9 shrink-0 place-items-center rounded-lg", m.source === "photo" ? "bg-brand-50 text-brand-600" : m.source === "order" ? "bg-brand-50 text-brand-700" : "bg-black/5 text-ink/50")}>
                     {m.source === "photo" ? <Camera className="h-4 w-4" /> : m.source === "order" ? <ShoppingBag className="h-4 w-4" /> : m.source === "manual" ? <PencilLine className="h-4 w-4" /> : <Utensils className="h-4 w-4" />}
                   </span>
                   <div className="min-w-0 flex-1">
@@ -236,16 +236,16 @@ export default function Dashboard() {
               <AreaChart data={weekData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
                 <defs>
                   <linearGradient id="cal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#ec3013" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#ec3013" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" vertical={false} />
                 <XAxis dataKey="day" tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} width={44} />
                 <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid rgba(0,0,0,0.08)", fontSize: 13 }} formatter={(v: number) => [`${v} cal`, "Calories"]} />
-                <ReferenceLine y={targets.calories} stroke="#f59e0b" strokeDasharray="5 4" label={{ value: "target", fontSize: 11, fill: "#f59e0b", position: "right" }} />
-                <Area type="monotone" dataKey="calories" stroke="#059669" strokeWidth={2.5} fill="url(#cal)" />
+                <ReferenceLine y={targets.calories} stroke="#e0853a" strokeDasharray="5 4" label={{ value: "target", fontSize: 11, fill: "#e0853a", position: "right" }} />
+                <Area type="monotone" dataKey="calories" stroke="#ec3013" strokeWidth={2.5} fill="url(#cal)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -263,7 +263,7 @@ export default function Dashboard() {
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
                 <YAxis domain={["dataMin - 3", "dataMax + 3"]} tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} width={40} />
                 <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid rgba(0,0,0,0.08)", fontSize: 13 }} formatter={(v: number) => [`${v} lb`, "Weight"]} />
-                <Line type="monotone" dataKey="lb" stroke="#059669" strokeWidth={2.5} dot={{ r: 3, fill: "#059669" }} />
+                <Line type="monotone" dataKey="lb" stroke="#ec3013" strokeWidth={2.5} dot={{ r: 3, fill: "#ec3013" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

@@ -178,10 +178,10 @@ function LogCard({ order }: { order: Order }) {
 
   if (order.logged) {
     return (
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900">
+      <div className="rounded-2xl border border-brand-200 bg-brand-50 p-5 text-sm text-brand-900">
         <p className="flex items-center gap-2 font-semibold"><CheckCircle2 className="h-5 w-5" /> Logged to your day</p>
         <p className="mt-1.5">This meal is on your dashboard with order {order.ref} attached as provenance.</p>
-        <Link href="/dashboard" className="mt-3 inline-flex items-center gap-1.5 font-semibold text-emerald-800 underline">
+        <Link href="/dashboard" className="mt-3 inline-flex items-center gap-1.5 font-semibold text-brand-800 underline">
           View dashboard <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

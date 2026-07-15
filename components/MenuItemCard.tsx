@@ -6,6 +6,7 @@ import type { MenuItem } from "@/lib/types";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
 import { deriveTags, fitScore } from "@/lib/nutrition";
+import { getRestaurant } from "@/data/restaurants";
 import { SmartImage } from "./SmartImage";
 import { FitBadge } from "./FitBadge";
 import { categoryImg } from "@/lib/images";
@@ -47,6 +48,7 @@ export function MenuItemCard({
 
   const fit = targets ? fitScore(item, targets, profile!.goal) : null;
   const tags = deriveTags(item).filter((t) => TAG_LABEL[t]);
+  const verified = getRestaurant(restaurantSlug)?.partner ?? false;
 
   const handleLog = () => {
     logMeal({
@@ -105,10 +107,20 @@ export function MenuItemCard({
             {item.calories} cal
           </span>
           <Macro label="P" value={item.protein} color="text-brand-700" />
-          <Macro label="C" value={item.carbs} color="text-sky-600" />
-          <Macro label="F" value={item.fat} color="text-amber-600" />
+          <Macro label="C" value={item.carbs} color="text-neutral-600" />
+          <Macro label="F" value={item.fat} color="text-neutral-600" />
           <span className="text-ink/40">·</span>
           <span className="text-ink/50">{item.fiber}g fiber</span>
+          <span className="text-ink/40">·</span>
+          <span
+            className={cls(
+              "rounded-full border px-1.5 py-px text-[10px] font-bold",
+              verified ? "border-brand-600 text-brand-700" : "border-neutral-400 text-ink/55",
+            )}
+            title={verified ? "Nutrition reviewed with the restaurant" : "Estimated from the menu — carries a ± range"}
+          >
+            {verified ? "Verified" : "Est. ±"}
+          </span>
         </div>
 
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
