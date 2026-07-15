@@ -1,0 +1,56 @@
+# Auto-deploy the live preview on every push to main.
+# Builds the static export (same as scripts/deploy-pages.sh) and publishes
+# ONLY the compiled app to the public Pages repo (Seymurhh/forkcast-live).
+# Source + docs stay private.
+#
+# One-time setup: add a repo secret named PAGES_DEPLOY_TOKEN
+#   (GitHub → Settings → Secrets and variables → Actions → New repository secret)
+#   Value: a fine-grained PAT with Contents: Read+Write on Seymurhh/forkcast-live.
+
+name: Deploy live preview
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-live
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Static export cannot include server route handlers.
+      - name: Remove server API routes for export
+        run: rm -rf app/api
+
+      - name: Build static export
+        run: STATIC_EXPORT=true PAGES_BASE_PATH=/forkcast-live NEXT_PUBLIC_USE_REAL_AI=false npx next build
+
+      - name: Publish to forkcast-live
+        env:
+          TOKEN: ${{ secrets.PAGES_DEPLOY_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::PAGES_DEPLOY_TOKEN secret is not set. Add it in repo Settings → Secrets → Actions."
+            exit 1
+          fi
+          cd out
+          touch .nojekyll
+          git init -q -b main
+          git config user.name "forkcast-deploy-bot"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -q -m "Deploy $(date -u +%Y-%m-%dT%H:%MZ) from ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${TOKEN}@github.com/Seymurhh/forkcast-live.git" main
