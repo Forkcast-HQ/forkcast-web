@@ -35,6 +35,10 @@
 
 :root {
   --bg: #f7f4ec;
+  --surface: #fffdf8;
+  --surface-strong: #ffffff;
+  --line: rgb(32 22 15 / 0.09);
+  --shadow-soft: 0 1px 2px rgb(32 22 15 / 0.04), 0 18px 48px -30px rgb(32 22 15 / 0.32);
 }
 
 * {
@@ -46,11 +50,48 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 8% 0%, rgb(226 97 62 / 0.075), transparent 26rem),
+    radial-gradient(circle at 92% 18%, rgb(111 143 106 / 0.07), transparent 30rem),
+    var(--bg);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid rgb(194 75 44 / 0.34);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 0.75rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: 999px;
+  background: var(--color-brand-950);
+  color: white;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: transform 150ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
 }
 
 .font-display {
@@ -99,6 +140,19 @@ body {
   }
   .card-shadow-lg {
     box-shadow: 0 2px 4px rgb(11 31 23 / 0.05), 0 24px 48px -20px rgb(11 31 23 / 0.22);
+  }
+  .surface-card {
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--surface-strong) 94%, transparent);
+    box-shadow: var(--shadow-soft);
+  }
+  .interactive-card {
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms ease, border-color 220ms ease;
+  }
+  .interactive-card:hover {
+    transform: translateY(-3px);
+    border-color: rgb(194 75 44 / 0.22);
+    box-shadow: 0 16px 44px -24px rgb(32 22 15 / 0.38);
   }
   .hero-grid {
     background-image:
@@ -184,4 +238,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   .animate-rise, .ring-pulse, .shimmer { animation: none !important; }
+  .interactive-card { transition: none; }
+  .interactive-card:hover { transform: none; }
 }

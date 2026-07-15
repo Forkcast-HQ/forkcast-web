@@ -26,17 +26,17 @@ export default function Home() {
         <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-brand-200/50 blur-3xl" />
         <div className="absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-amber-200/40 blur-3xl" />
 
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-16 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:px-8 lg:pb-24 lg:pt-24">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 pb-16 pt-14 sm:px-6 sm:pt-16 lg:min-h-[680px] lg:grid-cols-[1.08fr_0.92fr] lg:gap-12 lg:px-8 lg:pb-24 lg:pt-20">
           <div className="animate-rise">
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/70 px-3 py-1 text-sm font-medium text-brand-700">
               <Sparkles className="h-4 w-4" />
-              Nutrition-aware ordering, before you eat
+              Interactive Boston pilot · sample catalog
             </span>
             <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-6xl text-balance">
               Know what you&apos;ll eat,{" "}
               <span className="italic text-brand-600">before you sit down.</span>
             </h1>
-            <p className="mt-5 max-w-xl text-lg text-ink/65">
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink/65">
               Forkcast turns your height, weight and goals into a daily plan — then
               matches you to dishes at nearby restaurants that actually fit it.
               Order or walk in, snap a photo, and stay on track without the guesswork.
@@ -57,9 +57,14 @@ export default function Home() {
               </Link>
             </div>
 
-            <p className="mt-5 text-sm text-ink/50">
-              Free to start · No food logging burden · Boston launch
-            </p>
+            <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-ink/55" aria-label="Product highlights">
+              {['Personal Fit Scores', 'Explainable nutrition', 'No payment required'].map((item) => (
+                <li key={item} className="inline-flex items-center gap-1.5">
+                  <span className="grid h-4 w-4 place-items-center rounded-full bg-sage-100 text-[10px] font-black text-sage-700" aria-hidden="true">✓</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Product preview */}
@@ -73,6 +78,9 @@ export default function Home() {
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <span className="absolute left-4 top-4 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink/70 shadow-sm backdrop-blur">
+                  Product preview
+                </span>
                 <div className="absolute right-4 top-4 grid h-14 w-14 place-items-center rounded-full bg-brand-600 font-display text-xl font-bold text-white shadow-lg">
                   92
                 </div>
@@ -98,6 +106,9 @@ export default function Home() {
                     </span>
                   ))}
                 </div>
+              </div>
+              <div className="border-t border-black/[0.06] bg-cream/70 px-5 py-3 text-[11px] leading-relaxed text-ink/45">
+                Demonstration nutrition and restaurant data shown for product evaluation.
               </div>
             </div>
             <div className="absolute -left-6 -top-6 hidden rotate-[-6deg] rounded-2xl border border-black/5 bg-white px-4 py-3 card-shadow sm:block">
@@ -233,10 +244,11 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between">
           <div>
-            <SectionTag>On Forkcast now</SectionTag>
+            <SectionTag>Sample catalog</SectionTag>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-              Partner restaurants near you
+              Explore the Boston pilot experience
             </h2>
+            <p className="mt-2 max-w-2xl text-sm text-ink/55">Representative listings show how personalized discovery works before live restaurant onboarding.</p>
           </div>
           <Link href="/discover" className="hidden items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800 sm:inline-flex">
             View all <ArrowRight className="h-4 w-4" />

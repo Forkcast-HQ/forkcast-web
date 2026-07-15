@@ -28,8 +28,18 @@ export function Navbar() {
     const h = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenu(false);
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenu(false);
+        setOpen(false);
+      }
+    };
     document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", h);
+      document.removeEventListener("keydown", onKey);
+    };
   }, []);
 
   useEffect(() => {
@@ -37,21 +47,30 @@ export function Navbar() {
     setOpen(false);
   }, [pathname]);
 
-  return (
-    <header className="sticky top-0 z-50 border-b border-black/5 glass">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="shrink-0">
-          <Logo />
-        </Link>
+  const isActive = (href: string) =>
+    pathname === href || (href === "/discover" && pathname.startsWith("/restaurant/"));
 
-        <div className="hidden items-center gap-1 md:flex">
+  return (
+    <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-cream/85 shadow-[0_8px_30px_-24px_rgba(32,22,15,0.45)] backdrop-blur-xl">
+      <nav aria-label="Primary navigation" className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="shrink-0 rounded-xl" aria-label="Forkcast home">
+            <Logo />
+          </Link>
+          <span className="hidden rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-700 lg:inline-flex">
+            Boston pilot
+          </span>
+        </div>
+
+        <div className="hidden items-center gap-1 rounded-full border border-black/[0.06] bg-white/75 p-1 shadow-sm md:flex">
           {LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
+              aria-current={isActive(l.href) ? "page" : undefined}
               className={cls(
-                "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                pathname === l.href ? "bg-brand-50 text-brand-700" : "text-ink/70 hover:bg-black/5 hover:text-ink",
+                "rounded-full px-3.5 py-2 text-sm font-semibold transition-colors",
+                isActive(l.href) ? "bg-brand-950 text-white shadow-sm" : "text-ink/65 hover:bg-black/5 hover:text-ink",
               )}
             >
               {l.label}
@@ -64,7 +83,9 @@ export function Navbar() {
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setMenu((m) => !m)}
-                className="flex items-center gap-2 rounded-full border border-black/10 bg-white py-1 pl-1 pr-2.5 transition hover:border-black/20"
+                aria-expanded={menu}
+                aria-haspopup="menu"
+                className="flex items-center gap-2 rounded-full border border-black/10 bg-white py-1 pl-1 pr-2.5 shadow-sm transition hover:border-brand-300"
               >
                 <Avatar name={user.name} email={user.email} size={30} />
                 <span className="max-w-[120px] truncate text-sm font-semibold text-ink">
@@ -73,7 +94,7 @@ export function Navbar() {
                 <ChevronDown className={cls("h-4 w-4 text-ink/40 transition", menu && "rotate-180")} />
               </button>
               {menu && (
-                <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-black/5 bg-white card-shadow-lg">
+                <div role="menu" className="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-black/5 bg-white card-shadow-lg">
                   <div className="border-b border-black/5 px-4 py-3">
                     <p className="truncate text-sm font-semibold text-ink">{user.name || "Your account"}</p>
                     <p className="truncate text-xs text-ink/50">{user.email}</p>
@@ -99,7 +120,7 @@ export function Navbar() {
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+                className="inline-flex items-center rounded-full bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/15 transition hover:-translate-y-0.5 hover:bg-brand-700"
               >
                 Get started
               </Link>
@@ -108,19 +129,29 @@ export function Navbar() {
         </div>
 
         <button
-          className="grid h-10 w-10 place-items-center rounded-lg text-ink md:hidden"
+          className="grid h-11 w-11 place-items-center rounded-xl border border-black/[0.06] bg-white/80 text-ink shadow-sm md:hidden"
           onClick={() => setOpen((o) => !o)}
           aria-label="Toggle menu"
+          aria-expanded={open}
+          aria-controls="mobile-navigation"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </nav>
 
       {open && (
-        <div className="border-t border-black/5 bg-white/95 px-4 py-3 md:hidden">
+        <div id="mobile-navigation" className="border-t border-black/5 bg-cream/95 px-4 py-4 shadow-lg backdrop-blur-xl md:hidden">
           <div className="flex flex-col gap-1">
             {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} className="rounded-lg px-3 py-2.5 text-sm font-medium text-ink/80 hover:bg-black/5">
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-current={isActive(l.href) ? "page" : undefined}
+                className={cls(
+                  "rounded-xl px-3 py-3 text-sm font-semibold",
+                  isActive(l.href) ? "bg-brand-950 text-white" : "text-ink/75 hover:bg-black/5",
+                )}
+              >
                 {l.label}
               </Link>
             ))}
