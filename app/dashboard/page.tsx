@@ -92,7 +92,7 @@ export default function Dashboard() {
     return allMenuItems()
       .map((m) => ({ m, fit: fitScore(m, targets, profile.goal).score }))
       .sort((a, b) => b.fit - a.fit)
-      .slice(0, 3)
+      .slice(0, 6)
       .map((x) => x.m);
   }, [targets, profile]);
 
@@ -125,7 +125,7 @@ export default function Dashboard() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="animate-rise flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">
             {GOAL_LABELS[profile.goal]} · BMI {bmi.value} ({bmi.category})
@@ -185,24 +185,32 @@ export default function Dashboard() {
         <Tile icon={<Utensils className="h-5 w-5" />} label="Meals today" value={<CountUp value={today.length} />} />
       </div>
 
-      {/* Row 3: Recommended + Logged */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div>
-          <div className="mb-3 flex items-center gap-2">
+      {/* Row 3: Next best meals — full-width swipeable rail */}
+      <div className="mt-8">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-brand-600" />
-            <h2 className="font-display text-lg font-bold text-ink">Recommended for the rest of your day</h2>
+            <h2 className="font-display text-lg font-bold text-ink">Next best meals for the rest of your day</h2>
           </div>
-          {recommended.length ? (
-            <div className="space-y-3">
-              {recommended.map((m, i) => (
-                <MenuItemCard key={m.id} item={m} restaurantSlug={(m as any).restaurantSlug} restaurantName={(m as any).restaurantName} seed={i} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-ink/50">Set your goals to get recommendations.</p>
-          )}
+          <Link href="/discover" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-900">
+            Discover <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
+        {recommended.length ? (
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0 [scrollbar-width:thin]">
+            {recommended.map((m, i) => (
+              <div key={m.id} className="w-[88%] min-w-[300px] max-w-md shrink-0 snap-start sm:w-[46%] lg:w-[32%]">
+                <MenuItemCard item={m} restaurantSlug={(m as any).restaurantSlug} restaurantName={(m as any).restaurantName} seed={i} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-ink/50">Set your goals to get recommendations.</p>
+        )}
+      </div>
 
+      {/* Row 3b: Logged today */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-black/5 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-bold text-ink">Logged today</h2>
@@ -237,11 +245,29 @@ export default function Dashboard() {
             </ul>
           )}
         </div>
+
+        <div className="rounded-2xl border border-black/5 bg-white p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold text-ink">Weight</h2>
+            <span className="text-sm text-ink/50">{Math.round(kgToLb(profile.weightKg))} lb</span>
+          </div>
+          <div className="mt-4 h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={weightData} margin={{ top: 8, right: 12, left: -16, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" vertical={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
+                <YAxis domain={["dataMin - 3", "dataMax + 3"]} tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} width={40} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid rgba(0,0,0,0.08)", fontSize: 13 }} formatter={(v: number) => [`${v} lb`, "Weight"]} />
+                <Line type="monotone" dataKey="lb" stroke="#ec3013" strokeWidth={2.5} dot={{ r: 3, fill: "#ec3013" }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
 
-      {/* Row 4: charts */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="rounded-2xl border border-black/5 bg-white p-6 lg:col-span-2">
+      {/* Row 4: weekly trend — full width */}
+      <div className="mt-6">
+        <div className="rounded-2xl border border-black/5 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-bold text-ink">Calories this week</h2>
             {meals.length < 3 && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">Sample — fills in as you log</span>}
@@ -262,24 +288,6 @@ export default function Dashboard() {
                 <ReferenceLine y={targets.calories} stroke="#e0853a" strokeDasharray="5 4" label={{ value: "target", fontSize: 11, fill: "#e0853a", position: "right" }} />
                 <Area type="monotone" dataKey="calories" stroke="#ec3013" strokeWidth={2.5} fill="url(#cal)" />
               </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-black/5 bg-white p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold text-ink">Weight</h2>
-            <span className="text-sm text-ink/50">{Math.round(kgToLb(profile.weightKg))} lb</span>
-          </div>
-          <div className="mt-4 h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={weightData} margin={{ top: 8, right: 12, left: -16, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" vertical={false} />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
-                <YAxis domain={["dataMin - 3", "dataMax + 3"]} tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} width={40} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid rgba(0,0,0,0.08)", fontSize: 13 }} formatter={(v: number) => [`${v} lb`, "Weight"]} />
-                <Line type="monotone" dataKey="lb" stroke="#ec3013" strokeWidth={2.5} dot={{ r: 3, fill: "#ec3013" }} />
-              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>

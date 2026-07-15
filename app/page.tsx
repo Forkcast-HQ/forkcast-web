@@ -148,36 +148,54 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------------- DIFFERENTIATOR ---------------- */}
+      {/* ---------------- TRUST CONTRAST ---------------- */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="text-center">
           <SectionTag>Why it&apos;s different</SectionTag>
           <h2 className="mx-auto mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl text-balance">
-            Plan-ahead beats log-after.
+            Other apps show you a number. We show you where it came from.
           </h2>
         </div>
         <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-2">
-          <div className="rounded-3xl border border-black/10 bg-white p-7">
-            <p className="text-sm font-semibold uppercase tracking-wide text-ink/40">Today&apos;s apps</p>
-            <p className="mt-2 font-display text-xl font-bold text-ink">Log after eating</p>
-            <ul className="mt-5 space-y-3 text-ink/65">
-              <CompareLi ok={false}>Manual diary — most users quit within weeks</CompareLi>
-              <CompareLi ok={false}>Tells you the damage once it&apos;s done</CompareLi>
-              <CompareLi ok={false}>Generic database, not restaurant menus</CompareLi>
-              <CompareLi ok={false}>No connection to where you actually eat</CompareLi>
+          {/* Typical AI menu app — flat assertion */}
+          <div className="rounded-3xl border border-black/10 bg-white p-7 opacity-90">
+            <p className="text-sm font-semibold uppercase tracking-wide text-ink/40">Typical AI menu app</p>
+            <div className="mt-5 rounded-2xl border border-black/10 bg-neutral-100 p-5">
+              <p className="font-display text-lg font-bold text-ink">Grilled Chicken Bowl</p>
+              <p className="mt-3 font-display text-4xl font-extrabold text-ink">540 <span className="text-lg text-ink/50">cal</span></p>
+              <p className="mt-1 text-sm text-ink/45">Presented as fact. No source. No range. No way to correct it.</p>
+            </div>
+            <ul className="mt-5 space-y-2.5 text-ink/60">
+              <CompareLi ok={false}>&quot;22 million locations&quot; — AI guesses at scale</CompareLi>
+              <CompareLi ok={false}>Restaurants never see or verify their data</CompareLi>
+              <CompareLi ok={false}>Recommendation is a dead end — no order, no log</CompareLi>
             </ul>
           </div>
+          {/* Forkcast — evidence-carrying number */}
           <div className="rounded-3xl border-2 border-brand-500 bg-brand-50/50 p-7">
             <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Forkcast</p>
-            <p className="mt-2 font-display text-xl font-bold text-ink">Plan before ordering</p>
-            <ul className="mt-5 space-y-3 text-ink/75">
-              <CompareLi ok>Recommends dishes that already fit your day</CompareLi>
-              <CompareLi ok>Acts before the order, when it can still help</CompareLi>
-              <CompareLi ok>Real menus from real nearby restaurants</CompareLi>
-              <CompareLi ok>Two-sided: restaurants get health-minded diners</CompareLi>
+            <div className="mt-5 rounded-2xl border border-black/5 bg-white p-5 card-shadow">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-display text-lg font-bold text-ink">Grilled Chicken Bowl</p>
+                <span className="shrink-0 rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Verified</span>
+              </div>
+              <p className="mt-3 font-display text-4xl font-extrabold text-ink">
+                540 <span className="text-lg text-ink/50">cal</span>{" "}
+                <span className="align-middle text-base font-bold text-ink/40">±5%</span>
+              </p>
+              <p className="mt-1 text-sm text-ink/55">Reviewed with the restaurant · corrections versioned &amp; public · sponsored never changes scores</p>
+            </div>
+            <ul className="mt-5 space-y-2.5 text-ink/75">
+              <CompareLi ok>Every number carries a source and a ± range</CompareLi>
+              <CompareLi ok>Restaurants review and correct their own menus</CompareLi>
+              <CompareLi ok>Decision → order → confirmed log, one loop</CompareLi>
             </ul>
           </div>
         </div>
+        <p className="mx-auto mt-8 max-w-2xl text-center text-sm text-ink/50">
+          Depth over breadth: every dish verified or honestly labeled an estimate — one market at a time, starting with
+          Boston&apos;s independent restaurants.
+        </p>
       </section>
 
       {/* ---------------- FEATURED RESTAURANTS ---------------- */}
