@@ -83,8 +83,57 @@ export interface LoggedMeal {
   sodium: number;
   sugar: number;
   loggedAt: number; // epoch ms
-  source: "planned" | "photo" | "manual";
+  source: "planned" | "photo" | "manual" | "order";
   photo?: string; // data URL for photo-logged meals
+  // Provenance (order-confirmed meals) — evidence trail for every entry
+  orderRef?: string; // e.g. "F-1042"
+  portion?: number; // fraction consumed, 1 = full serving
+  confidence?: "partner-verified" | "estimated"; // nutrition-data confidence
+  note?: string; // substitutions / user corrections
+}
+
+// ---- Ordering ------------------------------------------------------
+
+export type Fulfillment = "pickup" | "delivery" | "partner";
+
+export interface CartLine {
+  slug: string; // restaurant slug (one restaurant per basket)
+  itemId: string;
+  qty: number;
+}
+
+export interface OrderItem {
+  itemId: string;
+  name: string;
+  price: number;
+  qty: number;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+  sodium: number;
+  sugar: number;
+}
+
+export type OrderStatus = "sent" | "accepted" | "preparing" | "ready";
+
+export interface Order {
+  id: string;
+  ref: string; // human order reference, e.g. "F-1042"
+  slug: string;
+  restaurantName: string;
+  partner: boolean; // partner-verified nutrition data at time of order
+  items: OrderItem[];
+  fulfill: Fulfillment;
+  placedAt: number; // epoch ms
+  subtotal: number;
+  deliveryFee: number;
+  tax: number;
+  total: number;
+  logged: boolean; // meal-log confirmation completed
+  dismissedLog?: boolean; // user chose not to log
+  integration: "prototype"; // no live restaurant/payment integration — never fake it
 }
 
 export interface WeightEntry {

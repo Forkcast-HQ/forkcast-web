@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Menu, X, LayoutDashboard, User, LogOut, ChevronDown } from "lucide-react";
+import { Menu, X, LayoutDashboard, User, LogOut, ChevronDown, ShoppingBag, ReceiptText } from "lucide-react";
 import { Logo } from "./Logo";
 import { Avatar } from "./Avatar";
 import { useAuth } from "@/lib/auth";
+import { useOrder } from "@/lib/order";
 import { cls } from "@/lib/format";
 
 const LINKS = [
@@ -20,6 +21,7 @@ export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, hydrated, logOut } = useAuth();
+  const { cartCount } = useOrder();
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -60,6 +62,20 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
+          {hydrated && user && (
+            <Link
+              href="/basket"
+              className="relative grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-black/5 hover:text-ink"
+              aria-label="Basket"
+            >
+              <ShoppingBag className="h-5 w-5" />
+              {cartCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          )}
           {hydrated && user ? (
             <div className="relative" ref={menuRef}>
               <button
@@ -79,6 +95,7 @@ export function Navbar() {
                     <p className="truncate text-xs text-ink/50">{user.email}</p>
                   </div>
                   <MenuLink href="/dashboard" icon={<LayoutDashboard className="h-4 w-4" />}>Dashboard</MenuLink>
+                  <MenuLink href="/orders" icon={<ReceiptText className="h-4 w-4" />}>Orders</MenuLink>
                   <MenuLink href="/profile" icon={<User className="h-4 w-4" />}>Profile &amp; settings</MenuLink>
                   <button
                     onClick={() => {
@@ -127,6 +144,8 @@ export function Navbar() {
             {hydrated && user ? (
               <>
                 <Link href="/dashboard" className="rounded-lg px-3 py-2.5 text-sm font-medium text-ink/80 hover:bg-black/5">Dashboard</Link>
+                <Link href="/basket" className="rounded-lg px-3 py-2.5 text-sm font-medium text-ink/80 hover:bg-black/5">Basket{cartCount > 0 ? ` (${cartCount})` : ""}</Link>
+                <Link href="/orders" className="rounded-lg px-3 py-2.5 text-sm font-medium text-ink/80 hover:bg-black/5">Orders</Link>
                 <Link href="/profile" className="rounded-lg px-3 py-2.5 text-sm font-medium text-ink/80 hover:bg-black/5">Profile &amp; settings</Link>
                 <button onClick={() => { logOut(); router.push("/"); }} className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50">Log out</button>
               </>

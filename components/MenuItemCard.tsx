@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Flame, Plus, MapPin } from "lucide-react";
+import { Check, Flame, Plus, MapPin, ShoppingBag } from "lucide-react";
 import type { MenuItem } from "@/lib/types";
 import { useUser } from "@/lib/store";
+import { useOrder } from "@/lib/order";
 import { deriveTags, fitScore } from "@/lib/nutrition";
 import { SmartImage } from "./SmartImage";
 import { FitBadge } from "./FitBadge";
@@ -34,7 +35,15 @@ export function MenuItemCard({
   showRestaurant?: boolean;
 }) {
   const { targets, profile, logMeal } = useUser();
+  const { addToCart, cartRestaurantSlug } = useOrder();
   const [added, setAdded] = useState(false);
+  const [inCart, setInCart] = useState(false);
+
+  const handleAddToOrder = () => {
+    addToCart(restaurantSlug, item.id);
+    setInCart(true);
+    setTimeout(() => setInCart(false), 2200);
+  };
 
   const fit = targets ? fitScore(item, targets, profile!.goal) : null;
   const tags = deriveTags(item).filter((t) => TAG_LABEL[t]);
@@ -126,25 +135,49 @@ export function MenuItemCard({
           ) : (
             <p className="text-xs text-ink/40">Set up your profile for a Fit Score</p>
           )}
-          <button
-            onClick={handleLog}
-            className={cls(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition",
-              added
-                ? "bg-brand-600 text-white"
-                : "bg-brand-50 text-brand-700 hover:bg-brand-100",
-            )}
-          >
-            {added ? (
-              <>
-                <Check className="h-4 w-4" /> Added
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4" /> Log it
-              </>
-            )}
-          </button>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              onClick={handleLog}
+              className={cls(
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition",
+                added
+                  ? "bg-brand-600 text-white"
+                  : "bg-brand-50 text-brand-700 hover:bg-brand-100",
+              )}
+            >
+              {added ? (
+                <>
+                  <Check className="h-4 w-4" /> Added
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4" /> Log it
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleAddToOrder}
+              title={
+                cartRestaurantSlug && cartRestaurantSlug !== restaurantSlug
+                  ? "Starts a new basket (one restaurant per order)"
+                  : "Add to order"
+              }
+              className={cls(
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition",
+                inCart ? "bg-brand-950 text-white" : "bg-black/5 text-ink/70 hover:bg-black/10",
+              )}
+            >
+              {inCart ? (
+                <>
+                  <Check className="h-4 w-4" /> In basket
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="h-4 w-4" /> Order
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

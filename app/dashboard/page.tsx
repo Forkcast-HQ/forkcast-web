@@ -15,7 +15,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowRight, Sparkles, Trash2, Camera, Utensils, PencilLine, Flame, Trophy, Target } from "lucide-react";
+import { ArrowRight, Sparkles, Trash2, Camera, Utensils, PencilLine, Flame, Trophy, Target, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useUser } from "@/lib/store";
 import { GOAL_LABELS, bmiInfo, kgToLb, fitScore } from "@/lib/nutrition";
@@ -202,12 +202,17 @@ export default function Dashboard() {
             <ul className="mt-4 space-y-3">
               {today.slice().reverse().map((m) => (
                 <li key={m.id} className="flex items-center gap-3">
-                  <span className={cls("grid h-9 w-9 shrink-0 place-items-center rounded-lg", m.source === "photo" ? "bg-brand-50 text-brand-600" : "bg-black/5 text-ink/50")}>
-                    {m.source === "photo" ? <Camera className="h-4 w-4" /> : m.source === "manual" ? <PencilLine className="h-4 w-4" /> : <Utensils className="h-4 w-4" />}
+                  <span className={cls("grid h-9 w-9 shrink-0 place-items-center rounded-lg", m.source === "photo" ? "bg-brand-50 text-brand-600" : m.source === "order" ? "bg-emerald-50 text-emerald-600" : "bg-black/5 text-ink/50")}>
+                    {m.source === "photo" ? <Camera className="h-4 w-4" /> : m.source === "order" ? <ShoppingBag className="h-4 w-4" /> : m.source === "manual" ? <PencilLine className="h-4 w-4" /> : <Utensils className="h-4 w-4" />}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-ink">{m.name}</p>
-                    <p className="text-xs text-ink/50">{m.calories} cal · {m.protein}g P{m.restaurantName ? ` · ${m.restaurantName}` : ""}</p>
+                    <p className="truncate text-xs text-ink/50">
+                      {m.calories} cal · {m.protein}g P{m.restaurantName ? ` · ${m.restaurantName}` : ""}
+                      {m.source === "order" && m.orderRef ? ` · Order ${m.orderRef}` : ""}
+                      {m.confidence ? ` · ${m.confidence === "partner-verified" ? "verified" : "estimated"}` : ""}
+                      {m.portion && m.portion !== 1 ? ` · ${m.portion}× portion` : ""}
+                    </p>
                   </div>
                   <button onClick={() => removeMeal(m.id)} className="rounded-lg p-1.5 text-ink/30 transition hover:bg-red-50 hover:text-red-500">
                     <Trash2 className="h-4 w-4" />

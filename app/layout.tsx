@@ -3,9 +3,11 @@ import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import { AuthProvider } from "@/lib/auth";
 import { UserProvider } from "@/lib/store";
+import { OrderProvider } from "@/lib/order";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { TodayBar } from "@/components/TodayBar";
+import { CartBar } from "@/components/CartBar";
 
 export const metadata: Metadata = {
   title: "Forkcast — Know before you go",
@@ -23,10 +25,13 @@ export default function RootLayout({
       <body className="min-h-screen">
         <AuthProvider>
           <UserProvider>
-            <Navbar />
-            <main>{children}</main>
-            <Footer />
-            <TodayBar />
+            <OrderProvider>
+              <Navbar />
+              <main>{children}</main>
+              <Footer />
+              <TodayBar />
+              <CartBar />
+            </OrderProvider>
           </UserProvider>
         </AuthProvider>
       </body>
