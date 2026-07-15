@@ -9,7 +9,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Store, Bike, Handshake, Info, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Store, Bike, Handshake, Info, ShieldAlert, CreditCard, ExternalLink } from "lucide-react";
 import { useOrder, DELIVERY_FEE, MA_MEALS_TAX } from "@/lib/order";
 import { getRestaurant } from "@/data/restaurants";
 import { money, cls } from "@/lib/format";
@@ -25,6 +25,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { hydrated, cartItems, cartTotals, cartRestaurantSlug, placeOrder } = useOrder();
   const [fulfill, setFulfill] = useState<Fulfillment>("pickup");
+  const [payMethod, setPayMethod] = useState<"Forkcast Pay" | "Card">("Forkcast Pay");
 
   if (!hydrated) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
 
@@ -79,16 +80,70 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Integration state — never fake a live connection */}
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-            <p className="flex items-start gap-2.5 text-sm text-amber-900">
-              <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>
-                <strong>Prototype checkout — restaurant ordering integration required.</strong>{" "}
-                {fulfill === "partner"
-                  ? `This flow would hand you off to ${rest.name}'s own ordering system once a partner integration is in place. No handoff link is live yet.`
-                  : "No live payment is processed and no order is transmitted to the restaurant. This demonstrates the intended flow: totals, tax, and the post-order meal-log workflow are fully functional."}
-              </span>
+          {/* Payment method — demo only, no real entry fields ever */}
+          <div className="rounded-2xl border border-black/5 bg-white p-5">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-lg font-bold text-ink">Payment</h2>
+              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700">Demo — nothing is charged</span>
+            </div>
+            <div className="mt-4 flex gap-2.5">
+              {(["Forkcast Pay", "Card"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setPayMethod(m)}
+                  className={cls(
+                    "flex-1 rounded-xl border-2 p-3 text-left transition",
+                    payMethod === m ? "border-ink bg-black/[0.03]" : "border-black/10 hover:border-black/25",
+                  )}
+                >
+                  <span className="flex items-center gap-2 font-semibold text-ink">
+                    <CreditCard className="h-4 w-4 text-ink/50" /> {m}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-ink/50">
+                    {m === "Forkcast Pay" ? "Planned wallet — mock" : "No card entry — payment processing not connected"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Integration state board — prototype vs live, per channel. Never fake a connection. */}
+          <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
+            <p className="flex items-center gap-2 font-display text-sm font-extrabold text-amber-900">
+              <ShieldAlert className="h-4 w-4" /> Integration state — prototype
+            </p>
+            <div className="mt-3 space-y-2">
+              <IntegrationRow
+                label="Restaurant order transmission"
+                state="Not connected"
+                detail={`Orders are not sent to ${rest.name}. A partner terminal (in development) will receive them live.`}
+              />
+              <IntegrationRow
+                label="Payment processing"
+                state="Not connected"
+                detail="Demo totals only — real math (tax, fees), no charge, no card data collected."
+              />
+              <IntegrationRow
+                label="Delivery partner API"
+                state="Not connected"
+                detail="No courier is dispatched and no delivery ETA is real."
+                hidden={fulfill !== "delivery"}
+              />
+              <IntegrationRow
+                label={`Handoff to ${rest.name}'s checkout`}
+                state="Link not live"
+                detail="Once a partner agreement exists, this option opens the restaurant's own ordering flow with your basket attached."
+                hidden={fulfill !== "partner"}
+              />
+              <IntegrationRow
+                label="Kitchen status updates"
+                state="Simulated"
+                detail="The tracking timeline after you place this demo order advances on a timer, clearly labeled."
+              />
+            </div>
+            <p className="mt-3 border-t border-amber-200 pt-3 text-xs text-amber-800">
+              Everything else on this page is live product: nutrition math, day-impact preview, order records, and the
+              confirmed meal-log workflow.
             </p>
           </div>
 
@@ -122,12 +177,31 @@ export default function CheckoutPage() {
                 <span>Total</span><span className="tabular-nums">{money(total)}</span>
               </div>
             </div>
-            <button
-              onClick={submit}
-              className="mt-5 w-full rounded-full bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700"
-            >
-              Place order (demo)
-            </button>
+            {fulfill === "partner" ? (
+              <>
+                <button
+                  disabled
+                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-neutral-300 px-5 py-3 font-semibold text-ink/45"
+                  title="No partner handoff link is live yet"
+                >
+                  <ExternalLink className="h-4 w-4" /> Open {rest.name}&apos;s checkout
+                </button>
+                <p className="mt-1.5 text-center text-[11px] font-semibold text-amber-700">Integration required — link not live</p>
+                <button
+                  onClick={submit}
+                  className="mt-3 w-full rounded-full bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700"
+                >
+                  Simulate handoff (demo order)
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={submit}
+                className="mt-5 w-full rounded-full bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700"
+              >
+                Place order (demo)
+              </button>
+            )}
             <p className="mt-2 text-center text-[11px] text-ink/40">No payment is charged. Demo order for flow validation.</p>
           </div>
         </aside>
@@ -138,6 +212,31 @@ export default function CheckoutPage() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">{children}</div>;
+}
+
+function IntegrationRow({
+  label,
+  state,
+  detail,
+  hidden = false,
+}: {
+  label: string;
+  state: string;
+  detail: string;
+  hidden?: boolean;
+}) {
+  if (hidden) return null;
+  return (
+    <div className="rounded-xl border border-amber-200 bg-white/70 p-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm font-semibold text-ink">{label}</span>
+        <span className="shrink-0 rounded-full border border-amber-400 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700">
+          {state}
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-ink/55">{detail}</p>
+    </div>
+  );
 }
 
 function Row({ label, value }: { label: string; value: string }) {
