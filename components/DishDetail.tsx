@@ -14,6 +14,7 @@ import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
 import { fitScore } from "@/lib/nutrition";
 import { correctionsFor } from "@/lib/bus";
+import { flyToBasket } from "@/lib/fly";
 import type { MenuCorrection } from "@/lib/types";
 import { FitBadge } from "@/components/FitBadge";
 import { SmartImage } from "@/components/SmartImage";
@@ -33,6 +34,7 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
   const { addToCart } = useOrder();
   const [inCart, setInCart] = useState(false);
   const [logged, setLogged] = useState(false);
+  const [portion, setPortion] = useState(1); // live preview multiplier
   const [corrections, setCorrections] = useState<MenuCorrection[]>([]);
 
   useEffect(() => {
@@ -52,10 +54,12 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
   const range = restaurant.partner ? RANGE_VERIFIED : RANGE_ESTIMATED;
   const consumed = hydrated ? consumedToday() : null;
   const remaining = targets && consumed ? Math.max(0, targets.calories - consumed.calories) : null;
-  const budgetPct = remaining !== null && remaining > 0 ? Math.round((item.calories / remaining) * 100) : null;
+  const budgetPct = remaining !== null && remaining > 0 ? Math.round(((item.calories * portion) / remaining) * 100) : null;
+  const scaled = (v: number) => Math.round(v * portion);
 
-  const addToOrder = () => {
+  const addToOrder = (e: React.MouseEvent<HTMLButtonElement>) => {
     addToCart(slug, item.id);
+    flyToBasket(e.currentTarget);
     setInCart(true);
     setTimeout(() => setInCart(false), 2200);
   };
@@ -66,14 +70,15 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
       restaurantName: restaurant.name,
       itemId: item.id,
       name: item.name,
-      calories: item.calories,
-      protein: item.protein,
-      carbs: item.carbs,
-      fat: item.fat,
-      fiber: item.fiber,
-      sodium: item.sodium,
-      sugar: item.sugar,
+      calories: Math.round(item.calories * portion),
+      protein: Math.round(item.protein * portion),
+      carbs: Math.round(item.carbs * portion),
+      fat: Math.round(item.fat * portion),
+      fiber: Math.round(item.fiber * portion),
+      sodium: Math.round(item.sodium * portion),
+      sugar: Math.round(item.sugar * portion),
       source: "planned",
+      portion,
       confidence: restaurant.partner ? "partner-verified" : "estimated",
     });
     setLogged(true);
@@ -133,11 +138,12 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
             </p>
           )}
 
-          {/* Budget line */}
+          {/* Budget line — live with portion */}
           {budgetPct !== null && (
             <p className="mt-4 flex items-center gap-2 text-sm text-ink/70">
               <Flame className="h-4 w-4 text-amber-accent" />
-              Uses <strong className="tabular-nums">{budgetPct}%</strong> of the {remaining} cal left in your day
+              {portion !== 1 ? `${portion}× portion uses` : "Uses"}{" "}
+              <strong className="tabular-nums">{budgetPct}%</strong> of the {remaining} cal left in your day
               {budgetPct > 100 ? " — over what remains" : ""}
             </p>
           )}
@@ -179,14 +185,36 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
               )}
             </div>
 
+            {/* Interactive macro donut */}
+            <MacroDonut protein={scaled(item.protein)} carbs={scaled(item.carbs)} fat={scaled(item.fat)} calories={scaled(item.calories)} />
+
+            {/* Portion slider — everything below updates live */}
+            <div className="mt-5 rounded-xl bg-black/[0.03] p-3">
+              <div className="flex items-baseline justify-between text-xs">
+                <span className="font-semibold text-ink">Portion</span>
+                <span className="font-bold tabular-nums text-brand-700">{portion}× · {scaled(item.calories)} cal</span>
+              </div>
+              <input
+                type="range"
+                min={0.25}
+                max={2}
+                step={0.25}
+                value={portion}
+                onChange={(e) => setPortion(Number(e.target.value))}
+                className="mt-2 w-full accent-[#ec3013]"
+                aria-label="Portion size"
+              />
+              <div className="flex justify-between text-[10px] text-ink/40"><span>¼×</span><span>1×</span><span>2×</span></div>
+            </div>
+
             <div className="mt-4 space-y-3.5">
-              <NutrientRow label="Calories" value={item.calories} unit="cal" max={targets ? targets.calories * 0.35 : item.calories * 1.4} range={range} />
-              <NutrientRow label="Protein" value={item.protein} unit="g" max={targets ? targets.protein * 0.4 : 50} range={range} accent />
-              <NutrientRow label="Carbs" value={item.carbs} unit="g" max={targets ? targets.carbs * 0.4 : 80} range={range} />
-              <NutrientRow label="Fat" value={item.fat} unit="g" max={targets ? targets.fat * 0.4 : 40} range={range} />
-              <NutrientRow label="Fiber" value={item.fiber} unit="g" max={10} range={range} />
-              <NutrientRow label="Sodium" value={item.sodium} unit="mg" max={2000} range={range} warnAt={1400} />
-              <NutrientRow label="Sugar" value={item.sugar} unit="g" max={35} range={range} warnAt={25} />
+              <NutrientRow label="Calories" value={scaled(item.calories)} unit="cal" max={targets ? targets.calories * 0.35 : item.calories * 1.4} range={range} />
+              <NutrientRow label="Protein" value={scaled(item.protein)} unit="g" max={targets ? targets.protein * 0.4 : 50} range={range} accent />
+              <NutrientRow label="Carbs" value={scaled(item.carbs)} unit="g" max={targets ? targets.carbs * 0.4 : 80} range={range} />
+              <NutrientRow label="Fat" value={scaled(item.fat)} unit="g" max={targets ? targets.fat * 0.4 : 40} range={range} />
+              <NutrientRow label="Fiber" value={scaled(item.fiber)} unit="g" max={10} range={range} />
+              <NutrientRow label="Sodium" value={scaled(item.sodium)} unit="mg" max={2000} range={range} warnAt={1400} />
+              <NutrientRow label="Sugar" value={scaled(item.sugar)} unit="g" max={35} range={range} warnAt={25} />
             </div>
 
             {/* Source line */}
@@ -238,6 +266,76 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
             )}
           </div>
         </aside>
+      </div>
+    </div>
+  );
+}
+
+// Interactive macro donut — hover/tap a segment to inspect it.
+function MacroDonut({ protein, carbs, fat, calories }: { protein: number; carbs: number; fat: number; calories: number }) {
+  const [active, setActive] = useState<"protein" | "carbs" | "fat" | null>(null);
+  const pCal = protein * 4;
+  const cCal = carbs * 4;
+  const fCal = fat * 9;
+  const total = Math.max(1, pCal + cCal + fCal);
+  const R = 42;
+  const C = 2 * Math.PI * R;
+  const segs = [
+    { key: "protein" as const, cal: pCal, grams: protein, color: "#ec3013", label: "Protein" },
+    { key: "carbs" as const, cal: cCal, grams: carbs, color: "#9b9797", label: "Carbs" },
+    { key: "fat" as const, cal: fCal, grams: fat, color: "#e0853a", label: "Fat" },
+  ];
+  let offset = 0;
+  const activeSeg = segs.find((s) => s.key === active);
+
+  return (
+    <div className="mt-4 flex items-center gap-5">
+      <svg width={120} height={120} viewBox="0 0 120 120" className="-rotate-90 shrink-0">
+        {segs.map((s) => {
+          const len = (s.cal / total) * C;
+          const el = (
+            <circle
+              key={s.key}
+              cx={60}
+              cy={60}
+              r={R}
+              fill="none"
+              stroke={s.color}
+              strokeWidth={active === s.key ? 16 : 11}
+              strokeDasharray={`${Math.max(0, len - 2).toFixed(1)} ${C.toFixed(1)}`}
+              strokeDashoffset={-offset}
+              className="cursor-pointer transition-all duration-200"
+              opacity={active && active !== s.key ? 0.35 : 1}
+              onMouseEnter={() => setActive(s.key)}
+              onMouseLeave={() => setActive(null)}
+              onClick={() => setActive(active === s.key ? null : s.key)}
+            />
+          );
+          offset += len;
+          return el;
+        })}
+        <g className="rotate-90" style={{ transformOrigin: "60px 60px" }}>
+          <text x={60} y={56} textAnchor="middle" className="fill-ink font-display" style={{ fontSize: 20, fontWeight: 800 }}>
+            {activeSeg ? `${activeSeg.grams}g` : calories.toLocaleString()}
+          </text>
+          <text x={60} y={73} textAnchor="middle" className="fill-ink/45" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            {activeSeg ? activeSeg.label : "calories"}
+          </text>
+        </g>
+      </svg>
+      <div className="space-y-1.5 text-xs">
+        {segs.map((s) => (
+          <button
+            key={s.key}
+            onMouseEnter={() => setActive(s.key)}
+            onMouseLeave={() => setActive(null)}
+            className={cls("flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left transition", active === s.key && "bg-black/[0.04]")}
+          >
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: s.color }} />
+            <span className="font-semibold text-ink">{s.label}</span>
+            <span className="ml-auto tabular-nums text-ink/55">{s.grams}g · {Math.round((s.cal / total) * 100)}%</span>
+          </button>
+        ))}
       </div>
     </div>
   );

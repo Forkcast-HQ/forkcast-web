@@ -8,6 +8,7 @@ import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
 import { deriveTags, fitScore } from "@/lib/nutrition";
 import { getRestaurant } from "@/data/restaurants";
+import { flyToBasket } from "@/lib/fly";
 import { SmartImage } from "./SmartImage";
 import { FitBadge } from "./FitBadge";
 import { categoryImg } from "@/lib/images";
@@ -41,8 +42,9 @@ export function MenuItemCard({
   const [added, setAdded] = useState(false);
   const [inCart, setInCart] = useState(false);
 
-  const handleAddToOrder = () => {
+  const handleAddToOrder = (e: React.MouseEvent<HTMLButtonElement>) => {
     addToCart(restaurantSlug, item.id);
+    flyToBasket(e.currentTarget);
     setInCart(true);
     setTimeout(() => setInCart(false), 2200);
   };

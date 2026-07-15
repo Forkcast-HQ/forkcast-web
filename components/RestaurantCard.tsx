@@ -7,6 +7,7 @@ import { useUser } from "@/lib/store";
 import { fitScore } from "@/lib/nutrition";
 import { SmartImage } from "./SmartImage";
 import { FitPill } from "./FitBadge";
+import { TiltCard } from "./TiltCard";
 import { restaurantImg } from "@/lib/images";
 import { priceLevelLabel } from "@/lib/format";
 
@@ -27,10 +28,11 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
   }
 
   return (
+    <TiltCard>
     <Link
       href={`/restaurant/${restaurant.slug}`}
       aria-label={`View ${restaurant.name} menu`}
-      className="interactive-card group block overflow-hidden rounded-[1.35rem] border border-black/[0.07] bg-white shadow-[0_1px_2px_rgba(32,22,15,0.03)]"
+      className="group block overflow-hidden rounded-[1.35rem] border border-black/[0.07] bg-white shadow-[0_1px_2px_rgba(32,22,15,0.03)] transition-shadow hover:card-shadow-lg"
     >
       <div className="relative aspect-[16/10] overflow-hidden">
         <SmartImage
@@ -108,5 +110,6 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
         </div>
       </div>
     </Link>
+    </TiltCard>
   );
 }

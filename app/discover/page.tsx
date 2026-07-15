@@ -194,15 +194,17 @@ export default function Discover() {
             <Sparkles className="h-5 w-5 text-brand-600" />
             <h2 id="top-matches-heading" className="font-display text-xl font-bold text-ink">Top matches for you</h2>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
+          {/* Swipeable rail (design handoff: swipeable dish cards) */}
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0 [scrollbar-width:thin]">
             {topDishes.map((m, i) => (
-              <MenuItemCard
-                key={m.id}
-                item={m}
-                restaurantSlug={m.restaurantSlug}
-                restaurantName={m.restaurantName}
-                seed={i}
-              />
+              <div key={m.id} className="w-[88%] min-w-[300px] max-w-md shrink-0 snap-start sm:w-[46%]">
+                <MenuItemCard
+                  item={m}
+                  restaurantSlug={m.restaurantSlug}
+                  restaurantName={m.restaurantName}
+                  seed={i}
+                />
+              </div>
             ))}
           </div>
         </section>

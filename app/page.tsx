@@ -6,12 +6,12 @@ import {
   MapPin,
   Sparkles,
   Store,
-  Target,
   TrendingDown,
   Utensils,
 } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
 import { RestaurantCard } from "@/components/RestaurantCard";
+import { HeroDemo } from "@/components/HeroDemo";
 import { restaurantImg, foodImg } from "@/lib/images";
 import { RESTAURANTS } from "@/data/restaurants";
 
@@ -37,9 +37,8 @@ export default function Home() {
               <span className="italic text-brand-600">before you sit down.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink/65">
-              Forkcast turns your height, weight and goals into a daily plan — then
-              matches you to dishes at nearby restaurants that actually fit it.
-              Order or walk in, snap a photo, and stay on track without the guesswork.
+              Your goals become a daily plan. Nearby menus re-rank around it.
+              Try it live — that card is the real engine. →
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -67,61 +66,9 @@ export default function Home() {
             </ul>
           </div>
 
-          {/* Product preview */}
+          {/* Live product demo — the real engine, interactive */}
           <div className="relative animate-rise lg:justify-self-end">
-            <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-black/5 bg-white card-shadow-lg">
-              <div className="relative h-56 w-full">
-                <SmartImage
-                  src={foodImg("salmon,bowl,quinoa,healthy", 901, 800, 600)}
-                  alt="Citrus salmon bowl"
-                  label="Citrus Salmon Bowl"
-                  className="h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                <span className="absolute left-4 top-4 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink/70 shadow-sm backdrop-blur">
-                  Product preview
-                </span>
-                <div className="absolute right-4 top-4 grid h-14 w-14 place-items-center rounded-full bg-brand-600 font-display text-xl font-bold text-white shadow-lg">
-                  92
-                </div>
-                <div className="absolute bottom-3 left-4 text-white">
-                  <p className="text-xs font-medium text-white/80">Char &amp; Greens · Seaport · 1.9 mi</p>
-                  <p className="font-display text-lg font-bold">Blackened Salmon Bowl</p>
-                </div>
-              </div>
-              <div className="space-y-3 p-5">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-semibold text-ink">Fits your day</span>
-                  <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
-                    Fit Score A
-                  </span>
-                </div>
-                <PreviewBar label="Calories" value="580 / 700 left" pct={58} />
-                <PreviewBar label="Protein" value="40g · great" pct={74} color="#059669" />
-                <PreviewBar label="Sodium" value="600mg · low" pct={30} color="#f59e0b" />
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {["High protein", "Good fiber", "Low sugar"].map((t) => (
-                    <span key={t} className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="border-t border-black/[0.06] bg-cream/70 px-5 py-3 text-[11px] leading-relaxed text-ink/45">
-                Demonstration nutrition and restaurant data shown for product evaluation.
-              </div>
-            </div>
-            <div className="absolute -left-6 -top-6 hidden rotate-[-6deg] rounded-2xl border border-black/5 bg-white px-4 py-3 card-shadow sm:block">
-              <div className="flex items-center gap-2">
-                <div className="grid h-9 w-9 place-items-center rounded-full bg-amber-accent/15 text-amber-600">
-                  <Target className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-medium text-ink/50">Daily target</p>
-                  <p className="text-sm font-bold text-ink">1,980 kcal · 150g protein</p>
-                </div>
-              </div>
-            </div>
+            <HeroDemo />
           </div>
         </div>
       </section>
@@ -145,19 +92,12 @@ export default function Home() {
               Eating out is the new normal — and it&apos;s where good intentions fall apart.
             </h2>
             <p className="mt-5 text-lg text-ink/65">
-              Americans now eat about a third of their calories away from home. Those
-              meals run ~200 calories and ~350mg more sodium than home cooking — and
-              we&apos;re terrible at guessing how much. Even mandatory calorie labels
-              move intake by only about <strong>24 calories</strong> per order.
-            </p>
-            <p className="mt-4 text-lg text-ink/65">
-              Today&apos;s apps make you log <em>after</em> you&apos;ve already eaten.
-              That&apos;s accounting, not coaching. Forkcast flips it: decide what fits{" "}
-              <strong>before</strong> you order.
+              A third of American calories are eaten out — and every existing app
+              reacts <em>after</em> the plate is empty. Forkcast acts <strong>before</strong> you order.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              <ProblemPoint icon={<TrendingDown className="h-5 w-5" />} title="Guesswork, not data" body="Menus rarely show protein, carbs or sodium for independent restaurants." />
-              <ProblemPoint icon={<Camera className="h-5 w-5" />} title="Too late to help" body="Photo-calorie apps tell you the damage once the plate is empty." />
+              <ProblemPoint icon={<TrendingDown className="h-5 w-5" />} title="Guesswork, not data" body="Independent-restaurant menus rarely show protein, sodium, or carbs — labeling rules only cover chains." />
+              <ProblemPoint icon={<Camera className="h-5 w-5" />} title="Too late to help" body="Log-after apps are accounting, not coaching. Labels alone shift intake by ~24 cal per order." />
             </div>
           </div>
           <div className="relative">
@@ -318,20 +258,6 @@ export default function Home() {
 }
 
 /* ---------- small presentational helpers ---------- */
-
-function PreviewBar({ label, value, pct, color = "#10b981" }: { label: string; value: string; pct: number; color?: string }) {
-  return (
-    <div>
-      <div className="mb-1 flex items-center justify-between text-xs">
-        <span className="font-medium text-ink/70">{label}</span>
-        <span className="text-ink/50">{value}</span>
-      </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-black/[0.07]">
-        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
-      </div>
-    </div>
-  );
-}
 
 function Stat({ figure, label, cite }: { figure: string; label: string; cite: string }) {
   return (

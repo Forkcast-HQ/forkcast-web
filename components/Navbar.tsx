@@ -83,6 +83,7 @@ export function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           {hydrated && user && (
             <Link
+              id="nav-basket"
               href="/basket"
               className="relative grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-black/5 hover:text-ink"
               aria-label="Basket"
