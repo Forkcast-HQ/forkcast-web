@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import { AuthProvider } from "@/lib/auth";
@@ -15,6 +15,11 @@ export const metadata: Metadata = {
     "Nutrition-aware restaurant recommendations. Plan what you'll eat out before you go, match dishes to your goals, and track every meal.",
 };
 
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#f7f4ec",
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -23,11 +28,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <AuthProvider>
           <UserProvider>
             <OrderProvider>
               <Navbar />
-              <main>{children}</main>
+              <main id="main-content" tabIndex={-1}>
+                {children}
+              </main>
               <Footer />
               <TodayBar />
               <CartBar />

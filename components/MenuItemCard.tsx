@@ -68,7 +68,7 @@ export function MenuItemCard({
   };
 
   return (
-    <div className="group flex gap-4 rounded-2xl border border-black/5 bg-white p-3 transition-shadow hover:card-shadow sm:p-4">
+    <article className="interactive-card group flex gap-3 rounded-2xl border border-black/[0.07] bg-white p-3 sm:gap-4 sm:p-4">
       <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28">
         <SmartImage
           src={categoryImg(item.category, seed)}
@@ -92,7 +92,7 @@ export function MenuItemCard({
                 {restaurantName}
               </p>
             )}
-            <h3 className="truncate font-display text-base font-bold text-ink">{item.name}</h3>
+            <h3 className="truncate font-display text-[1.05rem] font-bold text-ink">{item.name}</h3>
             <p className="mt-0.5 line-clamp-2 text-sm text-ink/55">{item.description}</p>
           </div>
           <span className="shrink-0 font-semibold text-ink">{money(item.price)}</span>
@@ -138,8 +138,9 @@ export function MenuItemCard({
           <div className="flex shrink-0 items-center gap-1.5">
             <button
               onClick={handleLog}
+              aria-label={`Log ${item.name} to today's plan`}
               className={cls(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition",
+                "inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition",
                 added
                   ? "bg-brand-600 text-white"
                   : "bg-brand-50 text-brand-700 hover:bg-brand-100",
@@ -180,7 +181,7 @@ export function MenuItemCard({
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
