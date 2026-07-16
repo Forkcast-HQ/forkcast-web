@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, Flame, Plus, MapPin, ShoppingBag } from "lucide-react";
+import { Check, Flame, MapPin, ShoppingBag } from "lucide-react";
 import type { MenuItem } from "@/lib/types";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
@@ -37,9 +37,8 @@ export function MenuItemCard({
   seed?: number;
   showRestaurant?: boolean;
 }) {
-  const { targets, profile, logMeal } = useUser();
+  const { targets, profile } = useUser();
   const { addToCart, cartRestaurantSlug } = useOrder();
-  const [added, setAdded] = useState(false);
   const [inCart, setInCart] = useState(false);
 
   const handleAddToOrder = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -57,25 +56,6 @@ export function MenuItemCard({
   const itemText = `${item.name} ${item.description} ${item.tags.join(" ")}`.toLowerCase();
   const allergenHits = (profile?.avoid ?? []).filter((a) => itemText.includes(a.toLowerCase()));
   const condWarns = conditionWarnings(item, profile?.conditions);
-
-  const handleLog = () => {
-    logMeal({
-      restaurantSlug,
-      restaurantName,
-      itemId: item.id,
-      name: item.name,
-      calories: item.calories,
-      protein: item.protein,
-      carbs: item.carbs,
-      fat: item.fat,
-      fiber: item.fiber,
-      sodium: item.sodium,
-      sugar: item.sugar,
-      source: "planned",
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2200);
-  };
 
   return (
     <article className="interactive-card group flex gap-3 rounded-2xl border border-black/[0.07] bg-white p-3 sm:gap-4 sm:p-4">
@@ -168,55 +148,34 @@ export function MenuItemCard({
         <div className="mt-3 flex items-center justify-between">
           {fit ? (
             <p className="truncate text-xs text-ink/50">
-              {fit.reasons.length ? fit.reasons.join(" · ") : "Tap to add to today"}
+              {fit.reasons.length ? fit.reasons.join(" · ") : "A middle-of-the-road fit for your goals"}
             </p>
           ) : (
             <p className="text-xs text-ink/40">Set up your profile for a Fit Score</p>
           )}
-          <div className="flex shrink-0 items-center gap-1.5">
-            <button
-              onClick={handleLog}
-              aria-label={`Log ${item.name} to today's plan`}
-              className={cls(
-                "inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition",
-                added
-                  ? "bg-brand-600 text-white"
-                  : "bg-brand-50 text-brand-700 hover:bg-brand-100",
-              )}
-            >
-              {added ? (
-                <>
-                  <Check className="h-4 w-4" /> Added
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" /> Log it
-                </>
-              )}
-            </button>
-            <button
-              onClick={handleAddToOrder}
-              title={
-                cartRestaurantSlug && cartRestaurantSlug !== restaurantSlug
-                  ? "Starts a new basket (one restaurant per order)"
-                  : "Add to order"
-              }
-              className={cls(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition",
-                inCart ? "bg-brand-950 text-white" : "bg-black/5 text-ink/70 hover:bg-black/10",
-              )}
-            >
-              {inCart ? (
-                <>
-                  <Check className="h-4 w-4" /> In basket
-                </>
-              ) : (
-                <>
-                  <ShoppingBag className="h-4 w-4" /> Order
-                </>
-              )}
-            </button>
-          </div>
+          <button
+            onClick={handleAddToOrder}
+            aria-label={`Add ${item.name} to your order`}
+            title={
+              cartRestaurantSlug && cartRestaurantSlug !== restaurantSlug
+                ? "Starts a new basket (one restaurant per order)"
+                : "Add to order — it's logged once the meal is confirmed"
+            }
+            className={cls(
+              "inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition",
+              inCart ? "bg-brand-950 text-white" : "bg-brand-600 text-white hover:bg-brand-700",
+            )}
+          >
+            {inCart ? (
+              <>
+                <Check className="h-4 w-4" /> In basket
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="h-4 w-4" /> Add to order
+              </>
+            )}
+          </button>
         </div>
       </div>
     </article>

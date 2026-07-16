@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, BadgeCheck, Check, Flame, Plus, ShieldAlert, ShoppingBag } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Check, Flame, ShieldAlert, ShoppingBag } from "lucide-react";
 import { getRestaurant } from "@/data/restaurants";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
@@ -30,10 +30,9 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
   const router = useRouter();
   const restaurant = getRestaurant(slug);
   const item = restaurant?.menu.find((m) => m.id === id);
-  const { profile, targets, consumedToday, hydrated, logMeal } = useUser();
+  const { profile, targets, consumedToday, hydrated } = useUser();
   const { addToCart } = useOrder();
   const [inCart, setInCart] = useState(false);
-  const [logged, setLogged] = useState(false);
   const [portion, setPortion] = useState(1); // live preview multiplier
   const [corrections, setCorrections] = useState<MenuCorrection[]>([]);
 
@@ -65,27 +64,6 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
     flyToBasket(e.currentTarget);
     setInCart(true);
     setTimeout(() => setInCart(false), 2200);
-  };
-
-  const logIt = () => {
-    logMeal({
-      restaurantSlug: slug,
-      restaurantName: restaurant.name,
-      itemId: item.id,
-      name: item.name,
-      calories: Math.round(item.calories * portion),
-      protein: Math.round(item.protein * portion),
-      carbs: Math.round(item.carbs * portion),
-      fat: Math.round(item.fat * portion),
-      fiber: Math.round(item.fiber * portion),
-      sodium: Math.round(item.sodium * portion),
-      sugar: Math.round(item.sugar * portion),
-      source: "planned",
-      portion,
-      confidence: restaurant.partner ? "partner-verified" : "estimated",
-    });
-    setLogged(true);
-    setTimeout(() => setLogged(false), 2200);
   };
 
   return (
@@ -159,26 +137,20 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
             </p>
           )}
 
-          {/* Actions */}
-          <div className="mt-5 flex gap-2">
+          {/* Action — meals reach your log through a confirmed order (or a photo) */}
+          <div className="mt-5">
             <button
               onClick={addToOrder}
               className={cls(
-                "inline-flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-3 font-semibold transition",
+                "inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 font-semibold transition",
                 inCart ? "bg-brand-950 text-white" : "bg-brand-600 text-white hover:bg-brand-700",
               )}
             >
               {inCart ? (<><Check className="h-4 w-4" /> In basket</>) : (<><ShoppingBag className="h-4 w-4" /> Add to order</>)}
             </button>
-            <button
-              onClick={logIt}
-              className={cls(
-                "inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold transition",
-                logged ? "border-ink bg-ink text-white" : "border-neutral-300 bg-white text-ink hover:border-ink",
-              )}
-            >
-              {logged ? (<><Check className="h-4 w-4" /> Logged</>) : (<><Plus className="h-4 w-4" /> Log without ordering</>)}
-            </button>
+            <p className="mt-2 text-center text-xs text-ink/45">
+              Logged to your day once the meal is confirmed — with portion edits and the order reference attached.
+            </p>
           </div>
         </div>
 
