@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Search, SlidersHorizontal, Sparkles, ArrowRight, Map as MapIcon, List, Star, Clock, Info, X } from "lucide-react";
 import { RESTAURANTS, CUISINES, allMenuItems } from "@/data/restaurants";
 import { useUser } from "@/lib/store";
-import { fitScore } from "@/lib/nutrition";
+import { fitScore, personalAdjust } from "@/lib/nutrition";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { MenuItemCard } from "@/components/MenuItemCard";
 import { FitPill } from "@/components/FitBadge";
@@ -115,11 +115,14 @@ export default function Discover() {
     [restaurants, bestFitOf],
   );
 
+  // Personalized: allergen hits excluded from recommendations, condition-
+  // flagged dishes ranked below clean ones (menus still show everything, flagged).
   const topDishes = useMemo(() => {
     if (!targets || !profile) return [];
     return allMenuItems()
-      .map((m) => ({ m, fit: fitScore(m, targets, profile.goal).score }))
-      .sort((a, b) => b.fit - a.fit)
+      .map((m) => ({ m, fit: fitScore(m, targets, profile.goal).score, adj: personalAdjust(m, profile) }))
+      .filter((x) => !x.adj.exclude)
+      .sort((a, b) => b.fit - b.adj.penalty - (a.fit - a.adj.penalty))
       .slice(0, 6)
       .map((x) => x.m);
   }, [targets, profile]);

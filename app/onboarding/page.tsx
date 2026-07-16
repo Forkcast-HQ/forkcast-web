@@ -8,6 +8,8 @@ import { useUser } from "@/lib/store";
 import {
   ACTIVITY_LABELS,
   ACTIVITY_FACTORS,
+  COMMON_ALLERGENS,
+  CONDITIONS,
   GOAL_LABELS,
   bmiInfo,
   computeTargets,
@@ -48,6 +50,8 @@ export default function Onboarding() {
   const [activity, setActivity] = useState<ActivityLevel>("moderate");
   const [goal, setGoal] = useState<Goal>("lose");
   const [dietary, setDietary] = useState<string[]>([]);
+  const [avoid, setAvoid] = useState<string[]>([]);
+  const [conditions, setConditions] = useState<string[]>([]);
 
   useEffect(() => {
     if (hydrated && !user) router.replace("/signup");
@@ -63,6 +67,8 @@ export default function Onboarding() {
       setActivity(existing.activity);
       setGoal(existing.goal);
       setDietary(existing.dietary || []);
+      setAvoid(existing.avoid || []);
+      setConditions(existing.conditions || []);
       const inches = cmToIn(existing.heightCm);
       setFt(String(Math.floor(inches / 12)));
       setInch(String(Math.round(inches % 12)));
@@ -80,8 +86,8 @@ export default function Onboarding() {
   const ageNum = clampNum(age, 14, 100, 30);
 
   const profile: HealthProfile = useMemo(
-    () => ({ name, sex, age: ageNum, heightCm, weightKg, activity, goal, dietary, avoid: [], createdAt: Date.now() }),
-    [name, sex, ageNum, heightCm, weightKg, activity, goal, dietary],
+    () => ({ name, sex, age: ageNum, heightCm, weightKg, activity, goal, dietary, avoid, conditions, createdAt: Date.now() }),
+    [name, sex, ageNum, heightCm, weightKg, activity, goal, dietary, avoid, conditions],
   );
   const bmi = bmiInfo(weightKg, heightCm);
   const targets = computeTargets(profile);
@@ -179,16 +185,21 @@ export default function Onboarding() {
                 </div>
                 <div className="mt-5">
                   <p className="mb-2 text-sm font-medium text-ink/70">Dietary preferences (optional)</p>
-                  <div className="flex flex-wrap gap-2">
-                    {DIETS.map((d) => {
-                      const on = dietary.includes(d);
-                      return (
-                        <button key={d} onClick={() => setDietary((c) => (on ? c.filter((x) => x !== d) : [...c, d]))} className={cls("rounded-full border px-3.5 py-1.5 text-sm font-medium transition", on ? "border-brand-500 bg-brand-600 text-white" : "border-black/10 bg-white text-ink/70 hover:border-black/20")}>
-                          {d}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <Chips options={DIETS} value={dietary} onChange={setDietary} />
+                </div>
+                <div className="mt-5">
+                  <p className="mb-2 text-sm font-medium text-ink/70">Allergies (optional) — dishes that may contain these get flagged</p>
+                  <Chips options={[...COMMON_ALLERGENS]} value={avoid} onChange={setAvoid} />
+                  <p className="mt-2 text-xs text-ink/45">
+                    Flags are advisories from menu text — never a guarantee. Always confirm allergens directly with the restaurant.
+                  </p>
+                </div>
+                <div className="mt-5">
+                  <p className="mb-2 text-sm font-medium text-ink/70">Health conditions (optional) — adds sodium / sugar / fat advisories</p>
+                  <Chips options={[...CONDITIONS]} value={conditions} onChange={setConditions} />
+                  <p className="mt-2 text-xs text-ink/45">
+                    Self-reported, stored only on your device, used solely to flag and de-prioritize dishes. Informational — not medical advice.
+                  </p>
                 </div>
               </div>
             </div>
@@ -258,6 +269,30 @@ export default function Onboarding() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Chips({ options, value, onChange }: { options: string[]; value: string[]; onChange: (v: string[]) => void }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((d) => {
+        const on = value.includes(d);
+        return (
+          <button
+            key={d}
+            type="button"
+            aria-pressed={on}
+            onClick={() => onChange(on ? value.filter((x) => x !== d) : [...value, d])}
+            className={cls(
+              "rounded-full border px-3.5 py-1.5 text-sm font-medium transition",
+              on ? "border-brand-500 bg-brand-600 text-white" : "border-black/10 bg-white text-ink/70 hover:border-black/20",
+            )}
+          >
+            {d}
+          </button>
+        );
+      })}
     </div>
   );
 }

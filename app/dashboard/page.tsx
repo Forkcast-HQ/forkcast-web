@@ -18,7 +18,7 @@ import {
 import { ArrowRight, Sparkles, Trash2, Camera, Utensils, PencilLine, Flame, Trophy, Target, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useUser } from "@/lib/store";
-import { GOAL_LABELS, bmiInfo, kgToLb, fitScore } from "@/lib/nutrition";
+import { GOAL_LABELS, bmiInfo, kgToLb, fitScore, personalAdjust } from "@/lib/nutrition";
 import { allMenuItems } from "@/data/restaurants";
 import { coachTip } from "@/lib/ai";
 import { MacroRing, MacroBar } from "@/components/MacroRing";
@@ -86,12 +86,14 @@ export default function Dashboard() {
     });
   }, [weights, profile]);
 
-  // Next best meals nearby — top-3 shortlist (design handoff: dashboard spec)
+  // Next best meals — personalized: allergen hits excluded, condition-flagged
+  // dishes ranked below clean alternatives (they stay visible on menus, flagged).
   const recommended = useMemo(() => {
     if (!targets || !profile) return [];
     return allMenuItems()
-      .map((m) => ({ m, fit: fitScore(m, targets, profile.goal).score }))
-      .sort((a, b) => b.fit - a.fit)
+      .map((m) => ({ m, fit: fitScore(m, targets, profile.goal).score, adj: personalAdjust(m, profile) }))
+      .filter((x) => !x.adj.exclude)
+      .sort((a, b) => b.fit - b.adj.penalty - (a.fit - a.adj.penalty))
       .slice(0, 6)
       .map((x) => x.m);
   }, [targets, profile]);

@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "@/lib/auth";
+import { ArrowRight, Eye, EyeOff, Store, User } from "lucide-react";
+import { useAuth, type AccountRole } from "@/lib/auth";
 import { AuthShell, AuthField } from "@/components/AuthShell";
+import { cls } from "@/lib/format";
 
 export default function SignUp() {
   const router = useRouter();
   const { signUp, user, hydrated } = useAuth();
+  const [role, setRole] = useState<AccountRole>("customer");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,25 +20,49 @@ export default function SignUp() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (hydrated && user) router.replace("/dashboard");
+    if (hydrated && user) router.replace(user.role === "restaurant" ? "/partner" : "/dashboard");
   }, [hydrated, user, router]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const res = signUp({ name, email, password });
+    const res = signUp({ name, email, password, role });
     if (!res.ok) {
       setError(res.error ?? "Something went wrong.");
       setBusy(false);
       return;
     }
-    router.push("/onboarding");
+    router.push(role === "restaurant" ? "/partner" : "/onboarding");
   };
 
   return (
     <AuthShell title="Create your account" subtitle="60 seconds to your first personalized recommendation.">
       <form onSubmit={submit} className="space-y-4">
-        <AuthField label="Name">
+        {/* Account type */}
+        <div className="grid grid-cols-2 gap-2">
+          {(
+            [
+              { key: "customer", label: "I'm a diner", desc: "Personal plan, Fit Scores, ordering", icon: <User className="h-4 w-4" /> },
+              { key: "restaurant", label: "I'm a restaurant", desc: "Order terminal, menu verification", icon: <Store className="h-4 w-4" /> },
+            ] as const
+          ).map((o) => (
+            <button
+              key={o.key}
+              type="button"
+              onClick={() => setRole(o.key)}
+              aria-pressed={role === o.key}
+              className={cls(
+                "rounded-xl border-2 p-3 text-left transition",
+                role === o.key ? "border-ink bg-black/[0.03]" : "border-black/10 hover:border-black/25",
+              )}
+            >
+              <span className="flex items-center gap-1.5 text-sm font-bold text-ink">{o.icon} {o.label}</span>
+              <span className="mt-0.5 block text-xs text-ink/50">{o.desc}</span>
+            </button>
+          ))}
+        </div>
+
+        <AuthField label={role === "restaurant" ? "Restaurant / contact name" : "Name"}>
           <input className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder="Alex Rivera" autoComplete="name" />
         </AuthField>
         <AuthField label="Email">

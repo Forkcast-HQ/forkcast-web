@@ -266,6 +266,26 @@ export function conditionWarnings(item: MenuItem, conditions: string[] | undefin
   return out;
 }
 
+// Allergen matches from menu text (advisory — never a guarantee).
+export function allergenMatches(item: MenuItem, avoid: string[] | undefined): string[] {
+  if (!avoid?.length) return [];
+  const text = `${item.name} ${item.description} ${item.tags.join(" ")}`.toLowerCase();
+  return avoid.filter((a) => text.includes(a.toLowerCase()));
+}
+
+// Personalization for RECOMMENDATION lists (top matches, shortlists):
+// - dishes matching a profile allergen are EXCLUDED from recommendations
+//   (still visible on menus, clearly flagged — we never hide the menu itself);
+// - dishes with condition advisories are pushed below clean alternatives.
+export function personalAdjust(
+  item: MenuItem,
+  profile: { avoid?: string[]; conditions?: string[] } | null | undefined,
+): { exclude: boolean; penalty: number } {
+  if (!profile) return { exclude: false, penalty: 0 };
+  if (allergenMatches(item, profile.avoid).length) return { exclude: true, penalty: 100 };
+  return { exclude: false, penalty: conditionWarnings(item, profile.conditions).length * 12 };
+}
+
 // Derived attribute tags for a dish (used for filter chips / badges)
 export function deriveTags(item: MenuItem): string[] {
   const t = new Set(item.tags);

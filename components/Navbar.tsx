@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Menu, X, LayoutDashboard, User, LogOut, ChevronDown, ShoppingBag, ReceiptText, ClipboardList } from "lucide-react";
+import { Menu, X, LayoutDashboard, User, LogOut, ChevronDown, ShoppingBag, ReceiptText, ClipboardList, MonitorSmartphone } from "lucide-react";
 import { Logo } from "./Logo";
 import { Avatar } from "./Avatar";
 import { useAuth } from "@/lib/auth";
@@ -22,6 +22,7 @@ export function Navbar() {
   const router = useRouter();
   const { user, hydrated, logOut } = useAuth();
   const { cartCount } = useOrder();
+  const isRestaurant = user?.role === "restaurant";
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -81,7 +82,7 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          {hydrated && user && (
+          {hydrated && user && !isRestaurant && (
             <Link
               id="nav-basket"
               href="/basket"
@@ -116,9 +117,15 @@ export function Navbar() {
                     <p className="truncate text-sm font-semibold text-ink">{user.name || "Your account"}</p>
                     <p className="truncate text-xs text-ink/50">{user.email}</p>
                   </div>
-                  <MenuLink href="/dashboard" icon={<LayoutDashboard className="h-4 w-4" />}>Dashboard</MenuLink>
-                  <MenuLink href="/orders" icon={<ReceiptText className="h-4 w-4" />}>Orders</MenuLink>
-                  <MenuLink href="/log" icon={<ClipboardList className="h-4 w-4" />}>Meal log</MenuLink>
+                  {isRestaurant ? (
+                    <MenuLink href="/partner" icon={<MonitorSmartphone className="h-4 w-4" />}>Partner terminal</MenuLink>
+                  ) : (
+                    <>
+                      <MenuLink href="/dashboard" icon={<LayoutDashboard className="h-4 w-4" />}>Dashboard</MenuLink>
+                      <MenuLink href="/orders" icon={<ReceiptText className="h-4 w-4" />}>Orders</MenuLink>
+                      <MenuLink href="/log" icon={<ClipboardList className="h-4 w-4" />}>Meal log</MenuLink>
+                    </>
+                  )}
                   <MenuLink href="/profile" icon={<User className="h-4 w-4" />}>Profile &amp; settings</MenuLink>
                   <button
                     onClick={() => {

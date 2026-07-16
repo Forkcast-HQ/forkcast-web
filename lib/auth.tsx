@@ -13,18 +13,21 @@ import React, {
 // accounts, per-user data — but NOT production security. Swap for a real
 // backend (e.g. Auth.js + a database) when going live; the UI won't change.
 
+export type AccountRole = "customer" | "restaurant";
+
 export interface Account {
   id: string;
   name: string;
   email: string;
   passwordHash: string;
+  role?: AccountRole; // default "customer" (accounts created before roles existed)
   createdAt: number;
 }
 
 interface AuthValue {
   hydrated: boolean;
   user: Account | null;
-  signUp: (input: { name: string; email: string; password: string }) => { ok: boolean; error?: string };
+  signUp: (input: { name: string; email: string; password: string; role?: AccountRole }) => { ok: boolean; error?: string };
   logIn: (input: { email: string; password: string }) => { ok: boolean; error?: string };
   logOut: () => void;
   updateName: (name: string) => void;
@@ -80,12 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUp: AuthValue["signUp"] = useCallback(
-    ({ name, email, password }) => {
+    ({ name, email, password, role }) => {
       const e = email.trim().toLowerCase();
       if (!e || !e.includes("@")) return { ok: false, error: "Enter a valid email." };
       if (password.length < 6) return { ok: false, error: "Password must be at least 6 characters." };
       if (accounts.some((a) => a.email === e)) return { ok: false, error: "An account with that email already exists." };
-      const acc: Account = { id: uid(), name: name.trim(), email: e, passwordHash: pwHash(password), createdAt: Date.now() };
+      const acc: Account = { id: uid(), name: name.trim(), email: e, passwordHash: pwHash(password), role: role ?? "customer", createdAt: Date.now() };
       persistAccounts([...accounts, acc]);
       setSession(acc.id);
       return { ok: true };

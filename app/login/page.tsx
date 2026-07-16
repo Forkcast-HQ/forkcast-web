@@ -16,7 +16,7 @@ export default function LogIn() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (hydrated && user) router.replace("/dashboard");
+    if (hydrated && user) router.replace(user.role === "restaurant" ? "/partner" : "/dashboard");
   }, [hydrated, user, router]);
 
   const submit = (e: React.FormEvent) => {
@@ -26,7 +26,8 @@ export default function LogIn() {
       setError(res.error ?? "Something went wrong.");
       return;
     }
-    router.push("/dashboard");
+    // Redirect happens in the effect above once the session updates
+    // (restaurants go to the partner terminal, diners to the dashboard).
   };
 
   return (
