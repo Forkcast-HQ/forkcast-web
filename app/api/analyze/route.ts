@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 
 // POST /api/analyze  { image: "data:image/jpeg;base64,..." } -> nutrition estimate.
-// GET  /api/analyze  -> lists the Groq models your account can access (debug).
+// GET  /api/analyze  -> provider/model debug info.
 //
-// Uses a Groq vision model (OpenAI-compatible). Because model availability
-// varies by account/tier and Groq deprecates models over time, this route
-// AUTO-DISCOVERS an accessible vision model and remembers what worked.
-// Key stays server-side (GROQ_API_KEY). Never runs on the static export build.
+// Providers (server-side keys only, set in .env.local — never committed):
+//   1. Google Gemini vision — preferred when GEMINI_API_KEY is set.
+//      Optional: GEMINI_MODEL (default gemini-2.5-flash, falls back to older flash models).
+//   2. Groq vision (OpenAI-compatible) — used when GROQ_API_KEY is set.
+//      Auto-discovers an accessible vision model and remembers what worked.
+// Never runs on the static export build.
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -60,6 +62,63 @@ function pickVisionModel(ids: string[]): string | undefined {
   return ids.filter((id) => score(id) > 0).sort((a, b) => score(b) - score(a))[0];
 }
 
+// ---- Gemini -------------------------------------------------------
+
+const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
+const GEMINI_FALLBACKS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+
+function splitDataUrl(image: string): { mime: string; data: string } | null {
+  const m = image.match(/^data:(image\/[a-z+.-]+);base64,(.+)$/i);
+  return m ? { mime: m[1], data: m[2] } : null;
+}
+
+async function callGemini(key: string, model: string, image: string) {
+  const img = splitDataUrl(image);
+  if (!img) return { ok: false, status: 400, raw: "Unsupported image data URL" };
+  const res = await fetch(`${GEMINI_BASE}/models/${model}:generateContent`, {
+    method: "POST",
+    headers: { "x-goog-api-key": key, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      generationConfig: { temperature: 0.2, maxOutputTokens: 700 },
+      contents: [
+        {
+          parts: [
+            { text: PROMPT },
+            { inline_data: { mime_type: img.mime, data: img.data } },
+          ],
+        },
+      ],
+    }),
+  });
+  return { ok: res.ok, status: res.status, raw: await res.text() };
+}
+
+function geminiText(raw: string): string {
+  try {
+    const body = JSON.parse(raw);
+    const parts = body?.candidates?.[0]?.content?.parts ?? [];
+    return parts.map((p: { text?: string }) => p.text ?? "").join("");
+  } catch {
+    return "";
+  }
+}
+
+async function analyzeWithGemini(key: string, image: string) {
+  const preferred = process.env.GEMINI_MODEL;
+  const models = preferred ? [preferred, ...GEMINI_FALLBACKS.filter((m) => m !== preferred)] : GEMINI_FALLBACKS;
+  let last = { ok: false, status: 0, raw: "" };
+  for (const model of models) {
+    const r = await callGemini(key, model, image);
+    if (r.ok) return { r, model };
+    last = r;
+    // Only fall through on model-availability errors; real errors surface immediately.
+    if (!(r.status === 404 || r.status === 400)) return { r, model };
+  }
+  return { r: last, model: models[models.length - 1] };
+}
+
+// ---- Groq ---------------------------------------------------------
+
 async function callVision(key: string, model: string, image: string) {
   const res = await fetch(`${GROQ_BASE}/chat/completions`, {
     method: "POST",
@@ -88,16 +147,43 @@ function isModelError(status: number, raw: string) {
   return status === 400 && (l.includes("model") && (l.includes("does not exist") || l.includes("decommission") || l.includes("not found") || l.includes("access")));
 }
 
+function shapeResponse(parsed: Record<string, unknown>, model: string) {
+  return NextResponse.json({
+    name: String(parsed.name || "Meal"),
+    confidence: Math.min(1, Math.max(0, Number(parsed.confidence) || 0.7)),
+    calories: num(parsed.calories),
+    protein: num(parsed.protein),
+    carbs: num(parsed.carbs),
+    fat: num(parsed.fat),
+    fiber: num(parsed.fiber),
+    sodium: num(parsed.sodium),
+    sugar: num(parsed.sugar),
+    items: Array.isArray(parsed.items) ? parsed.items.map(String).slice(0, 8) : [],
+    model,
+  });
+}
+
 export async function GET() {
-  const key = process.env.GROQ_API_KEY;
-  if (!key) return NextResponse.json({ error: "GROQ_API_KEY not set" }, { status: 500 });
-  const ids = await listModels(key);
-  return NextResponse.json({ available: ids.sort(), suggestedVisionModel: pickVisionModel(ids) ?? null });
+  const gemini = Boolean(process.env.GEMINI_API_KEY);
+  const groqKey = process.env.GROQ_API_KEY;
+  const groqModels = groqKey ? await listModels(groqKey) : [];
+  return NextResponse.json({
+    providers: {
+      gemini: gemini ? { configured: true, model: process.env.GEMINI_MODEL || GEMINI_FALLBACKS[0] } : { configured: false },
+      groq: groqKey
+        ? { configured: true, available: groqModels.sort(), suggestedVisionModel: pickVisionModel(groqModels) ?? null }
+        : { configured: false },
+    },
+    active: gemini ? "gemini" : groqKey ? "groq" : null,
+  });
 }
 
 export async function POST(req: Request) {
+  const geminiKey = process.env.GEMINI_API_KEY;
   const key = process.env.GROQ_API_KEY;
-  if (!key) return NextResponse.json({ error: "GROQ_API_KEY is not set on the server." }, { status: 500 });
+  if (!geminiKey && !key) {
+    return NextResponse.json({ error: "No AI key configured. Set GEMINI_API_KEY (preferred) or GROQ_API_KEY in .env.local." }, { status: 500 });
+  }
 
   let image: string | undefined;
   try {
@@ -108,6 +194,31 @@ export async function POST(req: Request) {
   if (!image || !image.startsWith("data:image")) {
     return NextResponse.json({ error: "Missing image data URL." }, { status: 400 });
   }
+
+  // ---- Gemini path (preferred) ----
+  if (geminiKey) {
+    try {
+      const { r, model } = await analyzeWithGemini(geminiKey, image);
+      if (r.ok) {
+        const parsed = extractJson(geminiText(r.raw));
+        if (parsed) return shapeResponse(parsed, `gemini:${model}`);
+        if (!key) return NextResponse.json({ error: "Gemini did not return valid JSON." }, { status: 502 });
+      } else if (!key) {
+        let detail = r.raw.slice(0, 300);
+        try {
+          detail = JSON.parse(r.raw)?.error?.message ?? detail;
+        } catch {
+          /* keep raw */
+        }
+        return NextResponse.json({ error: `Gemini ${r.status}: ${detail}` }, { status: 502 });
+      }
+      // fall through to Groq if configured
+    } catch {
+      if (!key) return NextResponse.json({ error: "Request to Gemini failed." }, { status: 502 });
+    }
+  }
+
+  if (!key) return NextResponse.json({ error: "GROQ_API_KEY is not set on the server." }, { status: 500 });
 
   try {
     let model = cachedModel || process.env.GROQ_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
@@ -142,19 +253,7 @@ export async function POST(req: Request) {
     if (!parsed) return NextResponse.json({ error: "Model did not return valid JSON." }, { status: 502 });
 
     cachedModel = model; // remember what worked
-    return NextResponse.json({
-      name: String(parsed.name || "Meal"),
-      confidence: Math.min(1, Math.max(0, Number(parsed.confidence) || 0.7)),
-      calories: num(parsed.calories),
-      protein: num(parsed.protein),
-      carbs: num(parsed.carbs),
-      fat: num(parsed.fat),
-      fiber: num(parsed.fiber),
-      sodium: num(parsed.sodium),
-      sugar: num(parsed.sugar),
-      items: Array.isArray(parsed.items) ? parsed.items.map(String).slice(0, 8) : [],
-      model,
-    });
+    return shapeResponse(parsed, model);
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Unknown error";
     return NextResponse.json({ error: `Request to Groq failed: ${msg}` }, { status: 502 });
