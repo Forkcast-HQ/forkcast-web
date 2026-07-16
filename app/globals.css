@@ -243,6 +243,17 @@ button:disabled,
 @keyframes shimmer {
   to { background-position: -200% 0; }
 }
+
+/* Auto-scrolling ticker */
+.marquee { overflow: hidden; }
+.marquee-track { animation: marquee 36s linear infinite; }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
 @keyframes pop {
   0% { transform: scale(0.8); opacity: 0; }
   60% { transform: scale(1.05); }

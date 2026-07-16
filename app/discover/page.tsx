@@ -33,11 +33,15 @@ export default function Discover() {
   const toggleAttr = (key: string) =>
     setAttrs((prev) => (prev.includes(key) ? prev.filter((a) => a !== key) : [...prev, key]));
 
-  // Honor ?view=map deep links (and shareable map view).
+  // Honor deep links: ?view=map, ?q=search, ?cuisine=X (hero search + cuisine rail).
   useEffect(() => {
-    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("view") === "map") {
-      setView("map");
-    }
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("view") === "map") setView("map");
+    const qp = params.get("q");
+    if (qp) setQ(qp);
+    const cp = params.get("cuisine");
+    if (cp && CUISINES.includes(cp)) setCuisine(cp);
   }, []);
 
   useEffect(() => {

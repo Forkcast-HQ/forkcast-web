@@ -12,11 +12,25 @@ import {
 import { SmartImage } from "@/components/SmartImage";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { HeroDemo } from "@/components/HeroDemo";
+import { HeroSearch } from "@/components/HeroSearch";
+import { DishMarquee } from "@/components/DishMarquee";
 import { restaurantImg, foodImg } from "@/lib/images";
-import { RESTAURANTS } from "@/data/restaurants";
+import { RESTAURANTS, CUISINES } from "@/data/restaurants";
+
+const CUISINE_ICONS: Record<string, string> = {
+  "Salads & Grain Bowls": "🥗",
+  "Grill & Bowls": "🍗",
+  "Hawaiian Poke": "🐟",
+  "Modern Mexican": "🌮",
+  "Mediterranean": "🫒",
+  "Armenian & Mediterranean": "🫒",
+  "Indian & South Asian": "🍛",
+  "Plant-Forward Cafe": "🌱",
+  "Juice & Smoothie Bar": "🥤",
+};
 
 export default function Home() {
-  const featured = RESTAURANTS.filter((r) => r.partner).slice(0, 3);
+  const featured = RESTAURANTS;
 
   return (
     <>
@@ -41,18 +55,21 @@ export default function Home() {
               Try it live — that card is the real engine. →
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+            {/* Big search — straight into personalized discovery */}
+            <HeroSearch />
+
+            <div className="mt-5 flex flex-wrap items-center gap-3">
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700"
+                className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700"
               >
-                Build my plan <ArrowRight className="h-5 w-5" />
+                Build my plan <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/discover"
-                className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-6 py-3.5 text-base font-semibold text-ink transition hover:border-black/20"
+                href="/discover?view=map"
+                className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-black/20"
               >
-                <MapPin className="h-5 w-5 text-brand-600" /> Browse restaurants
+                <MapPin className="h-4 w-4 text-brand-600" /> Open the map
               </Link>
             </div>
 
@@ -70,6 +87,27 @@ export default function Home() {
           <div className="relative animate-rise lg:justify-self-end">
             <HeroDemo />
           </div>
+        </div>
+      </section>
+
+      {/* ---------------- DISH TICKER ---------------- */}
+      <DishMarquee />
+
+      {/* ---------------- CUISINE RAIL ---------------- */}
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8" aria-label="Browse by cuisine">
+        <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 [scrollbar-width:none]">
+          {CUISINES.map((c) => (
+            <Link
+              key={c}
+              href={`/discover?cuisine=${encodeURIComponent(c)}`}
+              className="group flex shrink-0 snap-start flex-col items-center gap-2 rounded-2xl border border-black/5 bg-white px-5 py-4 transition hover:-translate-y-1 hover:border-brand-300 hover:card-shadow"
+            >
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-2xl transition group-hover:scale-110">
+                {CUISINE_ICONS[c] ?? "🍽️"}
+              </span>
+              <span className="whitespace-nowrap text-xs font-bold text-ink/70 group-hover:text-ink">{c}</span>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -212,9 +250,12 @@ export default function Home() {
             View all <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Swipeable carousel — the whole catalog, DoorDash-style */}
+        <div className="-mx-4 mt-8 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 sm:mx-0 sm:px-0 [scrollbar-width:thin]">
           {featured.map((r) => (
-            <RestaurantCard key={r.slug} restaurant={r} />
+            <div key={r.slug} className="w-[86%] min-w-[300px] max-w-sm shrink-0 snap-start sm:w-[46%] lg:w-[31%]">
+              <RestaurantCard restaurant={r} />
+            </div>
           ))}
         </div>
       </section>
