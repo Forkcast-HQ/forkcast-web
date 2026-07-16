@@ -5,8 +5,21 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Eye, EyeOff, Store, User } from "lucide-react";
 import { useAuth, type AccountRole } from "@/lib/auth";
-import { AuthShell, AuthField } from "@/components/AuthShell";
+import { AuthShell, AuthField, type AuthPanelContent } from "@/components/AuthShell";
 import { cls } from "@/lib/format";
+
+const RESTAURANT_PANEL: AuthPanelContent = {
+  kicker: "Forkcast for restaurants",
+  headline: "Health-minded diners find you. You control your data.",
+  bullets: [
+    "Live order terminal with customer allergy flags",
+    "Review & correct your menu's nutrition — versioned, never silent",
+    "Sponsored placement never changes Fit Scores",
+  ],
+  factBold: "2 in 3",
+  fact: "diners underestimate restaurant-meal calories. Verified menus turn that trust gap into your advantage.",
+  factCite: "Peer-reviewed, BMJ/JAMA",
+};
 
 export default function SignUp() {
   const router = useRouter();
@@ -36,7 +49,11 @@ export default function SignUp() {
   };
 
   return (
-    <AuthShell title="Create your account" subtitle="60 seconds to your first personalized recommendation.">
+    <AuthShell
+      title="Create your account"
+      subtitle={role === "restaurant" ? "Get your order terminal and menu-verification tools." : "60 seconds to your first personalized recommendation."}
+      panel={role === "restaurant" ? RESTAURANT_PANEL : undefined}
+    >
       <form onSubmit={submit} className="space-y-4">
         {/* Account type */}
         <div className="grid grid-cols-2 gap-2">

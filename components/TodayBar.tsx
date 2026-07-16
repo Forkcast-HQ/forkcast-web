@@ -13,7 +13,7 @@ export function TodayBar() {
   const { user, hydrated: authHydrated } = useAuth();
   const { profile, targets, hydrated, consumedToday, todaysMeals } = useUser();
 
-  if (!authHydrated || !hydrated || !user || !profile || !targets) return null;
+  if (!authHydrated || !hydrated || !user || user.role === "restaurant" || !profile || !targets) return null;
   if (HIDE_ON.some((p) => pathname.startsWith(p))) return null;
 
   const consumed = consumedToday();

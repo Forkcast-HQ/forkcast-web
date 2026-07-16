@@ -43,6 +43,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (authHydrated && !user) router.replace("/login");
+    else if (authHydrated && user?.role === "restaurant") router.replace("/partner");
   }, [authHydrated, user, router]);
 
   const consumed = hydrated ? consumedToday() : null;

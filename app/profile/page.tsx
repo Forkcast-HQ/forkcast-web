@@ -91,6 +91,51 @@ export default function Profile() {
   if (!hydrated || !storeHydrated) return <div className="py-24 text-center text-ink/40">Loading…</div>;
   if (!user) return null;
 
+  // Restaurant accounts: terminal-focused settings — no diner health cabinet.
+  if (user.role === "restaurant") {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-4">
+          <Avatar name={user.name} email={user.email} size={56} />
+          <div>
+            <h1 className="font-display text-3xl font-bold text-ink">Restaurant account</h1>
+            <p className="text-ink/55">{user.email}</p>
+          </div>
+        </div>
+
+        <div className="mt-8 space-y-6">
+          <Card icon={<User className="h-5 w-5" />} title="Account">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Restaurant / contact name"><input className="field" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+              <Field label="Email"><input className="field opacity-60" value={user.email} disabled /></Field>
+            </div>
+            <button onClick={() => { updateName(name); setSaved(true); setTimeout(() => setSaved(false), 2200); }} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
+              {saved ? <><Check className="h-4 w-4" /> Saved</> : <><Save className="h-4 w-4" /> Save changes</>}
+            </button>
+          </Card>
+
+          <Card title="Your tools">
+            <p className="text-sm text-ink/60">
+              Receive live orders with customer allergy/diet flags, quote prep times, and review or correct your menu&apos;s
+              nutrition data — every correction versioned and timestamped.
+            </p>
+            <Link href="/partner" className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-black">
+              Open the partner terminal <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Card>
+
+          <Card title="Danger zone" danger>
+            <div className="flex flex-wrap gap-3">
+              <button onClick={() => { logOut(); router.push("/"); }} className="inline-flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/20">
+                <LogOut className="h-4 w-4" /> Log out
+              </button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="flex items-center gap-4">

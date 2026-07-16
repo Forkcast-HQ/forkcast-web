@@ -18,7 +18,7 @@ export function CartBar() {
   const { user, hydrated: authHydrated } = useAuth();
   const { hydrated, cartCount, cartTotals, cartRestaurantSlug, activeOrder, now } = useOrder();
 
-  if (!authHydrated || !hydrated || !user) return null;
+  if (!authHydrated || !hydrated || !user || user.role === "restaurant") return null;
   if (!SHOW_ON.some((p) => pathname.startsWith(p))) return null;
 
   const order = activeOrder();

@@ -55,6 +55,7 @@ export default function Onboarding() {
 
   useEffect(() => {
     if (hydrated && !user) router.replace("/signup");
+    else if (hydrated && user?.role === "restaurant") router.replace("/partner");
   }, [hydrated, user, router]);
 
   // Prefill from existing profile or account name.
