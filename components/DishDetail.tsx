@@ -50,7 +50,8 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
   }
 
   const fit = targets && profile ? fitScore(item, targets, profile.goal) : null;
-  const range = restaurant.partner ? RANGE_VERIFIED : RANGE_ESTIMATED;
+  const published = restaurant.dataSource === "published";
+  const range = restaurant.partner || published ? RANGE_VERIFIED : RANGE_ESTIMATED;
   const itemText = `${item.name} ${item.description} ${item.tags.join(" ")}`.toLowerCase();
   const allergenHits = (profile?.avoid ?? []).filter((a) => itemText.includes(a.toLowerCase()));
   const condWarns = conditionWarnings(item, profile?.conditions);
@@ -163,6 +164,10 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
                 <span className="inline-flex items-center gap-1 rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white">
                   <BadgeCheck className="h-3.5 w-3.5" /> Partner-verified
                 </span>
+              ) : published ? (
+                <span className="inline-flex items-center gap-1 rounded-full border-2 border-brand-600 bg-brand-50 px-2.5 py-1 text-[11px] font-bold text-brand-700">
+                  <BadgeCheck className="h-3.5 w-3.5" /> Published
+                </span>
               ) : (
                 <span className="rounded-full border border-neutral-400 px-2.5 py-1 text-[11px] font-bold text-ink/70">Estimated ±{Math.round(RANGE_ESTIMATED * 100)}%</span>
               )}
@@ -204,7 +209,9 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
             <p className="mt-5 border-t border-black/5 pt-3 text-xs text-ink/50">
               Source: {restaurant.partner
                 ? `menu data reviewed with ${restaurant.name}; corrections are versioned and timestamped.`
-                : `estimated from ${restaurant.name}'s public menu by the Forkcast nutrition engine; not yet reviewed by the restaurant.`}
+                : published
+                  ? restaurant.sourceNote ?? `as published by ${restaurant.name}.`
+                  : restaurant.sourceNote ?? `estimated from ${restaurant.name}'s public menu by the Forkcast nutrition engine; not yet reviewed by the restaurant.`}
               {" "}Values are estimates with a ±{Math.round(range * 100)}% range, not measurements.
             </p>
           </div>

@@ -63,7 +63,13 @@ export interface Restaurant {
   distanceMi: number;
   lat: number;
   lng: number;
-  partner: boolean; // featured Forkcast partner
+  partner: boolean; // featured Forkcast partner (demo verification pattern)
+  // Nutrition-data provenance for real restaurants:
+  //  "published" — values from the restaurant's own public nutrition disclosure
+  //  "estimated" — Forkcast engine estimates from the public menu
+  // (undefined = original demo catalog entry)
+  dataSource?: "published" | "estimated";
+  sourceNote?: string; // what was published, what was estimated, retrieval date
   blurb: string;
   category: string; // hero image key
   tags: string[];

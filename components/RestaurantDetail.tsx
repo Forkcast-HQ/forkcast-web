@@ -100,12 +100,21 @@ export function RestaurantDetail({ slug }: { slug: string }) {
               </span>
               <span className="text-xs text-ink/55">Nutrition reviewed with the restaurant · corrections are versioned and timestamped</span>
             </>
+          ) : restaurant.dataSource === "published" ? (
+            <>
+              <span className="inline-flex items-center gap-1 rounded-full border-2 border-brand-600 bg-brand-50 px-2.5 py-1 text-[11px] font-bold text-brand-700">
+                <BadgeCheck className="h-3.5 w-3.5" /> Restaurant-published nutrition
+              </span>
+              <span className="max-w-xl text-xs text-ink/55">{restaurant.sourceNote}</span>
+            </>
           ) : (
             <>
               <span className="rounded-full border border-neutral-400 px-2.5 py-1 text-[11px] font-bold text-ink/70">
                 Estimated from menu
               </span>
-              <span className="text-xs text-ink/55">Values carry a ± range · not yet verified by this restaurant</span>
+              <span className="max-w-xl text-xs text-ink/55">
+                {restaurant.sourceNote ?? "Values carry a ± range · not yet verified by this restaurant"}
+              </span>
             </>
           )}
           <span className="ml-auto text-xs text-ink/45">Allergens: always confirm with the restaurant</span>

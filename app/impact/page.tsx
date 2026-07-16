@@ -127,6 +127,12 @@ export default function ImpactPage() {
                       <span className="inline-flex items-center gap-1 text-brand-700">
                         <BadgeCheck className="h-3.5 w-3.5" /> Demo partner-verified pattern
                       </span>
+                    ) : r.dataSource === "published" ? (
+                      <span className="inline-flex items-center gap-1 font-semibold text-brand-700">
+                        <BadgeCheck className="h-3.5 w-3.5" /> Restaurant-published disclosure
+                      </span>
+                    ) : r.dataSource === "estimated" ? (
+                      <span className="text-ink/60">Engine estimate — real restaurant, unpublished nutrition (±15%)</span>
                     ) : (
                       <span className="text-ink/60">Engine estimate from menu (±15%)</span>
                     )}
@@ -136,9 +142,11 @@ export default function ImpactPage() {
             </tbody>
           </table>
           <p className="border-t border-black/5 px-4 py-3 text-xs text-ink/50">
-            {RESTAURANTS.length} restaurants · {dishes} dishes · {partnerDishes} dishes under the partner-verified pattern.
-            The entire catalog is <strong>demonstration data</strong> modeled on Boston restaurants — no restaurant has
-            authorized or reviewed these listings yet. This table becomes the real ledger as pilot restaurants sign on.
+            {RESTAURANTS.length} restaurants · {dishes} dishes · {partnerDishes} dishes under the demo partner-verified pattern.
+            Rows marked <strong>restaurant-published</strong> quote real public nutrition disclosures (retrieval dates in
+            each listing); rows marked engine estimate cover real restaurants that publish no nutrition, clearly labeled.
+            No listed restaurant has authorized or partnered with Forkcast — prices, ratings, and delivery estimates are
+            placeholders. This table becomes the verified ledger as pilot restaurants sign on.
           </p>
         </div>
       </section>

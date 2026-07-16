@@ -50,7 +50,12 @@ export function MenuItemCard({
 
   const fit = targets ? fitScore(item, targets, profile!.goal) : null;
   const tags = deriveTags(item).filter((t) => TAG_LABEL[t]);
-  const verified = getRestaurant(restaurantSlug)?.partner ?? false;
+  const rest = getRestaurant(restaurantSlug);
+  const tier: "verified" | "published" | "estimated" = rest?.partner
+    ? "verified"
+    : rest?.dataSource === "published"
+      ? "published"
+      : "estimated";
 
   // Personal advisories: allergens (from menu text — never a guarantee) + conditions
   const itemText = `${item.name} ${item.description} ${item.tags.join(" ")}`.toLowerCase();
@@ -111,11 +116,17 @@ export function MenuItemCard({
           <span
             className={cls(
               "rounded-full border px-1.5 py-px text-[10px] font-bold",
-              verified ? "border-brand-600 text-brand-700" : "border-neutral-400 text-ink/55",
+              tier === "estimated" ? "border-neutral-400 text-ink/55" : "border-brand-600 text-brand-700",
             )}
-            title={verified ? "Nutrition reviewed with the restaurant" : "Estimated from the menu — carries a ± range"}
+            title={
+              tier === "verified"
+                ? "Nutrition reviewed with the restaurant"
+                : tier === "published"
+                  ? "From the restaurant's own published nutrition disclosure"
+                  : "Estimated from the menu — carries a ± range"
+            }
           >
-            {verified ? "Verified" : "Est. ±"}
+            {tier === "verified" ? "Verified" : tier === "published" ? "Published" : "Est. ±"}
           </span>
         </div>
 

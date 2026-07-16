@@ -244,6 +244,170 @@ export const RESTAURANTS: Restaurant[] = [
       mi("j6", "Immunity Shot Set", "Ginger-turmeric & wheatgrass shots.", 6.0, [60, 1, 12, 0, 1, 20, 8], "juice", ["vegan"]),
     ],
   },
+
+  // ================= REAL RESTAURANTS =================
+  // The entries below are real restaurants. Nutrition provenance is labeled
+  // per restaurant via dataSource/sourceNote. Prices, ratings, delivery
+  // estimates, and coordinates are approximate placeholders — Forkcast is
+  // NOT affiliated with any of these businesses. Where a restaurant publishes
+  // nutrition, we quote it and estimate only the missing fields (noted).
+
+  {
+    slug: "sweetgreen-back-bay",
+    name: "Sweetgreen",
+    cuisine: "Salads & Grain Bowls",
+    neighborhood: "Back Bay",
+    address: "659 Boylston St, Boston, MA",
+    priceLevel: 2,
+    rating: 4.4,
+    reviews: 1730,
+    deliveryMins: [15, 30],
+    distanceMi: 0.5,
+    lat: 42.3499,
+    lng: -71.0785,
+    partner: false,
+    dataSource: "published",
+    sourceNote:
+      "Calories, protein, carbs, and fat as published at sweetgreen.com/menu (retrieved July 15, 2026, Summer menu). Fiber, sodium, and sugar are Forkcast engine estimates. Not affiliated with Sweetgreen, Inc.",
+    blurb:
+      "The national fast-casual salad chain publishes per-dish macros and allergens — the transparency standard Forkcast wants every independent restaurant to reach.",
+    category: "salad-bar",
+    tags: ["healthy", "published nutrition", "vegan options"],
+    menu: [
+      mi("sg1", "Harvest Bowl", "Roasted chicken, sweet potatoes, apples, goat cheese, almonds, wild rice, shredded kale, balsamic vinaigrette. Contains milk, tree nuts.", 13.95, [740, 32, 60, 41, 9, 810, 14], "grain-bowl", []),
+      mi("sg2", "Chicken Pesto Parm", "Roasted chicken, spicy broccoli, tomatoes, parmesan, garlic breadcrumbs, golden quinoa, spinach, pesto vinaigrette. Contains wheat, milk.", 13.45, [525, 35, 38, 23, 6, 900, 5], "grain-bowl", []),
+      mi("sg3", "Crispy Rice Bowl", "Blackened chicken, carrots, cabbage, cucumbers, roasted almonds, crispy rice, wild rice, arugula, spicy cashew. Contains tree nuts, sesame.", 13.75, [640, 28, 61, 30, 7, 850, 10], "grain-bowl", []),
+      mi("sg4", "Shroomami", "Roasted tofu, warm portobello mix, cucumbers, basil, cabbage, almonds, wild rice, kale, miso sesame ginger. Contains soy, sesame, tree nuts.", 12.95, [635, 18, 50, 42, 8, 980, 9], "grain-bowl", ["vegan"]),
+      mi("sg5", "Kale Caesar", "Roasted chicken, tomatoes, shaved parmesan, parmesan crisps, kale, romaine, lime, caesar. Contains milk, egg, fish.", 12.45, [490, 35, 14, 32, 4, 760, 3], "salad", []),
+      mi("sg6", "Guacamole Greens", "Roasted chicken, avocado, tomatoes, pickled onions, tortilla chips, spring mix, lime cilantro jalapeño. Contains soy.", 12.95, [555, 23, 35, 33, 9, 690, 6], "salad", ["gluten-free"]),
+      mi("sg7", "Super Green Goddess", "Chickpeas, sweet potatoes, carrots, spicy broccoli, almonds, spinach, kale, green goddess ranch. Contains milk, egg, tree nuts.", 11.95, [465, 12, 36, 31, 10, 620, 8], "salad", ["vegetarian"]),
+      mi("sg8", "Hummus Crunch", "Hummus, feta, chickpeas, tomatoes, cucumbers, napa slaw, garlic breadcrumbs, pesto vinaigrette. Contains milk, wheat, sesame.", 11.75, [390, 12, 39, 18, 8, 780, 6], "salad", ["vegetarian"]),
+      mi("sg9", "Miso Glazed Salmon Plate", "Miso glazed salmon, avocado, cucumbers, crispy onions, white rice, nori sesame, spicy cashew. Contains wheat, soy, fish, sesame, tree nuts.", 16.95, [930, 35, 88, 48, 6, 1150, 16], "salmon-plate", []),
+      mi("sg10", "Hot Honey Chicken Plate", "Blackened chicken, roasted sweet potatoes, napa slaw, crispy onions, golden quinoa, hot honey mustard. Contains wheat.", 15.95, [875, 49, 68, 41, 7, 1050, 18], "chicken-plate", []),
+    ],
+  },
+
+  {
+    slug: "halal-guys-allston",
+    name: "The Halal Guys",
+    cuisine: "Halal Middle Eastern",
+    neighborhood: "Allston",
+    address: "1 Brighton Ave, Allston, MA",
+    priceLevel: 1,
+    rating: 4.3,
+    reviews: 2210,
+    deliveryMins: [20, 35],
+    distanceMi: 2.8,
+    lat: 42.3528,
+    lng: -71.1323,
+    partner: false,
+    dataSource: "published",
+    sourceNote:
+      "Nutrition from thehalalguys.com/nutritional-guide (retrieved July 15, 2026; page dated April 2026). Platter values combine the published protein + rice servings; fields the guide leaves blank are Forkcast estimates. Halal certification per their published program. Not affiliated with The Halal Guys.",
+    blurb:
+      "The halal street-cart institution publishes a full nutrition and allergen guide — platters, gyros, falafel and all. A model case for halal-conscious diners.",
+    category: "mediterranean-resto",
+    tags: ["halal", "published nutrition"],
+    menu: [
+      mi("hg1", "Chicken & Rice Platter", "Halal chicken over yellow rice (regular). Add white/hot sauce to taste. Contains soy.", 11.99, [466, 38, 52, 8, 3, 1083, 2], "chicken-plate", ["halal", "gluten-free"]),
+      mi("hg2", "Beef Gyro & Rice Platter", "Sliced beef gyro over yellow rice (regular). Contains gluten, soy.", 12.99, [858, 27, 64, 54, 3, 1300, 3], "mediterranean", ["halal"]),
+      mi("hg3", "Falafel Platter", "Crispy falafel over rice with lettuce, tomato, pita (regular; as published). Contains soy, mustard, sesame.", 10.99, [673, 20, 62, 38, 21, 1411, 3], "mediterranean", ["halal", "vegan"]),
+      mi("hg4", "Chicken Gyro Sandwich", "Halal chicken in pita with lettuce and tomato. Contains gluten.", 8.99, [377, 30, 43, 7, 3, 899, 4], "wrap", ["halal"]),
+      mi("hg5", "BBQ Chicken Platter", "BBQ-glazed halal chicken over yellow rice (regular). Contains soy.", 11.99, [425, 32, 52, 7, 2, 1026, 2], "chicken-plate", ["halal", "gluten-free"]),
+      mi("hg6", "French Fries", "Crinkle-cut fries (10 oz, as published). Contains soy, sesame.", 4.99, [839, 9, 121, 35, 12, 1170, 0], "mediterranean", ["vegetarian"]),
+      mi("hg7", "Baklava", "Layered phyllo with nuts and honey (as published). Contains nuts, gluten, dairy.", 3.99, [410, 6, 56, 18, 7, 159, 31], "dessert", ["vegetarian"]),
+    ],
+  },
+
+  {
+    slug: "clover-downtown",
+    name: "Clover Food Lab",
+    cuisine: "Vegetarian Fast Food",
+    neighborhood: "Downtown",
+    address: "27 School St, Boston, MA",
+    priceLevel: 1,
+    rating: 4.5,
+    reviews: 980,
+    deliveryMins: [15, 30],
+    distanceMi: 1.1,
+    lat: 42.3577,
+    lng: -71.0603,
+    partner: false,
+    dataSource: "estimated",
+    sourceNote:
+      "Boston's homegrown vegetarian fast-food chain publishes ingredients but not full per-dish macros — all values are Forkcast engine estimates from the public menu (July 2026). Not affiliated with Clover Food Lab.",
+    blurb:
+      "A Boston vegetarian institution built around seasonal sandwiches — exactly the beloved independent that publishes no nutrition numbers. Forkcast estimates them, honestly labeled.",
+    category: "cafe",
+    tags: ["vegetarian", "vegan options", "local"],
+    menu: [
+      mi("cl1", "Chickpea Fritter Sandwich", "Crispy chickpea fritters, hummus, cucumber-tomato salad, pickled vegetables in pita.", 9.95, [560, 18, 74, 22, 12, 890, 8], "sandwich", ["vegan"]),
+      mi("cl2", "Impossible Meatball Sandwich", "Impossible meatballs, marinara, cashew ricotta on a roll.", 11.95, [640, 28, 68, 28, 9, 1150, 10], "sandwich", ["vegan"]),
+      mi("cl3", "Japanese Sweet Potato Sandwich", "Roasted sweet potato, whipped ricotta, apple, arugula in pita.", 10.45, [520, 14, 70, 20, 10, 720, 12], "sandwich", ["vegetarian"]),
+      mi("cl4", "Mezze Platter", "Hummus, seasonal vegetables, tabbouleh, pickles, pita.", 12.45, [620, 16, 72, 28, 14, 940, 9], "mediterranean", ["vegan"]),
+      mi("cl5", "Cream of Tomato Soup", "Slow-cooked tomato soup with herbs.", 5.95, [220, 6, 26, 10, 4, 780, 12], "soup", ["vegetarian"]),
+    ],
+  },
+
+  {
+    slug: "life-alive-back-bay",
+    name: "Life Alive Organic Cafe",
+    cuisine: "Plant-Based Cafe",
+    neighborhood: "Back Bay",
+    address: "431 Boylston St, Boston, MA",
+    priceLevel: 2,
+    rating: 4.6,
+    reviews: 1120,
+    deliveryMins: [20, 35],
+    distanceMi: 0.7,
+    lat: 42.3513,
+    lng: -71.0745,
+    partner: false,
+    dataSource: "estimated",
+    sourceNote:
+      "This organic vegetarian cafe does not publish per-dish macros — all values are Forkcast engine estimates from the public menu (July 2026). Not affiliated with Life Alive.",
+    blurb:
+      "Warm grain bowls, broths, and smoothies from a much-loved plant-based cafe — a vegan/vegetarian showcase for confidence-labeled estimation.",
+    category: "cafe",
+    tags: ["vegan options", "vegetarian", "organic"],
+    menu: [
+      mi("la1", "The Goddess Bowl", "Ginger-nama shoyu sauce, carrots, beets, broccoli, kale, quinoa, brown rice.", 13.95, [620, 21, 88, 21, 15, 640, 10], "grain-bowl", ["vegan", "gluten-free"]),
+      mi("la2", "The Adventurer Bowl", "Sweet chili sauce, tofu, greens, carrots, corn, quinoa and rice.", 14.45, [690, 24, 96, 24, 16, 720, 12], "grain-bowl", ["vegan"]),
+      mi("la3", "The Swami Wrap", "Hummus, avocado, greens, carrots, beets in a whole-wheat wrap.", 11.95, [540, 18, 70, 20, 12, 680, 8], "wrap", ["vegan"]),
+      mi("la4", "The Emperor Bowl", "Miso-ginger broth, greens, tofu, shiitake, brown rice, sesame.", 13.45, [560, 22, 78, 18, 12, 890, 7], "grain-bowl", ["vegan"]),
+      mi("la5", "Green Radiance Smoothie", "Kale, banana, mango, ginger, coconut water.", 8.95, [280, 6, 58, 4, 7, 95, 38], "smoothie", ["vegan", "gluten-free"]),
+    ],
+  },
+
+  {
+    slug: "annas-taqueria-brookline",
+    name: "Anna's Taqueria",
+    cuisine: "Mexican Taqueria",
+    neighborhood: "Brookline",
+    address: "1412 Beacon St, Brookline, MA",
+    priceLevel: 1,
+    rating: 4.4,
+    reviews: 1890,
+    deliveryMins: [20, 35],
+    distanceMi: 3.1,
+    lat: 42.3399,
+    lng: -71.1298,
+    partner: false,
+    dataSource: "estimated",
+    sourceNote:
+      "A Boston-area burrito institution with no published nutrition — all values are Forkcast engine estimates from the public menu (July 2026). Not affiliated with Anna's Taqueria.",
+    blurb:
+      "Beloved super burritos since 1995 and not a nutrition number in sight — the everyday independent Forkcast exists to make legible.",
+    category: "mexican-resto",
+    tags: ["local", "vegetarian options"],
+    menu: [
+      mi("an1", "Grilled Chicken Super Burrito", "Grilled chicken, rice, beans, cheese, salsa, guacamole in a flour tortilla.", 9.25, [820, 42, 96, 28, 10, 1580, 5], "wrap", []),
+      mi("an2", "Carnitas Super Burrito", "Slow-cooked pork, rice, beans, cheese, salsa in a flour tortilla.", 9.75, [890, 38, 95, 36, 9, 1650, 5], "wrap", []),
+      mi("an3", "Veggie Super Burrito", "Rice, whole beans, cheese, guacamole, salsa, lettuce in a flour tortilla.", 8.25, [720, 20, 108, 22, 14, 1290, 6], "wrap", ["vegetarian"]),
+      mi("an4", "Chicken Quesadilla", "Griddled flour tortilla, chicken, melted cheese, salsa.", 8.95, [780, 38, 62, 40, 5, 1420, 4], "taco", []),
+      mi("an5", "Chicken Tacos (2)", "Soft corn tortillas, grilled chicken, onion, cilantro, salsa.", 6.5, [480, 30, 44, 20, 6, 840, 3], "taco", ["gluten-free"]),
+    ],
+  },
 ];
 
 // ---- Lookups ------------------------------------------------------
