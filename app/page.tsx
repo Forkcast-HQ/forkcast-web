@@ -14,23 +14,17 @@ import { RestaurantCard } from "@/components/RestaurantCard";
 import { HeroDemo } from "@/components/HeroDemo";
 import { HeroSearch } from "@/components/HeroSearch";
 import { DishMarquee } from "@/components/DishMarquee";
+import { Rail } from "@/components/Rail";
 import { restaurantImg, foodImg } from "@/lib/images";
 import { RESTAURANTS, CUISINES } from "@/data/restaurants";
 
-const CUISINE_ICONS: Record<string, string> = {
-  "Salads & Grain Bowls": "🥗",
-  "Grill & Bowls": "🍗",
-  "Hawaiian Poke": "🐟",
-  "Modern Mexican": "🌮",
-  "Mediterranean": "🫒",
-  "Armenian & Mediterranean": "🫒",
-  "Indian & South Asian": "🍛",
-  "Plant-Forward Cafe": "🌱",
-  "Juice & Smoothie Bar": "🥤",
-};
-
 export default function Home() {
   const featured = RESTAURANTS;
+  // Real plate photography for each cuisine tile (representative restaurant).
+  const cuisineTiles = CUISINES.map((c) => {
+    const r = RESTAURANTS.find((x) => x.cuisine === c)!;
+    return { cuisine: c, img: restaurantImg(r.category) };
+  });
 
   return (
     <>
@@ -44,15 +38,15 @@ export default function Home() {
           <div className="animate-rise">
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/70 px-3 py-1 text-sm font-medium text-brand-700">
               <Sparkles className="h-4 w-4" />
-              Interactive Boston pilot · sample catalog
+              Live demo · Boston pilot catalog
             </span>
             <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-6xl text-balance">
-              Know what you&apos;ll eat,{" "}
+              Know what you&apos;ll eat{" "}
               <span className="italic text-brand-600">before you sit down.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink/65">
-              Your goals become a daily plan. Nearby menus re-rank around it.
-              Try it live — that card is the real engine. →
+              Set your goals once. Every menu nearby re-ranks around what&apos;s left of
+              your day — and the demo card here is the real engine. Try it.
             </p>
 
             {/* Big search — straight into personalized discovery */}
@@ -74,7 +68,7 @@ export default function Home() {
             </div>
 
             <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-ink/55" aria-label="Product highlights">
-              {['Personal Fit Scores', 'Explainable nutrition', 'No payment required'].map((item) => (
+              {['A Fit Score on every dish', 'Every number shows its source', 'Free during the pilot'].map((item) => (
                 <li key={item} className="inline-flex items-center gap-1.5">
                   <span className="grid h-4 w-4 place-items-center rounded-full bg-sage-100 text-[10px] font-black text-sage-700" aria-hidden="true">✓</span>
                   {item}
@@ -93,19 +87,30 @@ export default function Home() {
       {/* ---------------- DISH TICKER ---------------- */}
       <DishMarquee />
 
-      {/* ---------------- CUISINE RAIL ---------------- */}
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8" aria-label="Browse by cuisine">
-        <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 [scrollbar-width:none]">
-          {CUISINES.map((c) => (
+      {/* ---------------- CUISINE RAIL — real photography ---------------- */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8" aria-label="Browse by cuisine">
+        <div className="mb-5 flex items-end justify-between">
+          <h2 className="font-display text-xl font-extrabold text-ink">Browse by craving</h2>
+          <Link href="/discover" className="text-sm font-semibold text-brand-700 hover:text-brand-900">All restaurants →</Link>
+        </div>
+        <div className="-mx-4 flex snap-x gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {cuisineTiles.map(({ cuisine, img }) => (
             <Link
-              key={c}
-              href={`/discover?cuisine=${encodeURIComponent(c)}`}
-              className="group flex shrink-0 snap-start flex-col items-center gap-2 rounded-2xl border border-black/5 bg-white px-5 py-4 transition hover:-translate-y-1 hover:border-brand-300 hover:card-shadow"
+              key={cuisine}
+              href={`/discover?cuisine=${encodeURIComponent(cuisine)}`}
+              className="group flex shrink-0 snap-start flex-col items-center gap-2.5"
             >
-              <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-2xl transition group-hover:scale-110">
-                {CUISINE_ICONS[c] ?? "🍽️"}
+              <span className="block h-24 w-24 overflow-hidden rounded-full ring-2 ring-transparent ring-offset-2 ring-offset-cream transition duration-300 group-hover:ring-brand-600 sm:h-28 sm:w-28">
+                <SmartImage
+                  src={img}
+                  alt={cuisine}
+                  label={cuisine}
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                />
               </span>
-              <span className="whitespace-nowrap text-xs font-bold text-ink/70 group-hover:text-ink">{c}</span>
+              <span className="max-w-[8.5rem] text-center text-xs font-bold leading-snug text-ink/70 transition group-hover:text-ink">
+                {cuisine}
+              </span>
             </Link>
           ))}
         </div>
@@ -114,9 +119,9 @@ export default function Home() {
       {/* ---------------- STAT BAND ---------------- */}
       <section className="border-y border-black/5 bg-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px overflow-hidden px-4 py-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-          <Stat figure="58.5%" label="of U.S. food spending is now eaten away from home — an all-time high" cite="USDA ERS, 2023" />
-          <Stat figure="2 in 3" label="diners underestimate their restaurant meal's calories; 1 in 4 by 500+" cite="Peer-reviewed, BMJ/JAMA" />
-          <Stat figure="40.3%" label="of U.S. adults have obesity; 21% of children" cite="CDC NHANES, 2021-23" />
+          <Stat figure="58.5%" label="of U.S. food spending now happens away from home — an all-time high" cite="USDA ERS, 2023" />
+          <Stat figure="2 in 3" label="diners underestimate their restaurant meal's calories — 1 in 4 by 500 or more" cite="Peer-reviewed, BMJ/JAMA" />
+          <Stat figure="40.3%" label="of U.S. adults have obesity, along with 21% of children" cite="CDC NHANES, 2021–23" />
           <Stat figure="$173B" label="annual U.S. medical cost of obesity alone" cite="CDC, 2024" />
         </div>
       </section>
@@ -130,12 +135,13 @@ export default function Home() {
               Eating out is the new normal — and it&apos;s where good intentions fall apart.
             </h2>
             <p className="mt-5 text-lg text-ink/65">
-              A third of American calories are eaten out — and every existing app
-              reacts <em>after</em> the plate is empty. Forkcast acts <strong>before</strong> you order.
+              Americans now eat a third of their calories away from home — and every
+              existing app reacts <em>after</em> the plate is empty. Forkcast acts{" "}
+              <strong>before</strong> you order.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              <ProblemPoint icon={<TrendingDown className="h-5 w-5" />} title="Guesswork, not data" body="Independent-restaurant menus rarely show protein, sodium, or carbs — labeling rules only cover chains." />
-              <ProblemPoint icon={<Camera className="h-5 w-5" />} title="Too late to help" body="Log-after apps are accounting, not coaching. Labels alone shift intake by ~24 cal per order." />
+              <ProblemPoint icon={<TrendingDown className="h-5 w-5" />} title="Guesswork, not data" body="Independent restaurants rarely publish protein, sodium, or carbs — federal labeling rules only cover chains." />
+              <ProblemPoint icon={<Camera className="h-5 w-5" />} title="Too late to help" body="Log-after apps are accounting, not coaching — and menu labels alone shift intake by only ~24 calories per order." />
             </div>
           </div>
           <div className="relative">
@@ -170,10 +176,10 @@ export default function Home() {
             </p>
           </div>
           <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <Step n="01" icon={<HeartPulse className="h-6 w-6" />} title="Build your cabinet" body="Enter height, weight, age, activity and goal. We compute your BMI, BMR/TDEE and macro targets with real formulas." />
-            <Step n="02" icon={<Sparkles className="h-6 w-6" />} title="Get matched dishes" body="Every nearby dish gets a personal Fit Score — calories, protein density, fiber, sodium, sugar — ranked for you." />
-            <Step n="03" icon={<Utensils className="h-6 w-6" />} title="Order or walk in" body="Add it to your day in one tap. Delivery, pickup, or just go eat — your plan updates instantly." />
-            <Step n="04" icon={<Camera className="h-6 w-6" />} title="Snap to confirm" body="Photo-log what you actually ate. We reconcile it against your plan and your weekly trend." />
+            <Step n="01" icon={<HeartPulse className="h-6 w-6" />} title="Build your profile" body="Height, weight, age, activity, and goal — we compute your targets with clinical formulas (Mifflin-St Jeor), plus allergies and conditions to watch." />
+            <Step n="02" icon={<Sparkles className="h-6 w-6" />} title="See what fits" body="Every nearby dish gets a personal Fit Score from calories, protein, fiber, sodium, and sugar — ranked against what's left of your day." />
+            <Step n="03" icon={<Utensils className="h-6 w-6" />} title="Order or dine in" body="Build a basket and send it to the restaurant, or just walk in — either way, your plan updates the moment you commit." />
+            <Step n="04" icon={<Camera className="h-6 w-6" />} title="Confirm the meal" body="Confirmed orders pre-fill your log; photos cover everything else. Every entry keeps its source, portion, and confidence." />
           </div>
           <div className="mt-12">
             <Link
@@ -240,23 +246,25 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between">
           <div>
-            <SectionTag>Sample catalog</SectionTag>
+            <SectionTag>The catalog</SectionTag>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-              Explore the Boston pilot experience
+              Explore the Boston pilot
             </h2>
-            <p className="mt-2 max-w-2xl text-sm text-ink/55">Representative listings show how personalized discovery works before live restaurant onboarding.</p>
+            <p className="mt-2 max-w-2xl text-sm text-ink/55">A representative catalog — this is how discovery will feel as real restaurants come aboard.</p>
           </div>
           <Link href="/discover" className="hidden items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800 sm:inline-flex">
             View all <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        {/* Swipeable carousel — the whole catalog, DoorDash-style */}
-        <div className="-mx-4 mt-8 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 sm:mx-0 sm:px-0 [scrollbar-width:thin]">
-          {featured.map((r) => (
-            <div key={r.slug} className="w-[86%] min-w-[300px] max-w-sm shrink-0 snap-start sm:w-[46%] lg:w-[31%]">
-              <RestaurantCard restaurant={r} />
-            </div>
-          ))}
+        {/* Full-catalog carousel with paging arrows */}
+        <div className="mt-8">
+          <Rail>
+            {featured.map((r) => (
+              <div key={r.slug} className="w-[86%] min-w-[300px] max-w-md shrink-0 snap-start py-2 sm:w-[46%] lg:w-[32%]">
+                <RestaurantCard restaurant={r} />
+              </div>
+            ))}
+          </Rail>
         </div>
       </section>
 
@@ -272,9 +280,9 @@ export default function Home() {
                 Get discovered by diners who came to eat well.
               </h2>
               <p className="mt-4 text-lg text-white/70">
-                We turn your menu into per-dish nutrition, surface your best
-                options to people actively trying to hit their goals, and send you
-                higher-intent, higher-retention customers.
+                We turn your menu into per-dish nutrition you can review and
+                correct, then surface your best dishes to people actively trying
+                to hit their goals — higher-intent diners who come back.
               </p>
               <Link
                 href="/for-restaurants"
@@ -297,12 +305,12 @@ export default function Home() {
 
       {/* ---------------- FINAL CTA ---------------- */}
       <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-50 to-white p-10 text-center sm:p-16">
+        <div className="rounded-3xl border border-brand-200 bg-brand-50 p-10 text-center sm:p-16">
           <h2 className="mx-auto max-w-2xl font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl text-balance">
             Build your plan in 60 seconds.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-ink/65">
-            See your numbers, then watch nearby menus reorder themselves around your goals.
+            See your numbers, then watch nearby menus reorder around your goals.
           </p>
           <Link
             href="/signup"

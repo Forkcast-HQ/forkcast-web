@@ -244,9 +244,9 @@ button:disabled,
   to { background-position: -200% 0; }
 }
 
-/* Auto-scrolling ticker */
+/* Auto-scrolling ticker — deliberately unhurried */
 .marquee { overflow: hidden; }
-.marquee-track { animation: marquee 36s linear infinite; }
+.marquee-track { animation: marquee 75s linear infinite; }
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
