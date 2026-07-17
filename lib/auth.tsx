@@ -31,6 +31,10 @@ interface AuthValue {
   logIn: (input: { email: string; password: string }) => { ok: boolean; error?: string };
   logOut: () => void;
   updateName: (name: string) => void;
+  // Demo-grade reset: accounts live only on this device, so the reset is
+  // immediate (no email round-trip). Production swaps this for a real
+  // email-verified reset flow without changing the UI.
+  resetPassword: (input: { email: string; newPassword: string }) => { ok: boolean; error?: string };
 }
 
 const ACCOUNTS_KEY = "forkcast.accounts";
@@ -109,6 +113,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logOut = useCallback(() => setSession(null), [setSession]);
 
+  const resetPassword: AuthValue["resetPassword"] = useCallback(
+    ({ email, newPassword }) => {
+      const e = email.trim().toLowerCase();
+      const acc = accounts.find((a) => a.email === e);
+      if (!acc) return { ok: false, error: "No account with that email exists on this device." };
+      if (newPassword.length < 6) return { ok: false, error: "Password must be at least 6 characters." };
+      persistAccounts(accounts.map((a) => (a.id === acc.id ? { ...a, passwordHash: pwHash(newPassword) } : a)));
+      return { ok: true };
+    },
+    [accounts, persistAccounts],
+  );
+
   const updateName = useCallback(
     (name: string) => {
       if (!userId) return;
@@ -120,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const user = accounts.find((a) => a.id === userId) ?? null;
 
   return (
-    <Ctx.Provider value={{ hydrated, user, signUp, logIn, logOut, updateName }}>
+    <Ctx.Provider value={{ hydrated, user, signUp, logIn, logOut, updateName, resetPassword }}>
       {children}
     </Ctx.Provider>
   );

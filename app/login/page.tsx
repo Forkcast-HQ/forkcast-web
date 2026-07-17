@@ -37,7 +37,7 @@ export default function LogIn() {
           <input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" autoComplete="email" required />
         </AuthField>
         <AuthField label="Password">
-          <div className="relative">
+          <div className="relative mb-0">
             <input
               className="field pr-11"
               type={show ? "text" : "password"}
@@ -52,6 +52,11 @@ export default function LogIn() {
             </button>
           </div>
         </AuthField>
+        <div className="-mt-2 text-right">
+          <Link href="/forgot-password" className="text-sm font-semibold text-brand-700 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
 
         {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600">{error}</p>}
 
