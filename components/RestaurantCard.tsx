@@ -44,9 +44,17 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/0" />
 
         <div className="absolute left-3 top-3 flex gap-2">
-          {restaurant.partner && (
+          {restaurant.partner ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-brand-700 shadow-sm backdrop-blur">
-              <BadgeCheck className="h-3.5 w-3.5" /> Sample listing
+              <BadgeCheck className="h-3.5 w-3.5" /> Partner-verified (demo)
+            </span>
+          ) : restaurant.dataSource === "published" ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
+              <BadgeCheck className="h-3.5 w-3.5" /> Published nutrition
+            </span>
+          ) : (
+            <span className="rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-ink/60 shadow-sm backdrop-blur">
+              Estimated ±
             </span>
           )}
         </div>

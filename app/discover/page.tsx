@@ -48,14 +48,20 @@ export default function Discover() {
     if (hydrated && profile) setSort("fit");
   }, [hydrated, profile]);
 
-  // best-fit dish per restaurant (for sort + headline)
+  // Best-fit dish per restaurant (for sort + headline) — PERSONALIZED:
+  // allergen-matching dishes can't carry a restaurant's headline score, and
+  // condition advisories apply their penalty, matching the dish rails.
   const bestFitOf = useMemo(() => {
     const map = new Map<string, number>();
     if (!targets || !profile) return map;
     for (const r of RESTAURANTS) {
       let best = 0;
-      for (const m of r.menu) best = Math.max(best, fitScore(m, targets, profile.goal).score);
-      map.set(r.slug, best);
+      for (const m of r.menu) {
+        const adj = personalAdjust(m, profile);
+        if (adj.exclude) continue;
+        best = Math.max(best, fitScore(m, targets, profile.goal).score - adj.penalty);
+      }
+      map.set(r.slug, Math.max(0, best));
     }
     return map;
   }, [targets, profile]);
@@ -65,11 +71,13 @@ export default function Discover() {
     if (cuisine) list = list.filter((r) => r.cuisine === cuisine);
     if (q.trim()) {
       const s = q.toLowerCase();
+      // Search covers dishes too — "falafel" should find The Halal Guys.
       list = list.filter(
         (r) =>
           r.name.toLowerCase().includes(s) ||
           r.cuisine.toLowerCase().includes(s) ||
-          r.neighborhood.toLowerCase().includes(s),
+          r.neighborhood.toLowerCase().includes(s) ||
+          r.menu.some((m) => m.name.toLowerCase().includes(s) || m.description.toLowerCase().includes(s)),
       );
     }
     if (dietOnly && profile?.dietary.length) {
@@ -82,7 +90,8 @@ export default function Discover() {
     // any dish passes ALL selected attributes (partner is restaurant-level).
     if (attrs.length) {
       list = list.filter((r) => {
-        if (attrs.includes("partner") && !r.partner) return false;
+        // "Verified data" = demo partner-verified OR restaurant-published
+        if (attrs.includes("partner") && !r.partner && r.dataSource !== "published") return false;
         const dishAttrs = attrs.filter((a) => a !== "partner");
         if (!dishAttrs.length) return true;
         return r.menu.some((m) =>
@@ -191,7 +200,11 @@ export default function Discover() {
 
       <div className="mt-3 flex items-start gap-2 rounded-xl px-1 text-xs leading-relaxed text-ink/50">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-600" />
-        <p>Boston restaurants and nutrition values are demonstration data for this pilot; verify menu details with the restaurant before ordering.</p>
+        <p>
+          Catalog mixes demo listings, restaurant-published nutrition (quoted from public disclosures), and labeled
+          engine estimates. Prices, ratings, and delivery times are placeholders — always verify details, especially
+          allergens, with the restaurant.
+        </p>
       </div>
 
       {/* Top dishes rail */}
@@ -202,7 +215,7 @@ export default function Discover() {
             <h2 id="top-matches-heading" className="font-display text-xl font-bold text-ink">Top matches for you</h2>
           </div>
           {/* Swipeable rail (design handoff: swipeable dish cards) */}
-          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0 [scrollbar-width:thin]">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {topDishes.map((m, i) => (
               <div key={m.id} className="w-[88%] min-w-[300px] max-w-md shrink-0 snap-start sm:w-[46%]">
                 <MenuItemCard
@@ -264,7 +277,7 @@ export default function Discover() {
           {/* Dish-attribute chips (design handoff set) */}
           <div className="mt-3 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Dish attribute filters">
             {[
-              { key: "partner", label: "Partner-verified" },
+              { key: "partner", label: "Verified data" },
               { key: "high-protein", label: "High protein" },
               { key: "under-500", label: "Under 500 kcal" },
               { key: "low-sodium", label: "Low sodium" },
@@ -302,7 +315,7 @@ export default function Discover() {
           <p className="text-sm text-ink/55" aria-live="polite">
             <span className="font-bold text-ink">{restaurants.length}</span> {restaurants.length === 1 ? "restaurant" : "restaurants"} in this view
           </p>
-          <p className="hidden text-xs text-ink/40 sm:block">Sample Boston catalog</p>
+          <p className="hidden text-xs text-ink/40 sm:block">Boston pilot catalog · demo + published + estimated tiers</p>
         </div>
 
         {view === "list" ? (
