@@ -10,8 +10,10 @@ import type {
   DailyTargets,
   Goal,
   HealthProfile,
+  LoggedMeal,
   MenuItem,
   Sex,
+  WeightEntry,
 } from "./types";
 
 export const ACTIVITY_FACTORS: Record<ActivityLevel, number> = {
@@ -124,9 +126,9 @@ const PROTEIN_PER_KG: Record<Goal, number> = {
   gain: 1.8,
 };
 
-export function computeTargets(p: HealthProfile): DailyTargets {
+export function computeTargets(p: HealthProfile, tdeeOverride?: number): DailyTargets {
   const bmr = bmrMifflin(p.weightKg, p.heightCm, p.age, p.sex);
-  const tdee = bmr * ACTIVITY_FACTORS[p.activity];
+  const tdee = tdeeOverride ?? bmr * ACTIVITY_FACTORS[p.activity];
   const floor = p.sex === "male" ? 1500 : 1200; // safe minimum intake
   const calories = Math.max(floor, Math.round((tdee + GOAL_DELTA[p.goal]) / 10) * 10);
 
@@ -146,6 +148,117 @@ export function computeTargets(p: HealthProfile): DailyTargets {
     fiber: fiberG,
     bmr: Math.round(bmr),
     tdee: Math.round(tdee),
+  };
+}
+
+// ---- Adaptive TDEE calibration -------------------------------------
+// Predictive equations are day-one estimates; individual metabolisms vary
+// by hundreds of kcal. The state-of-the-art consumer approach (popularized
+// by adaptive apps like MacroFactor) back-calculates TRUE energy burn from
+// the user's own logs via energy balance:
+//
+//   observed TDEE = average logged intake − (Δweight kg × 7700 kcal) / days
+//
+// If you ate 2,200/day and lost weight, you burned more than 2,200 — no
+// formula needed. We blend toward the observed value in proportion to how
+// complete the data is, so one sparse week can't whipsaw the target.
+
+const KCAL_PER_KG = 7700; // energy density of body-mass change (approximation)
+const CAL_WINDOW_DAYS = 28;
+const MIN_SPAN_DAYS = 10;
+const MIN_COMPLETE_DAYS = 8;
+const COMPLETE_DAY_KCAL = 1000; // below this, assume the day wasn't fully logged
+
+export interface CalibrationResult {
+  status: "insufficient" | "active";
+  // progress toward activation (for the "calibrating…" UI)
+  completeDays: number;
+  spanDays: number;
+  weighIns: number;
+  reason?: string;
+  // when active:
+  observedTdee?: number;
+  blendedTdee?: number;
+  formulaTdee: number;
+  delta?: number; // observed − formula
+  weightChangeKg?: number;
+  confidence?: number; // 0..1 — how much data backs the observation
+}
+
+export function calibrateTdee(
+  p: HealthProfile,
+  meals: LoggedMeal[],
+  weights: WeightEntry[],
+): CalibrationResult {
+  const bmr = bmrMifflin(p.weightKg, p.heightCm, p.age, p.sex);
+  const formulaTdee = Math.round(bmr * ACTIVITY_FACTORS[p.activity]);
+  const cutoff = Date.now() - CAL_WINDOW_DAYS * 86400000;
+
+  const recentWeights = weights
+    .filter((w) => new Date(w.date + "T12:00:00").getTime() >= cutoff)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const base: CalibrationResult = {
+    status: "insufficient",
+    completeDays: 0,
+    spanDays: 0,
+    weighIns: recentWeights.length,
+    formulaTdee,
+  };
+
+  if (recentWeights.length < 2) {
+    return { ...base, reason: "Needs at least two weigh-ins — update your weight in Profile as you go." };
+  }
+
+  const first = recentWeights[0];
+  const last = recentWeights[recentWeights.length - 1];
+  const spanStart = new Date(first.date + "T00:00:00").getTime();
+  const spanEnd = new Date(last.date + "T23:59:59").getTime();
+  const spanDays = Math.max(1, Math.round((spanEnd - spanStart) / 86400000));
+
+  // Full-day intake totals inside the weigh-in span
+  const byDay = new Map<string, number>();
+  for (const m of meals) {
+    if (m.loggedAt < spanStart || m.loggedAt > spanEnd) continue;
+    const d = new Date(m.loggedAt);
+    const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    byDay.set(k, (byDay.get(k) ?? 0) + m.calories);
+  }
+  const completeTotals = Array.from(byDay.values()).filter((v) => v >= COMPLETE_DAY_KCAL);
+  const completeDays = completeTotals.length;
+
+  const progress = { ...base, completeDays, spanDays };
+  if (spanDays < MIN_SPAN_DAYS) {
+    return { ...progress, reason: `Weigh-ins span ${spanDays} day${spanDays === 1 ? "" : "s"} — ${MIN_SPAN_DAYS}+ needed for a reliable read.` };
+  }
+  if (completeDays < MIN_COMPLETE_DAYS) {
+    return { ...progress, reason: `${completeDays} fully logged day${completeDays === 1 ? "" : "s"} of the ${MIN_COMPLETE_DAYS} needed. Keep logging complete days.` };
+  }
+
+  const avgIntake = completeTotals.reduce((s, v) => s + v, 0) / completeDays;
+  const weightChangeKg = last.weightKg - first.weightKg;
+  let observedTdee = avgIntake - (weightChangeKg * KCAL_PER_KG) / spanDays;
+
+  // Guardrails: implausible observations usually mean incomplete logging.
+  observedTdee = Math.max(formulaTdee * 0.65, Math.min(formulaTdee * 1.35, observedTdee));
+
+  // Confidence grows with logging completeness and span length.
+  const confidence = Math.min(1, completeDays / spanDays) * Math.min(1, spanDays / 21);
+  // Conservative blend: at full confidence, observed carries 60% of the answer.
+  const w = 0.6 * confidence;
+  const blendedTdee = Math.round((formulaTdee + w * (observedTdee - formulaTdee)) / 10) * 10;
+
+  return {
+    status: "active",
+    completeDays,
+    spanDays,
+    weighIns: recentWeights.length,
+    observedTdee: Math.round(observedTdee),
+    blendedTdee,
+    formulaTdee,
+    delta: Math.round(observedTdee - formulaTdee),
+    weightChangeKg: Math.round(weightChangeKg * 10) / 10,
+    confidence: Math.round(confidence * 100) / 100,
   };
 }
 

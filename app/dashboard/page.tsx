@@ -40,7 +40,7 @@ function greeting() {
 export default function Dashboard() {
   const router = useRouter();
   const { user, hydrated: authHydrated } = useAuth();
-  const { profile, targets, hydrated, meals, weights, consumedToday, todaysMeals, removeMeal, streak } = useUser();
+  const { profile, targets, calibration, hydrated, meals, weights, consumedToday, todaysMeals, removeMeal, streak } = useUser();
 
   useEffect(() => {
     if (authHydrated && !user) router.replace("/login");
@@ -459,6 +459,84 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Metabolic calibration — your target, tuned by your own data */}
+      {calibration && (
+        <div className={cls("mt-6 rounded-2xl border p-6", calibration.status === "active" ? "border-brand-300 bg-white" : "border-black/5 bg-white")}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 font-display text-lg font-bold text-ink">
+              <Target className="h-5 w-5 text-brand-600" /> Metabolic calibration
+            </h2>
+            {calibration.status === "active" ? (
+              <span className="rounded-full bg-brand-600 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+                Calibrated from your data
+              </span>
+            ) : (
+              <span className="rounded-full border border-neutral-300 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-ink/50">
+                Calibrating…
+              </span>
+            )}
+          </div>
+
+          {calibration.status === "active" ? (
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-xl bg-black/[0.03] p-3.5">
+                <p className="kicker text-ink/45">Textbook estimate</p>
+                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums text-ink/60">{calibration.formulaTdee.toLocaleString()}</p>
+                <p className="text-[11px] text-ink/45">kcal/day · Mifflin-St Jeor × activity</p>
+              </div>
+              <div className="rounded-xl bg-black/[0.03] p-3.5">
+                <p className="kicker text-ink/45">Your observed burn</p>
+                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums text-ink">{calibration.observedTdee!.toLocaleString()}</p>
+                <p className={cls("text-[11px] font-semibold", (calibration.delta ?? 0) >= 0 ? "text-brand-700" : "text-ink/45")}>
+                  {(calibration.delta ?? 0) >= 0 ? "+" : ""}{calibration.delta!.toLocaleString()} vs textbook · from {calibration.completeDays} logged days &amp; {calibration.weighIns} weigh-ins
+                </p>
+              </div>
+              <div className="rounded-xl border-2 border-brand-600 bg-brand-50 p-3.5">
+                <p className="kicker text-brand-700">Target now uses</p>
+                <p className="mt-1 font-display text-2xl font-extrabold tabular-nums text-brand-700">{calibration.blendedTdee!.toLocaleString()}</p>
+                <p className="text-[11px] text-brand-700/70">kcal/day burn · {Math.round((calibration.confidence ?? 0) * 100)}% data confidence blend</p>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4">
+              <p className="text-sm text-ink/65">{calibration.reason}</p>
+              <div className="mt-3 flex items-center gap-3">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-neutral-200">
+                  <div
+                    className="h-full rounded-full bg-brand-600 transition-all"
+                    style={{ width: `${Math.min(100, Math.round(((calibration.completeDays / 8) * 0.6 + (Math.min(calibration.weighIns, 2) / 2) * 0.4) * 100))}%` }}
+                  />
+                </div>
+                <span className="shrink-0 text-xs tabular-nums text-ink/50">{calibration.completeDays}/8 days · {calibration.weighIns}/2 weigh-ins</span>
+              </div>
+            </div>
+          )}
+
+          {/* What this is & why it works */}
+          <details className="group mt-4 border-t border-black/5 pt-3">
+            <summary className="cursor-pointer text-sm font-semibold text-brand-700 hover:text-brand-900">
+              What is this, and why does it work?
+            </summary>
+            <div className="mt-2 space-y-2 text-sm leading-relaxed text-ink/65">
+              <p>
+                Every calorie formula — ours, Fitbit&apos;s, anyone&apos;s — is a population average, and individual
+                metabolisms vary from it by hundreds of calories. Even the best fitness wearables misjudge energy burn
+                by ~25% in validation studies. But your own body keeps perfect books: <strong>if you log what you eat
+                and how your weight changes, your true burn rate is simple arithmetic</strong> (a kilogram of body mass
+                holds roughly 7,700 kcal). Eat 2,200 a day while losing half a kilo a week, and you&apos;re burning about
+                2,750 — no formula required.
+              </p>
+              <p>
+                Forkcast starts you on the clinical-standard Mifflin-St Jeor estimate, then blends toward your observed
+                burn as your logs accumulate — weighted by data confidence, capped conservatively, and recalculated over
+                a rolling 28-day window so one unusual week can&apos;t distort your target. Sparse days (under 1,000 kcal
+                logged) are treated as incomplete and excluded rather than misread as dieting.
+              </p>
+            </div>
+          </details>
+        </div>
+      )}
+
       {/* Methodology — where the numbers come from */}
       <div className="mt-6 rounded-2xl border border-black/5 bg-white p-5">
         <p className="flex items-start gap-2.5 text-xs leading-relaxed text-ink/55">
@@ -468,8 +546,9 @@ export default function Dashboard() {
             <strong>Mifflin-St Jeor equation</strong> (the clinical standard recommended by the Academy of Nutrition and
             Dietetics), scaled by your activity level, then adjusted for your goal (−500 kcal to lose ≈1 lb/week, +300 to
             gain lean mass) with safety floors of 1,500/1,200 kcal. Protein follows ISSN guidance, fiber follows the
-            Dietary Guidelines for Americans (14 g per 1,000 kcal), and BMI categories follow CDC definitions. These are
-            evidence-based estimates for healthy adults, not medical advice —{" "}
+            Dietary Guidelines for Americans (14 g per 1,000 kcal), and BMI categories follow CDC definitions. Once you
+            have enough logs and weigh-ins, metabolic calibration (above) refines the estimate with your own observed
+            energy balance. These are evidence-based estimates for healthy adults, not medical advice —{" "}
             <Link href="/how-it-works" className="font-semibold text-brand-700 underline">see the full methodology</Link>.
           </span>
         </p>

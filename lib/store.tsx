@@ -14,7 +14,7 @@ import type {
   LoggedMeal,
   WeightEntry,
 } from "./types";
-import { computeTargets } from "./nutrition";
+import { calibrateTdee, computeTargets, type CalibrationResult } from "./nutrition";
 import { todayKey, uid } from "./format";
 import { useAuth } from "./auth";
 
@@ -29,6 +29,7 @@ interface PersistShape {
 interface StoreValue extends PersistShape {
   hydrated: boolean;
   targets: DailyTargets | null;
+  calibration: CalibrationResult | null; // adaptive TDEE from the user's own logs
   setProfile: (p: HealthProfile) => void;
   logMeal: (m: Omit<LoggedMeal, "id" | "loggedAt"> & { loggedAt?: number }) => void;
   removeMeal: (id: string) => void;
@@ -136,7 +137,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, [userId]);
 
-  const targets = useMemo(() => (profile ? computeTargets(profile) : null), [profile]);
+  // Adaptive calibration: once enough logs + weigh-ins exist, the target is
+  // computed from the user's OWN observed energy balance, blended with the
+  // formula in proportion to data confidence. Fit Scores and budgets follow.
+  const calibration = useMemo(
+    () => (profile ? calibrateTdee(profile, meals, weights) : null),
+    [profile, meals, weights],
+  );
+
+  const targets = useMemo(
+    () =>
+      profile
+        ? computeTargets(profile, calibration?.status === "active" ? calibration.blendedTdee : undefined)
+        : null,
+    [profile, calibration],
+  );
 
   const todaysMeals = useCallback(() => {
     const key = todayKey();
@@ -179,6 +194,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     weights,
     hydrated,
     targets,
+    calibration,
     setProfile,
     logMeal,
     removeMeal,
