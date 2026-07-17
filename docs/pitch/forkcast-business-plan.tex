@@ -1,0 +1,261 @@
+% Forkcast — Business Plan v2.0 (July 2026)
+% Compile: latexmk -pdf forkcast-business-plan.tex
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=0.95in,top=0.9in,bottom=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}\renewcommand{\familydefault}{\sfdefault}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage[hidelinks]{hyperref}
+
+% ---- Brand ----
+\definecolor{accent}{HTML}{EC3013}
+\definecolor{accentdark}{HTML}{AE1800}
+\definecolor{ink}{HTML}{201E1D}
+\definecolor{ground}{HTML}{F3F2F2}
+\definecolor{muted}{HTML}{605D5D}
+
+\color{ink}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\renewcommand{\arraystretch}{1.35}
+
+% ---- Headings ----
+\titleformat{\section}
+  {\Large\bfseries\color{ink}}
+  {\textcolor{accent}{\thesection}}{0.7em}{}
+  [\vspace{-6pt}{\color{accent}\rule{2.2cm}{2pt}}]
+\titlespacing*{\section}{0pt}{18pt}{10pt}
+\titleformat{\subsection}{\normalsize\bfseries\color{ink}}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+
+% ---- Header/footer ----
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{muted}\textbf{\textcolor{accent}{Fork}cast} --- Business Plan v2.0}
+\fancyhead[R]{\small\color{muted}July 2026 · Confidential draft}
+\fancyfoot[C]{\small\color{muted}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{{\color{ground}\hrule width\headwidth height 1pt}}
+
+\newcommand{\kicker}[1]{{\footnotesize\bfseries\color{accent}\MakeUppercase{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+
+% ================= TITLE =================
+\begin{titlepage}
+\thispagestyle{empty}
+\vspace*{1.4cm}
+{\color{accent}\rule{2.6cm}{6pt}}\\[14pt]
+{\Huge\bfseries \textcolor{accent}{Fork}cast}\\[6pt]
+{\LARGE\bfseries The trust layer for restaurant\\nutrition decisions}\\[16pt]
+{\large\color{muted} Business Plan --- Version 2.0 · July 2026}\\[4pt]
+{\small\color{muted} Prepared for pre-seed conversations and the founder's evidence record.}
+
+\vspace{1.6cm}
+{\color{ground}\hrule height 2pt}
+\vspace{0.9cm}
+
+\kicker{The product in one sentence}\\[3pt]
+Forkcast tells diners what to order \emph{before} they order --- scored against their own body and goals --- then closes the loop: order, confirm, log, measure. It is the only product connecting pre-order decision support, verified independent-restaurant nutrition data, and post-order confirmed logging.
+
+\vspace{0.8cm}
+\kicker{Sourcing \& integrity}\\[3pt]
+All market figures are sourced (CDC, USDA ERS, AHRQ, peer-reviewed literature, company filings/press; see \texttt{RESEARCH.md}). Competitive claims come from live site captures dated July 15, 2026 (\texttt{COMPETITIVE\_SCAN\_2026-07.md}). Nothing in this document claims users, partners, revenue, or outcomes that do not exist.
+
+\vfill
+{\small\color{muted}
+Working product: private repository \texttt{Seymurhh/forkcast} (38+ dated commits) · live demo site\\
+Companions: \texttt{FINANCIAL\_MODEL.md} · \texttt{RESEARCH.md} · \texttt{MENU\_COLLECTION.md} · \texttt{SYSTEM\_ARCHITECTURE.md}}
+\end{titlepage}
+
+% ================= 0 ANSWER =================
+\section*{\textcolor{accent}{0}\hspace{0.6em}The answer first}
+\vspace{-6pt}{\color{accent}\rule{2.2cm}{2pt}}
+
+\textbf{Americans eat out more than ever, decide blind, and every existing app reacts only after the plate is empty.} The category leader for ``eat out healthy'' markets AI guesses across 22 million locations as facts; the logging giants own the aftermath; the delivery marketplaces own the transaction. Nobody owns the \emph{decision} --- and nobody at all serves the roughly 65\% of U.S. restaurants that are independent and exempt from federal menu labeling.
+
+\textbf{Forkcast owns the decision, and earns the right to with honesty no competitor structurally can match:} every nutrition number carries its source and a $\pm$ range; restaurants review and correct their own data through a versioned public process; sponsored placement can never touch the score; and the personal calorie target itself recalibrates from the user's own measured energy balance. The full product --- decision $\to$ order $\to$ restaurant terminal $\to$ confirmed log $\to$ adaptive measurement --- \textbf{exists and works today}.
+
+\textbf{The ask:} $\sim$\textbf{\$1.0--1.5M pre-seed SAFE} ($\sim$\$5--6M post) plus non-dilutive SBIR, to run the Boston pilot against six pre-registered metrics, convert the first independent restaurants into verified partners, and prove retention economics.
+
+% ================= 1 SITUATION =================
+\section{Situation --- eating out is where American diets are decided}
+
+\begin{tabularx}{\textwidth}{@{}L r >{\raggedright\arraybackslash}p{4.6cm}@{}}
+\toprule
+\textbf{Fact} & \textbf{Figure} & \textbf{Source}\\
+\midrule
+Food spending eaten away from home & \textbf{58.5\%} & USDA ERS, 2024 (record; \$4,485/capita, +12\% YoY)\\
+Daily calories from food away from home & $\sim$1/3 & USDA ERS / NHANES (directional)\\
+Restaurant vs.\ home meal & \textbf{+200 kcal, +350 mg Na} & USDA ERS\\
+Diners underestimating restaurant calories & \textbf{2 in 3} & USDA/NHANES 2024 ($\sim$25\% by 500+ kcal)\\
+Behavior change from mandatory calorie labels & \textbf{$\sim$24 kcal/order} & Peer-reviewed labeling literature\\
+U.S. adults obese / overweight & \textbf{40.3\% + 31.7\%} & CDC NCHS, 2024 ($\approx$72\% combined)\\
+Diet-related disease cost & \textbf{$\sim$\$334B/yr} & CDC; AHRQ MEPS (obesity $\sim$\$173B, 2019\$)\\
+\bottomrule
+\end{tabularx}
+
+% ================= 2 COMPLICATION =================
+\section{Complication --- three structural failures nobody has fixed}
+
+\begin{enumerate}[leftmargin=1.4em,itemsep=3pt]
+\item \textbf{The data doesn't exist where people actually eat.} FDA menu labeling (21 CFR 101.11) binds only 20+-location chains. The independent majority publish nothing, and no commercial database covers them.
+\item \textbf{The timing is wrong everywhere.} Logging apps (MyFitnessPal: 220M registered, $\sim$30M MAU) act after eating --- accounting, not coaching --- and 70--80\% of calorie-app users quit within two weeks. Labels act at the menu but move behavior $\sim$24 kcal. Delivery apps act at the transaction with zero nutrition intelligence.
+\item \textbf{The new ``AI menu'' entrants sell certainty they don't have.} MenuFit (live capture, July 2026): ``\#1 App For Eating Out Healthy,'' 22.3M locations, meals that ``perfectly align with your macros'' --- no sources, no error ranges, no corrections, no restaurant participation, no web product, and a recommendation that dead-ends. Credibility is the category's open flank.
+\end{enumerate}
+
+% ================= 3 RESOLUTION =================
+\section{Resolution --- the trust layer, already built}
+
+Forkcast turns a health profile (Mifflin-St Jeor BMR $\to$ activity-scaled TDEE $\to$ goal-adjusted targets; ISSN macros; CDC BMI classes; allergies and conditions) into an explainable per-dish \textbf{Fit Score}, ranks every nearby menu around what's left of the user's day, and then --- unlike every competitor --- finishes the job:
+
+\begin{center}
+\kicker{plan $\to$ discover $\to$ compare $\to$ order $\to$ restaurant accepts $\to$ confirm $\to$ log with evidence $\to$ measure $\to$ recalibrate}
+\end{center}
+
+\subsection*{As built --- dated commits, July 2026}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{5.2cm} L@{}}
+\toprule
+\textbf{Capability (all live)} & \textbf{Why it matters}\\
+\midrule
+Fit Score engine + condition/allergen personalization & Explainable, safety-aware ranking; allergen matches excluded from recommendations; condition advisories on every dish\\
+Full ordering loop: basket $\to$ checkout $\to$ tracking $\to$ ``Log this meal?'' & The decision connects to the record; every logged restaurant meal carries an order reference\\
+Restaurant partner terminal & Order queue with customer allergy flags, prep quotes, and \textbf{versioned, timestamped menu corrections} surfacing publicly on dish pages\\
+Three-tier data provenance & \emph{Partner-verified} / \emph{Restaurant-published} (Sweetgreen captured live July 2026; The Halal Guys' published guide) / \emph{Estimated $\pm$15\%} (real Boston independents, labeled)\\
+Adaptive metabolic calibration & Target TDEE back-calculated from the user's own logged intake + weight change, confidence-blended --- the state-of-the-art approach, attached to restaurant decisions\\
+Evidence system & Exportable meal log with source/portion/confidence per entry; \texttt{/impact} page with six pre-registered pilot metrics and a public source ledger\\
+Role-based accounts; web-first, shareable dish pages & Two-sided from day one; app-only competitors have no web surface at all\\
+\bottomrule
+\end{tabularx}
+
+\textbf{Deliberately \emph{not} built:} payment processing, live delivery dispatch, partner handoff links --- all shown as clearly-labeled integration states, never simulated as real.
+
+% ================= 4 MARKET =================
+\section{Market}
+
+{\small\color{muted}U.S.-only; reasoning explicit so each number can be challenged (derivations in \texttt{RESEARCH.md}).}
+
+\begin{itemize}[leftmargin=1.4em,itemsep=3pt]
+\item \textbf{TAM $\approx$ \$11.1B/yr.} $\sim$186M U.S. adults with elevated BMI ($\approx$72\% of 258M; CDC 2024) $\times$ $\sim$\$60 blended annual ARPU (anchored between MyFitnessPal Premium \$79.99/yr and Cal AI \$29.99/yr). Triangulates with the independently sized calorie-tracking app market (\$5.5--14B, 2025; 12--20\% CAGR).
+\item \textbf{SAM $\approx$ \$3.3B/yr.} $\sim$55.7M goal-oriented active dieters who eat out often ($\sim$30\% of the pool) $\times$ \$60.
+\item \textbf{SOM $\approx$ \$40--90M ARR (5-yr).} 0.5--2.0\% of SAM (0.28--1.1M payers; 1\% $\approx$ \$33M consumer ARR) plus restaurant retail-media and B2B2C legs. \textbf{Retention-bound, not demand-bound.}
+\item \textbf{Velocity proof:} Cal AI reached $\sim$15M downloads and \$30M+ ARR in under two years before MyFitnessPal acquired it (Dec 2025).
+\end{itemize}
+
+% ================= 5 COMPETITION =================
+\section{Competition --- and the flank they all leave open}
+
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm} >{\raggedright\arraybackslash}p{4.3cm} L@{}}
+\toprule
+\textbf{Player} & \textbf{Owns} & \textbf{Structurally absent}\\
+\midrule
+MenuFit / PlateMate / Nuuro & ``Know what to order''; AI menu scoring; influencer GTM & Sources, error ranges, corrections, restaurant participation, ordering/logging loop, web presence; guilt-based framing excludes the health-condition market\\
+MyFitnessPal & Retrospective logging at scale & Acts after eating; restaurant data weakest (same dish 400--1,200 kcal); 70--80\% two-week churn; first revenue decline ($-$5.7\%, 2025)\\
+DoorDash / Uber Eats & Ordering logistics, merchant graph, \$1B+ ads & Zero personal-nutrition intelligence; sponsored placement \emph{is} the product\\
+Sweetgreen / CAVA & Excellent single-brand transparency & Cannot be brand-agnostic\\
+Foodsmart / Nourish & Payer-funded dietitian care & Care delivery, not the moment of ordering\\
+\bottomrule
+\end{tabularx}
+
+\textbf{Whitespace in one line:} \emph{nobody connects pre-order decision support, verified independent-restaurant data, and post-order confirmed logging --- and nobody can prove their numbers.}
+
+\textbf{The moat compounds through participation:} every verified menu, every versioned correction, every order-confirmed meal (ground truth vs.\ estimate --- a validation dataset no retrospective logger can construct), and every calibration cycle makes the data asset harder to replicate than any vision model.
+
+% ================= 6 MODEL =================
+\section{Business model --- three legs, sequenced}
+
+\begin{enumerate}[leftmargin=1.4em,itemsep=3pt]
+\item \textbf{Consumer subscription (launch).} $\sim$\$60/yr blended, annual-led; useful free tier. Gate growth on \textbf{LTV:CAC $\geq$ 3:1, 6--9-month payback}.
+\item \textbf{Restaurant retail-media (margin scaler).} Clearly-labeled featured placement $\sim$\$200/mo/location (2{,}000 locations $\approx$ \$4.8M; 10{,}000 $\approx$ \$24M) --- with the categorical rule that \textbf{sponsorship never affects Fit Scores}. Verified-menu partnership is the on-ramp.
+\item \textbf{B2B2C covered nutrition (durable).} Payer/employer contracts on broadly-covered medical nutrition therapy (CPT 97802--97804); Medicaid expansion treated as optionality, not thesis.
+\end{enumerate}
+
+% ================= 7 GTM =================
+\section{Go-to-market --- density, then proof, then scale}
+
+\textbf{Phase 1 (months 0--12): Boston density.} Chains seeded from published disclosures (the Sweetgreen / Halal Guys pattern, already demonstrated); independents digitized block-by-block under the documented protocol (\texttt{MENU\_COLLECTION.md}: source $\to$ digitize $\to$ estimate $\to$ owner-verify $\to$ maintain). Acquisition via TikTok/influencer (the Cal AI playbook) aimed at GLP-1 and goal-oriented audiences --- trust-first, guilt-free positioning the incumbents ceded.
+
+\textbf{The pilot is pre-registered.} Six metrics defined \emph{before} measurement, published at \texttt{/impact}: pre-order decision rate; verified-menu coverage; correction turnaround; logged-meal accuracy (order ground truth vs.\ estimates); independent-restaurant onboarding cost; diet-quality delta. Definitions don't move after the fact.
+
+\textbf{Phase 2 (12--30 mo):} convert coverage into retail-media; raise seed on retention + featured-restaurant proof (AI took 62\% of 2025 digital-health VC). \quad \textbf{Phase 3 (30 mo+):} payer/employer contracts on covered MNT.
+
+% ================= 8 FUNDING =================
+\section{Funding strategy}
+
+\begin{itemize}[leftmargin=1.4em,itemsep=3pt]
+\item \textbf{Pre-seed:} $\sim$\$1.0--1.5M SAFE ($\sim$\$5--6M post) --- mid-range of 2024--26 norms, defensible with a working product and pilot protocol.
+\item \textbf{Non-dilutive:} NIH/NIDDK, USDA-NIFA, NSF SBIR (Phase I $\sim$\$150--300k / \$125--175k / $\sim$\$275k; Phase II \$1--2M). \emph{SBIR/STTR lapsed Oct 2025, reauthorized Apr 2026 --- verify solicitation calendars.}
+\item \textbf{Seed ($\sim$\$4--6M) at months 12--18} on retention + featured-cohort proof; \textbf{Series A ($\sim$\$15--25M)} for GTM and the payer leg.
+\item \textbf{Why now:} the GLP-1 / food-as-medicine funding wave (Nourish \$70M Series B at \$1B+; Foodsmart \$200M; Fay and Berry Street \$50M each) rewards evidence-first nutrition positioning.
+\end{itemize}
+
+% ================= 9 MILESTONES =================
+\section{Milestones --- next 18 months}
+
+\begin{tabularx}{\textwidth}{@{}L l l@{}}
+\toprule
+\textbf{Milestone} & \textbf{Target} & \textbf{Status}\\
+\midrule
+Working end-to-end product (decision $\to$ order $\to$ log $\to$ measure) & --- & \textbf{Done, Jul 2026}\\
+Published-nutrition chain seeding demonstrated & --- & \textbf{Done}\\
+Pilot metrics pre-registered publicly (\texttt{/impact}) & --- & \textbf{Done}\\
+Backend: cross-device accounts, live terminal sync & Mo 1--2 & Next\\
+Catalog: 20+ restaurants incl.\ verified independents & Mo 3 & 13 today\\
+First 3--5 owner-verified partners (letters + correction logs) & Mo 4--6 & ---\\
+D30 retention $>$ 35\% (vs.\ $\sim$30\% category) & Mo 6--12 & ---\\
+Featured-restaurant cohort 150+ · $\sim$3{,}000 Boston subscribers & Mo 12--18 & ---\\
+SBIR Phase I · Seed raised & Mo 9--18 & ---\\
+\bottomrule
+\end{tabularx}
+
+% ================= 10 RISKS =================
+\section{Risks \& mitigations}
+
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{5.0cm} L@{}}
+\toprule
+\textbf{Risk} & \textbf{Mitigation}\\
+\midrule
+Estimation accuracy is physics-bound ($\sim$16--25\% photo floor) & Lead with menu text (models match nutritionists there); ground in USDA FNDDS (grounding cuts error 63--83\%); surface $\pm$ ranges; correction built into every surface; never marketed as clinical\\
+Retention kills this category & Plan-ahead is a decision habit, not a logging chore; order-confirmed logging removes the diary; calibration compounds the reason to stay; annual plans $\sim$halve churn\\
+Two-sided cold start & Published-disclosure seeding gives day-one chain coverage; density beats breadth; the terminal gives independents value before any fee\\
+GLP-1 substitution & Position as the eating-out companion \emph{for} GLP-1 users --- the angle funding the category\\
+Incumbent consolidation (MFP $\times$ Cal AI) & Moat is the verified-data + correction + ground-truth graph, not the model\\
+Trust/integrity failure would be fatal & Governance is product: sponsored-scoring separation is categorical; corrections versioned and public; simulated states labeled; \texttt{/impact} no-unrecorded-claims commitment\\
+Policy risk on B2B2C & Anchor on commercial MNT; Medicaid expansion as optionality\\
+\bottomrule
+\end{tabularx}
+
+% ================= 11 NATIONAL INTEREST =================
+\section{National-interest alignment}
+
+{\small\color{muted}This section states the founder's case factually; it draws no legal conclusions.}
+
+\begin{itemize}[leftmargin=1.4em,itemsep=3pt]
+\item \textbf{Substantial merit.} Restaurant-nutrition transparency for the independent majority federal labeling does not reach; pre-order decision support where labels demonstrably fail ($\sim$24 kcal/order); health literacy through explained, sourced, correctable numbers; small-restaurant menu digitization at documented cost.
+\item \textbf{National importance.} A reproducible protocol --- collection standard, provenance tiers, correction governance, pre-registered measurement --- designed to scale across U.S. markets; addressed at a diet-disease burden of $\sim$\$334B/yr.
+\item \textbf{Well positioned.} Working product with dated commit history; live-captured published-data integrations; documented methods; financial and competitive analyses; a pilot designed for verifiable evidence (restaurant letters, correction logs, exportable provenance-carrying data).
+\item \textbf{Evidence integrity.} No fabricated users, restaurants, partners, outcomes, revenue, ratings, or health claims --- enforced in the product itself (prototype stamps, simulation labels, demo-payment disclosures, confidence tiers).
+\end{itemize}
+
+% ================= 12 TEAM =================
+\section{Team}
+
+Founder: Harvard SEAS (engineering); sole builder of the product to date. Pre-seed hires: a registered dietitian / nutrition-science advisor (credibility + B2B2C), an ML engineer (estimation engine), and a local GTM lead (restaurant density). Advisory targets: a fast-casual operator and a digital-health payer-contracting advisor.
+
+\vspace{14pt}
+{\color{ground}\hrule height 2pt}
+\vspace{6pt}
+{\small\color{muted}Companions: \texttt{FINANCIAL\_MODEL.md} · \texttt{RESEARCH.md} (cited evidence base) · \texttt{COMPETITIVE\_SCAN\_2026-07.md} (live captures) · \texttt{MENU\_COLLECTION.md} (data protocol) · \texttt{SYSTEM\_ARCHITECTURE.md} · \texttt{DESIGN\_INTEGRATION\_NIW.md}. Working product: repository (\texttt{npm run dev}) and the published demo site.}
+
+\end{document}
