@@ -9,6 +9,7 @@ import { useUser } from "@/lib/store";
 import { fitScore, personalAdjust } from "@/lib/nutrition";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { MenuItemCard } from "@/components/MenuItemCard";
+import { Rail } from "@/components/Rail";
 import { FitPill } from "@/components/FitBadge";
 import { GOAL_LABELS } from "@/lib/nutrition";
 import { cls, priceLevelLabel } from "@/lib/format";
@@ -33,7 +34,11 @@ export default function Discover() {
   const toggleAttr = (key: string) =>
     setAttrs((prev) => (prev.includes(key) ? prev.filter((a) => a !== key) : [...prev, key]));
 
-  // Honor deep links: ?view=map, ?q=search, ?cuisine=X (hero search + cuisine rail).
+  const ATTR_KEYS = ["partner", "high-protein", "under-500", "low-sodium", "high-fiber"];
+  const urlHadSort = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("sort"))[0];
+
+  // Honor deep links: ?view=map, ?q, ?cuisine, ?attrs, ?sort (hero search,
+  // cuisine rail, and shared filtered views).
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -42,11 +47,31 @@ export default function Discover() {
     if (qp) setQ(qp);
     const cp = params.get("cuisine");
     if (cp && CUISINES.includes(cp)) setCuisine(cp);
+    const ap = params.get("attrs");
+    if (ap) setAttrs(ap.split(",").filter((a) => ATTR_KEYS.includes(a)));
+    const sp = params.get("sort");
+    if (sp === "fit" || sp === "distance" || sp === "rating") setSort(sp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (hydrated && profile) setSort("fit");
-  }, [hydrated, profile]);
+    if (hydrated && profile && !urlHadSort) setSort("fit");
+  }, [hydrated, profile, urlHadSort]);
+
+  // Keep the URL in sync so any filtered view is shareable / bookmarkable.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const p = new URLSearchParams();
+    if (q.trim()) p.set("q", q.trim());
+    if (cuisine) p.set("cuisine", cuisine);
+    if (attrs.length) p.set("attrs", attrs.join(","));
+    if (view === "map") p.set("view", "map");
+    p.set("sort", sort);
+    // Drop the sort param when it's the default, to keep URLs clean.
+    if (sort === (profile ? "fit" : "rating")) p.delete("sort");
+    const qs = p.toString();
+    window.history.replaceState(null, "", qs ? `?${qs}` : window.location.pathname);
+  }, [q, cuisine, attrs, view, sort, profile]);
 
   // Best-fit dish per restaurant (for sort + headline) — PERSONALIZED:
   // allergen-matching dishes can't carry a restaurant's headline score, and
@@ -214,10 +239,10 @@ export default function Discover() {
             <Sparkles className="h-5 w-5 text-brand-600" />
             <h2 id="top-matches-heading" className="font-display text-xl font-bold text-ink">Top matches for you</h2>
           </div>
-          {/* Swipeable rail (design handoff: swipeable dish cards) */}
-          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {/* Swipeable rail with paging arrows (design handoff: swipeable dish cards) */}
+          <Rail itemGap="gap-4">
             {topDishes.map((m, i) => (
-              <div key={m.id} className="w-[88%] min-w-[300px] max-w-md shrink-0 snap-start sm:w-[46%]">
+              <div key={m.id} className="w-[88%] min-w-[300px] max-w-md shrink-0 snap-start py-1 sm:w-[46%]">
                 <MenuItemCard
                   item={m}
                   restaurantSlug={m.restaurantSlug}
@@ -226,7 +251,7 @@ export default function Discover() {
                 />
               </div>
             ))}
-          </div>
+          </Rail>
         </section>
       )}
 
@@ -321,9 +346,22 @@ export default function Discover() {
         {view === "list" ? (
           <>
             <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {restaurants.map((r) => (
-                <RestaurantCard key={r.slug} restaurant={r} />
-              ))}
+              {restaurants.map((r) => {
+                const s = q.trim().toLowerCase();
+                const dishMatches = s
+                  ? r.menu.filter((m) => m.name.toLowerCase().includes(s) || m.description.toLowerCase().includes(s)).length
+                  : 0;
+                return (
+                  <div key={r.slug}>
+                    <RestaurantCard restaurant={r} />
+                    {dishMatches > 0 && (
+                      <p className="mt-1.5 flex items-center gap-1 pl-1 text-[11px] font-semibold text-brand-700">
+                        <Search className="h-3 w-3" /> {dishMatches} {dishMatches === 1 ? "dish matches" : "dishes match"} &ldquo;{q.trim()}&rdquo;
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             {restaurants.length === 0 && (
               <div className="py-16 text-center text-ink/50">
