@@ -78,7 +78,7 @@
 {\Huge\bfseries \textcolor{accent}{Fork}cast}\\[6pt]
 {\LARGE\bfseries The trust layer for restaurant\\nutrition decisions}\\[16pt]
 {\large\color{muted} Business Plan --- Version 2.0 · July 2026}\\[4pt]
-{\small\color{muted} Prepared for pre-seed conversations and the founder's evidence record.}
+{\small\color{muted} Prepared for pre-seed conversations.}
 
 \vspace{1.6cm}
 {\color{ground}\hrule height 2pt}
@@ -89,12 +89,12 @@ Forkcast tells diners what to order \emph{before} they order --- scored against 
 
 \vspace{0.8cm}
 \kicker{Sourcing \& integrity}\\[3pt]
-All market figures are sourced (CDC, USDA ERS, AHRQ, peer-reviewed literature, company filings/press; see \texttt{RESEARCH.md}). Competitive claims come from live site captures dated July 15, 2026 (\texttt{COMPETITIVE\_SCAN\_2026-07.md}). Nothing in this document claims users, partners, revenue, or outcomes that do not exist.
+All market figures are sourced (CDC, USDA ERS, AHRQ, peer-reviewed literature, company filings/press; see the accompanying Market Research Dossier). Competitive claims come from live site captures dated July 15, 2026 (Competitive Scan appendix). Nothing in this document claims users, partners, revenue, or outcomes that do not exist.
 
 \vfill
 {\small\color{muted}
-Working product: private repository \texttt{Seymurhh/forkcast} (38+ dated commits) · live demo site\\
-Companions: \texttt{FINANCIAL\_MODEL.md} · \texttt{RESEARCH.md} · \texttt{MENU\_COLLECTION.md} · \texttt{SYSTEM\_ARCHITECTURE.md}}
+A complete working product accompanies this plan; a live demonstration is available on request.\\
+Appendices: Financial Model · Market Research Dossier · Menu Collection Protocol · System Architecture}
 \end{titlepage}
 
 % ================= 0 ANSWER =================
@@ -172,7 +172,7 @@ Forkcast turns a health profile (Mifflin-St Jeor BMR $\to$ activity-scaled TDEE 
 \caption*{\scriptsize\color{muted}\textbf{Exhibit 1 --- The closed loop.} Competitors stop at the recommendation (or start after the meal); Forkcast connects the decision to the record. Highlighted steps are where every competitor drops out.}
 \end{figure}
 
-\subsection*{As built --- dated commits, July 2026}
+\subsection*{As built --- July 2026}
 \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{5.2cm} L@{}}
 \toprule
 \textbf{Capability (all live)} & \textbf{Why it matters}\\
@@ -182,7 +182,7 @@ Full ordering loop: basket $\to$ checkout $\to$ tracking $\to$ ``Log this meal?'
 Restaurant partner terminal & Order queue with customer allergy flags, prep quotes, and \textbf{versioned, timestamped menu corrections} surfacing publicly on dish pages\\
 Three-tier data provenance & \emph{Partner-verified} / \emph{Restaurant-published} (Sweetgreen captured live July 2026; The Halal Guys' published guide) / \emph{Estimated $\pm$15\%} (real Boston independents, labeled)\\
 Adaptive metabolic calibration & Target TDEE back-calculated from the user's own logged intake + weight change, confidence-blended --- the state-of-the-art approach, attached to restaurant decisions\\
-Evidence system & Exportable meal log with source/portion/confidence per entry; \texttt{/impact} page with six pre-registered pilot metrics and a public source ledger\\
+Evidence system & Exportable meal log with source/portion/confidence per entry; a public Impact page with six pre-registered pilot metrics and a public source ledger\\
 Role-based accounts; web-first, shareable dish pages & Two-sided from day one; app-only competitors have no web surface at all\\
 \bottomrule
 \end{tabularx}
@@ -221,13 +221,13 @@ Role-based accounts; web-first, shareable dish pages & Two-sided from day one; a
   \draw[arracc] (evid.east) .. controls +(9mm,0) and +(9mm,0) .. (cal.east)
     node[midway, lbl, right, xshift=-0.5mm] {ground truth\\feeds back};
 \end{tikzpicture}
-\caption*{\scriptsize\color{muted}\textbf{Exhibit 2 --- Architecture.} Three surfaces over shared engines over the data asset. Every arrow that touches the data layer makes it more defensible: corrections from restaurants, order-confirmed ground truth from diners. Full detail: \texttt{SYSTEM\_ARCHITECTURE.md}.}
+\caption*{\scriptsize\color{muted}\textbf{Exhibit 2 --- Architecture.} Three surfaces over shared engines over the data asset. Every arrow that touches the data layer makes it more defensible: corrections from restaurants, order-confirmed ground truth from diners. Full detail in the System Architecture appendix.}
 \end{figure}
 
 % ================= 4 MARKET =================
 \section{Market}
 
-{\small\color{muted}U.S.-only; reasoning explicit so each number can be challenged (derivations in \texttt{RESEARCH.md}).}
+{\small\color{muted}U.S.-only; reasoning explicit so each number can be challenged (derivations in the Market Research Dossier).}
 
 \begin{itemize}[leftmargin=1.4em,itemsep=3pt]
 \item \textbf{TAM $\approx$ \$11.1B/yr.} $\sim$186M U.S. adults with elevated BMI ($\approx$72\% of 258M; CDC 2024) $\times$ $\sim$\$60 blended annual ARPU (anchored between MyFitnessPal Premium \$79.99/yr and Cal AI \$29.99/yr). Triangulates with the independently sized calorie-tracking app market (\$5.5--14B, 2025; 12--20\% CAGR).
@@ -324,14 +324,14 @@ Cal AI & --- & \$29.99 & Photo-only volume play\\
 \end{tabularx}
 
 \vspace{4pt}
-\textbf{Unit economics at the new price (v2):} blended gross ARPU $\sim$\$42/yr; CAC $\sim$\$15 (restaurant co-marketing as a $\sim$\$0-CAC channel); \textbf{LTV:CAC $\approx$ 3.3:1, payback $\approx$ 6 months}. The honest trade: Year-5 base ARR moves from \$58M (v1) to a more defensible \textbf{\$37M} --- low end of the \$30--90M SOM envelope --- with named upside paths (featured adoption, order volume, earned ARPU lifts, GLP-1 employer channel) back toward \$50M+. Pricing headroom is \emph{upward}: verified trust can raise prices; eroded trust can only cut. Full build: \texttt{FINANCIAL\_MODEL.md} (v2).
+\textbf{Unit economics at the new price (v2):} blended gross ARPU $\sim$\$42/yr; CAC $\sim$\$15 (restaurant co-marketing as a $\sim$\$0-CAC channel); \textbf{LTV:CAC $\approx$ 3.3:1, payback $\approx$ 6 months}. The honest trade: Year-5 base ARR moves from \$58M (v1) to a more defensible \textbf{\$37M} --- low end of the \$30--90M SOM envelope --- with named upside paths (featured adoption, order volume, earned ARPU lifts, GLP-1 employer channel) back toward \$50M+. Pricing headroom is \emph{upward}: verified trust can raise prices; eroded trust can only cut. Full build in the Financial Model appendix.
 
 % ================= 7 GTM =================
 \section{Go-to-market --- density, then proof, then scale}
 
-\textbf{Phase 1 (months 0--12): Boston density.} Chains seeded from published disclosures (the Sweetgreen / Halal Guys pattern, already demonstrated); independents digitized block-by-block under the documented protocol (\texttt{MENU\_COLLECTION.md}: source $\to$ digitize $\to$ estimate $\to$ owner-verify $\to$ maintain). Acquisition via TikTok/influencer (the Cal AI playbook) aimed at GLP-1 and goal-oriented audiences --- trust-first, guilt-free positioning the incumbents ceded.
+\textbf{Phase 1 (months 0--12): Boston density.} Chains seeded from published disclosures (the Sweetgreen / Halal Guys pattern, already demonstrated); independents digitized block-by-block under a documented collection protocol (source $\to$ digitize $\to$ estimate $\to$ owner-verify $\to$ maintain). Acquisition via TikTok/influencer (the Cal AI playbook) aimed at GLP-1 and goal-oriented audiences --- trust-first, guilt-free positioning the incumbents ceded.
 
-\textbf{The pilot is pre-registered.} Six metrics defined \emph{before} measurement, published at \texttt{/impact}: pre-order decision rate; verified-menu coverage; correction turnaround; logged-meal accuracy (order ground truth vs.\ estimates); independent-restaurant onboarding cost; diet-quality delta. Definitions don't move after the fact.
+\textbf{The pilot is pre-registered.} Six metrics defined \emph{before} measurement, published on the product's public Impact page: pre-order decision rate; verified-menu coverage; correction turnaround; logged-meal accuracy (order ground truth vs.\ estimates); independent-restaurant onboarding cost; diet-quality delta. Definitions don't move after the fact.
 
 \textbf{Phase 2 (12--30 mo):} convert coverage into retail-media; raise seed on retention + featured-restaurant proof (AI took 62\% of 2025 digital-health VC). \quad \textbf{Phase 3 (30 mo+):} payer/employer contracts on covered MNT.
 
@@ -354,7 +354,7 @@ Cal AI & --- & \$29.99 & Photo-only volume play\\
 \midrule
 Working end-to-end product (decision $\to$ order $\to$ log $\to$ measure) & --- & \textbf{Done, Jul 2026}\\
 Published-nutrition chain seeding demonstrated & --- & \textbf{Done}\\
-Pilot metrics pre-registered publicly (\texttt{/impact}) & --- & \textbf{Done}\\
+Pilot metrics pre-registered publicly & --- & \textbf{Done}\\
 Backend: cross-device accounts, live terminal sync & Mo 1--2 & Next\\
 Catalog: 20+ restaurants incl.\ verified independents & Mo 3 & 13 today\\
 First 3--5 owner-verified partners (letters + correction logs) & Mo 4--6 & ---\\
@@ -376,7 +376,7 @@ Retention kills this category & Plan-ahead is a decision habit, not a logging ch
 Two-sided cold start & Published-disclosure seeding gives day-one chain coverage; density beats breadth; the terminal gives independents value before any fee\\
 GLP-1 substitution & Position as the eating-out companion \emph{for} GLP-1 users --- the angle funding the category\\
 Incumbent consolidation (MFP $\times$ Cal AI) & Moat is the verified-data + correction + ground-truth graph, not the model\\
-Trust/integrity failure would be fatal & Governance is product: sponsored-scoring separation is categorical; corrections versioned and public; simulated states labeled; \texttt{/impact} no-unrecorded-claims commitment\\
+Trust/integrity failure would be fatal & Governance is product: sponsored-scoring separation is categorical; corrections versioned and public; simulated states labeled; a standing no-unrecorded-claims commitment\\
 Policy risk on B2B2C & Anchor on commercial MNT; Medicaid expansion as optionality\\
 \bottomrule
 \end{tabularx}
@@ -401,6 +401,6 @@ Founder: Harvard SEAS (engineering); sole builder of the product to date. Pre-se
 \vspace{14pt}
 {\color{ground}\hrule height 2pt}
 \vspace{6pt}
-{\small\color{muted}Companions: \texttt{FINANCIAL\_MODEL.md} · \texttt{RESEARCH.md} (cited evidence base) · \texttt{COMPETITIVE\_SCAN\_2026-07.md} (live captures) · \texttt{MENU\_COLLECTION.md} (data protocol) · \texttt{SYSTEM\_ARCHITECTURE.md} · \texttt{DESIGN\_INTEGRATION\_NIW.md}. Working product: repository (\texttt{npm run dev}) and the published demo site.}
+{\small\color{muted}Appendices available on request: Financial Model · Market Research Dossier (cited evidence base) · Competitive Scan, July 2026 (live captures) · Menu Collection Protocol · System Architecture. A live product demonstration accompanies this plan.}
 
 \end{document}
