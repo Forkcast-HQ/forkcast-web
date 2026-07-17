@@ -1,6 +1,28 @@
-# Forkcast — Financial Model
+# Forkcast — Financial Model (v2, July 2026)
 
-*A transparent, assumption-driven 5-year model. Every line is a lever you can challenge. Benchmarks are sourced from the research dossier (CDC, USDA ERS, company filings, SaaS/marketplace norms). This is a planning model, not a guarantee.*
+*A transparent, assumption-driven 5-year model. Every line is a lever you can challenge. Benchmarks are sourced from the research dossier (CDC, USDA ERS, company filings, SaaS/marketplace norms). This is a planning model, not a guarantee. v2 reprices both sides to win the price comparison and to make the restaurant incentive earned rather than assumed.*
+
+---
+
+## 0. Pricing strategy — built to win the price war
+
+**The competitive price map (from `RESEARCH.md`, 2025–26):**
+
+| Product | Monthly | Annual | Notes |
+|---|---:|---:|---|
+| MyFitnessPal Premium | $19.99 | $79.99 | Premium+ $24.99/$99.99; backlash over paywalled free features |
+| Noom / coaching apps | ~$40–70 | ~$209 | $62M dark-pattern settlement; trust erosion |
+| MacroFactor | ~$11.99 | ~$71.99 | Monetizes *accuracy/adaptive* — our closest pricing analog |
+| Cal AI | — | $29.99 | Volume play, photo-only |
+| **Forkcast Premium** | **$4.99** | **$39.99** | Undercuts every monthly by 4–14×, undercuts MFP annual by half |
+
+**Three pricing rules:**
+
+1. **The free tier is the wedge, not a teaser.** Free forever: Fit Scores, discovery, ordering, and confirmed-order logging — the closed loop itself. The category's most-hated move (MyFitnessPal paywalling logging basics) is our acquisition gift; charging for the loop would also starve the restaurant leg of order volume and the data asset of ground truth. Free-user COGS is tiny (text scoring is cheap; photo AI is the expensive part and is Premium).
+2. **Premium sells the science, not the basics.** $4.99/mo or $39.99/yr (annual-led): adaptive metabolic calibration, pattern analytics, unlimited photo AI, evidence export, condition packs, multi-profile. Cronometer and MacroFactor prove accuracy/adaptivity command willingness-to-pay — we price *under* them at launch and earn later lifts with verified data.
+3. **Never win the feature war and lose the trust war.** Transparent pricing, painless cancel, no auto-renew traps — the exact wounds Noom/MFP created. Trust *is* the brand.
+
+**Price-war defense:** if a competitor drops price, our floor is defensible because (a) the loop's COGS is bounded (see §4), (b) our acquisition leans on a channel competitors don't have — restaurant partners co-marketing to their own customers at ~$0 CAC, and (c) verified accuracy is a differentiated good — the analog products that monetize trust hold price even against free loggers.
 
 ---
 
@@ -9,25 +31,37 @@
 ### Consumer subscription
 | Lever | Assumption | Basis |
 |---|---|---|
-| Pricing | $8.99/mo or **$59.99/yr** | Between MyFitnessPal Premium ($79.99/yr) and Cal AI ($29.99/yr) |
-| Blended net ARPU | **~$60/yr gross → ~$51 net** | After ~15% blended platform/payment fees (web-first billing minimizes app-store cut) |
-| Free→paid conversion | **4–6%** of registered | Freemium consumer-health norm (2–5%) |
-| Paid churn | ~**3.5%/mo** blended (annual-plan-led) | Category churns worst of all subscriptions; annual plans ~halve it |
-| Avg paid lifetime | ~**16–18 months** | Implied by annual-led mix |
-| Blended CAC (per paying user) | **~$22** | TikTok CPI $3–6 + organic/referral mix; gated, not guaranteed |
-| Gross margin (consumer) | **~82%** | See COGS below |
+| Pricing | $4.99/mo or **$39.99/yr** | See §0; undercuts MFP annual ~50%, all monthlies 4–14× |
+| Blended gross ARPU | **~$42/yr** | Annual-led mix with some monthly |
+| Blended net ARPU | **~$36/yr** | After ~15% platform/payment (web-first billing minimizes app-store cut) |
+| Free→paid conversion | **6–8%** of registered | Above the 2–5% freemium norm — justified by the lower price point and the free loop driving habitual use |
+| Paid churn | ~**3.0%/mo** blended | Lower price + annual-led + calibration lock-in; category's worst-in-class churn is the central risk |
+| Avg paid lifetime | ~**20 months** | Implied |
+| Blended CAC (per paying user) | **~$15** | TikTok CPI $3–6 + restaurant-partner co-marketing (~$0 CAC channel) + organic |
+| Gross margin (consumer) | **~82%** | See §4 |
 
-### Restaurant retail-media
+### Restaurant leg — the incentive ladder (redesigned)
+*The old flat $200/mo assumed willingness-to-pay before value was proven. v2 makes every dollar earned:*
+
+| Rung | Price | The restaurant's incentive |
+|---|---|---|
+| **1. Verified Partner** | **Free, forever** | Order terminal + allergy flags, menu verification & public corrections, verified badge, analytics-lite. *Why free: their labor makes our data asset better — and free tools are how we win the supply side DoorDash taxes.* |
+| **2. Order commission** | **6% on Forkcast-originated pickup orders** | They already pay DoorDash/Uber 15–30% for marketplace demand; we are the cheap, health-intent, direct-pickup channel. Pay only when we deliver a customer. |
+| **3. Featured placement** | **From $99/mo/location, optional** | Clearly-labeled retail media, bought only after the order channel proves volume. **Never affects Fit Scores** — integrity is the product. |
+
 | Lever | Assumption |
 |---|---|
-| Featured placement | **~$200/mo/location** ($2,400/yr) |
-| Gross margin | ~**90%** (software + placement) |
-| Benchmark | DoorDash ad/retail-media **>$1B run-rate**; 13–30% delivery take-rates |
+| Forkcast-originated pickup orders | ~60/mo per active location (maturing markets) × ~$16 avg ticket |
+| Commission yield | ~$58/mo ≈ **~$690/yr/location** |
+| Featured adoption | ~30% of active locations @ $99/mo ≈ **~$360/yr blended across all locations** |
+| **Blended restaurant yield** | **~$1,050/yr per active location** (vs. $2,400 assumed in v1) |
+| Gross margin | ~**87%** |
+| Benchmark | DoorDash ads >$1B run-rate; 13–30% marketplace take-rates make 6% look like relief |
 
 ### B2B2C covered nutrition (from Year 3)
 | Lever | Assumption |
 |---|---|
-| Model | Commercial MNT (CPT 97802–97804) via payer/employer |
+| Model | Commercial MNT (CPT 97802–97804) via payer/employer; GLP-1 companion programs |
 | Recognition | Conservative; ramps Y3→Y5 |
 | Gross margin | ~**70%** (RD time / partner rev-share) |
 
@@ -35,20 +69,18 @@
 
 ## 2. Five-year revenue build
 
-**Paying consumers (end of year)** — a deliberate climb from a single metro to multi-metro US, reaching **~0.8% of the 55.7M SAM** by Y5 (inside the 0.5–2.0% SOM band).
-
 | | Y1 (Boston) | Y2 | Y3 | Y4 | Y5 |
 |---|---:|---:|---:|---:|---:|
 | Paying subscribers (EoY) | 3,000 | 25,000 | 90,000 | 220,000 | 450,000 |
-| **Consumer ARR** (@$60) | $0.18M | $1.50M | $5.40M | $13.20M | $27.00M |
-| Featured restaurant locations | 40 | 400 | 1,500 | 4,000 | 9,000 |
-| **Restaurant ARR** (@$2,400) | $0.06M* | $0.96M | $3.60M | $9.60M | $21.60M |
+| **Consumer ARR** (@$42) | $0.13M | $1.05M | $3.78M | $9.24M | $18.90M |
+| Active partner locations | 40 | 400 | 1,500 | 4,000 | 9,000 |
+| **Restaurant revenue** (@~$1.05k) | $0.02M* | $0.42M | $1.58M | $4.20M | $9.45M |
 | **B2B2C revenue** | – | – | $0.50M | $3.00M | $9.00M |
-| **Total revenue (recognized)** | **$0.24M** | **$2.46M** | **$9.50M** | **$25.80M** | **$57.60M** |
+| **Total revenue** | **$0.15M** | **$1.47M** | **$5.86M** | **$16.44M** | **$37.35M** |
 
-\* Partial-year for restaurant leg in Y1.
+\* Partial-year.
 
-Y5 total (~$57.6M) sits within the research-derived **$40–90M 5-yr SOM**. Restaurant revenue tracks the dossier's own anchors (2,000 locations ≈ $4.8M; 10,000 ≈ $24M).
+Y5 base (~$37M) sits at the low end of the research-derived $30–90M+ SOM envelope — the deliberate cost of pricing to win. Upside paths back toward $50M+: featured-placement adoption above 30%, order volume above 60/mo/location, earned ARPU lifts (family plans, condition packs), and the GLP-1 employer channel.
 
 ---
 
@@ -56,16 +88,16 @@ Y5 total (~$57.6M) sits within the research-derived **$40–90M 5-yr SOM**. Rest
 
 | Metric | Value | Notes |
 |---|---:|---|
-| Gross ARPU | $60/yr | Blended payer |
-| Net ARPU | ~$51/yr | After ~15% platform/payment |
-| Gross-margin contribution | ~$42/yr | 82% GM |
-| Avg paid lifetime | ~1.6 yr | Annual-led |
-| **LTV** (GM contribution × lifetime) | **~$67** | |
-| **CAC** | **~$22** | Blended paid + organic |
-| **LTV : CAC** | **~3.0 : 1** | At/above the 3:1 gate |
-| **CAC payback** | **~7 months** | Within 6–9 mo target |
+| Gross ARPU | $42/yr | Blended |
+| Net ARPU | ~$36/yr | After ~15% platform/payment |
+| GM contribution | ~$29.5/yr | 82% GM |
+| Avg paid lifetime | ~1.7 yr | Annual-led + calibration lock-in |
+| **LTV** | **~$50** | |
+| **CAC** | **~$15** | The price cut is *funded by CAC discipline*: restaurant co-marketing is a ~$0-CAC channel no logging app has |
+| **LTV : CAC** | **~3.3 : 1** | Above the 3:1 gate |
+| **CAC payback** | **~6 months** | Within the 6–9 mo target |
 
-**This is the model's most fragile assumption.** The category's constraint is retention, not demand (70–80% quit in 2 weeks). Every growth cohort is gated on holding LTV:CAC ≥ 3:1 and payback ≤ 9 months before scaling spend. If retention underperforms, we slow paid acquisition rather than buy unprofitable users.
+**The honest trade:** cutting ARPU ~30% vs. v1 breaks unit economics *unless* CAC drops with it. The restaurant channel is the mechanism — every Verified Partner is a storefront, a QR on the counter, and a co-marketing motive (they want Forkcast diners). If blended CAC runs above ~$22 for two consecutive cohorts, we slow paid spend rather than buy unprofitable users.
 
 ---
 
@@ -75,13 +107,13 @@ Per **paying** user per month:
 
 | Component | Cost/mo | Note |
 |---|---:|---|
-| AI meal-photo inference | ~$0.06–0.20 | ~20 photos/mo. Opus 4.8 vision ≈ **$0.015/photo**; Haiku 4.5 ≈ **$0.003/photo**. Route most volume to a cheaper tier + cache. |
-| Nutrition data APIs | ~$0.10–0.25 | Nutritionix/FatSecret tiers; USDA FoodData Central is free |
+| AI meal-photo inference | ~$0.06–0.20 | ~20 photos/mo; tier routing (cheap model default, frontier for hard plates) + caching |
+| Nutrition data APIs | ~$0.10–0.25 | Nutritionix/FatSecret tiers; USDA FDC free |
 | Infra / hosting | ~$0.10 | |
 | Payments | ~3% of revenue | |
-| **Total COGS** | **~$0.70–1.00/mo** | → **~80–85% gross margin** |
+| **Total COGS** | **~$0.60–0.90/mo** | → **~82% gross margin** at $3.33/mo blended |
 
-AI inference is a *controllable* COGS line: tier routing (Haiku for routine photos, Opus for hard/mixed plates), prompt caching, and leaning on menu name+description over raw vision keep it well under 1% of revenue at scale.
+Free-tier COGS ≈ $0.03–0.06/user/mo (no photo AI, text scoring only) — the free wedge is affordable at scale.
 
 ---
 
@@ -89,17 +121,17 @@ AI inference is a *controllable* COGS line: tier routing (Haiku for routine phot
 
 | | Y1 | Y2 | Y3 | Y4 | Y5 |
 |---|---:|---:|---:|---:|---:|
-| Revenue | $0.24M | $2.46M | $9.50M | $25.80M | $57.60M |
-| Gross profit (~83%) | $0.20M | $2.04M | $7.9M | $21.4M | $47.8M |
-| Team (R&D + ops) | $0.9M | $2.4M | $5.0M | $9.5M | $16.0M |
-| Marketing / GTM | $0.4M | $1.6M | $4.0M | $8.5M | $15.0M |
-| G&A | $0.2M | $0.6M | $1.2M | $2.3M | $4.0M |
-| **Operating income** | **−$1.3M** | **−$2.6M** | **−$2.3M** | **+$1.1M** | **+$12.8M** |
-| Cumulative funding needed | $1.3M | $3.9M | $6.2M | — | — |
+| Revenue | $0.15M | $1.47M | $5.86M | $16.44M | $37.35M |
+| Gross profit (~83%) | $0.12M | $1.22M | $4.86M | $13.64M | $31.00M |
+| Team (R&D + ops) | $0.9M | $2.2M | $4.2M | $7.0M | $11.0M |
+| Marketing / GTM | $0.35M | $1.2M | $2.8M | $5.5M | $9.0M |
+| G&A | $0.2M | $0.5M | $1.0M | $1.8M | $3.0M |
+| **Operating income** | **−$1.33M** | **−$2.68M** | **−$3.14M** | **−$0.66M** | **+$8.0M** |
+| Cumulative funding needed | $1.3M | $4.0M | $7.2M | $7.8M | — |
 
-**Path to profitability ≈ Year 4**, driven by the high-margin restaurant + B2B2C legs layering on top of consumer. Non-dilutive SBIR offsets R&D in Y1–Y2 (not shown above as revenue).
+**Path to profitability ≈ late Year 4 / Year 5.** Lower pricing pushes breakeven out ~2–3 quarters vs. v1; the compensation is a structurally harder-to-attack market position. Non-dilutive SBIR offsets Y1–Y2 R&D (not shown as revenue).
 
-**Capital plan:** Pre-seed ~$1.25M (covers Y1 + into Y2 with SBIR) → Seed ~$5M (Y2) → Series A ~$15–25M (Y3) to fund the Y3 scale-up before Y4 breakeven.
+**Capital plan:** Pre-seed ~$1.25M → Seed ~$5M (Y2) → Series A ~$15–25M (Y3). Total pre-breakeven need ~$8M, inside the plan.
 
 ---
 
@@ -107,12 +139,10 @@ AI inference is a *controllable* COGS line: tier routing (Haiku for routine phot
 
 | Allocation | % | $ | What it buys |
 |---|---:|---:|---|
-| Product & engineering | 45% | ~$560k | Core app + the independent-restaurant nutrition layer (the moat) |
-| GTM (Boston) | 28% | ~$350k | Influencer/TikTok acquisition, restaurant partnerships, density |
-| Data & API costs | 12% | ~$150k | Nutritionix/FatSecret licensing, AI inference, infra |
+| Product & engineering | 45% | ~$560k | Backend, mobile, the independent-restaurant nutrition layer (the moat) |
+| GTM (Boston) | 28% | ~$350k | Influencer/TikTok + restaurant-partner co-marketing engine |
+| Data & API costs | 12% | ~$150k | Nutrition licensing, AI inference, infra |
 | Ops & G&A | 15% | ~$190k | Legal, accounting, dietitian advisor |
-
-**Stacked with non-dilutive SBIR** for the estimation-engine R&D, extending effective runway.
 
 ---
 
@@ -121,10 +151,10 @@ AI inference is a *controllable* COGS line: tier routing (Haiku for routine phot
 | Program | Phase I | Phase II | Fit |
 |---|---:|---:|---|
 | NIH/NIDDK SBIR/STTR | ~$150–300k | ~$1–2M | Obesity/metabolic-disease prevention |
-| USDA-NIFA SBIR (Food Science & Nutrition) | ~$125–175k | ~$650k–1M | Nutrition + food systems |
-| NSF SBIR/STTR | ~$275k | ~$1M | Deep-tech estimation engine |
+| USDA-NIFA SBIR | ~$125–175k | ~$650k–1M | Nutrition + food systems |
+| NSF SBIR/STTR | ~$275k | ~$1M | Estimation-engine deep tech |
 
-*Verify post-reauthorization (Apr 2026) solicitation windows before relying on timing — SBIR/STTR lapsed Oct 2025 and only reauthorized Apr 13, 2026.*
+*Verify post-reauthorization (Apr 2026) solicitation windows — SBIR/STTR lapsed Oct 2025, reauthorized Apr 13, 2026.*
 
 ---
 
@@ -132,21 +162,22 @@ AI inference is a *controllable* COGS line: tier routing (Haiku for routine phot
 
 | Scenario | SAM capture | Consumer ARR | + Restaurant + B2B2C | **Total ARR** |
 |---|---:|---:|---:|---:|
-| **Bear** | ~0.5% (280k) | ~$17M | ~$13M | **~$30M** |
-| **Base** | ~0.8% (450k) | ~$27M | ~$31M | **~$58M** |
-| **Bull** | ~2.0% (1.1M) | ~$67M | ~$23M+ | **~$90M+** |
+| **Bear** | ~0.5% (280k) | ~$12M | ~$9M | **~$21M** |
+| **Base** | ~0.8% (450k) | ~$19M | ~$18M | **~$37M** |
+| **Bull** | ~2.0% (1.1M) | ~$46M | ~$27M+ | **~$73M+** |
 
-All three land inside the research-derived $30–90M+ SOM envelope. The swing factor is consumer retention; the de-risker is that the restaurant retail-media leg scales on *coverage*, somewhat independent of consumer churn.
+The swing factor remains consumer retention; the de-riskers are that restaurant revenue is now **performance-based** (it exists exactly when consumer engagement exists — the legs reinforce rather than hedge) and that pricing headroom is *upward*: we can raise prices from a position of verified trust, while incumbents can only cut from positions of eroded trust.
 
 ---
 
 ## 9. What would make this model wrong (and how we'd know early)
 
-- **Retention below ~30% D30** → consumer LTV collapses; we'd cut paid spend and lean on the restaurant leg. *Tracked weekly from Boston launch.*
-- **CAC above ~$35** → payback breaks 9 months; shift to organic/partnership channels. *Tracked per cohort.*
-- **Independent-restaurant estimation unreliable** → narrow to chains first, expand only as accuracy clears a published bar. *Tracked via held-out nutrition validation.*
-- **Restaurant willingness-to-pay < $200/mo** → reprice to performance-based (CPA on visits). *Tracked from first 40 Boston partners.*
+- **Retention below ~30% D30** → LTV collapses; cut paid spend, lean on the partner channel. *Tracked weekly from Boston launch.*
+- **Blended CAC above ~$22 for two cohorts** → payback breaks; shift entirely to organic/partner channels. *Tracked per cohort.*
+- **Forkcast-originated orders below ~25/mo/location at month 6** → commission leg underperforms; revisit featured pricing and pickup incentives. *Tracked per partner from the first 40.*
+- **Free→paid conversion below ~4%** → Premium feature set is mis-drawn; move condition packs or calibration depth across the line (never the loop itself). *Tracked monthly.*
+- **Independent-restaurant estimation unreliable** → narrow to chains/published tiers until accuracy clears a published bar. *Tracked via held-out validation.*
 
 ---
 
-*Companion: `BUSINESS_PLAN.md` (narrative, market, GTM, risks) and `SYSTEM_ARCHITECTURE.md` (technical design).*
+*Companions: `BUSINESS_PLAN.md` (narrative) · `RESEARCH.md` (sourced benchmarks) · `SYSTEM_ARCHITECTURE.md`.*

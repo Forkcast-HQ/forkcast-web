@@ -79,9 +79,9 @@ Forkcast turns a health profile (Mifflin-St Jeor BMR → activity-scaled TDEE �
 
 ## 6. Business model — three legs, sequenced
 
-1. **Consumer subscription (launch).** ~$60/yr blended, annual-led to fight churn; genuinely useful free tier. Gate growth on **LTV:CAC ≥ 3:1, 6–9-month payback**.
-2. **Restaurant retail-media (margin scaler).** Clearly-labeled featured placement ~$200/mo/location (2,000 locations ≈ $4.8M; 10,000 ≈ $24M) — with the categorical rule that **sponsorship never affects Fit Scores**, our structural answer to the marketplaces' conflict of interest. Verified-menu partnership is the on-ramp.
-3. **B2B2C covered nutrition (durable).** Payer/employer contracts on broadly-covered medical nutrition therapy (CPT 97802–97804); Medicaid/food-benefit expansion treated as optionality, not thesis.
+1. **Consumer subscription (launch) — priced to win.** The closed loop is **free forever** (charging for logging is the incumbents' most-hated move, and free order volume feeds the restaurant leg). Premium — calibration, analytics, unlimited photo AI, condition packs — at **$4.99/mo or $39.99/yr**: half of MyFitnessPal's annual, 4–14× under every incumbent monthly, priced just below the accuracy-monetizers (MacroFactor $71.99/yr) whose model proves trust holds price. Gate growth on **LTV:CAC ≥ 3:1, ~6-month payback**, funded by a ~$0-CAC channel no logger has: restaurant-partner co-marketing.
+2. **Restaurant leg — every dollar earned (incentive ladder).** Rung 1: **Verified Partner is free forever** (terminal, allergy flags, corrections, badge) — their participation improves our data asset. Rung 2: **6% commission on Forkcast-originated pickup orders** — against the 15–30% they already pay marketplaces, we are the cheap, health-intent channel; they pay only when we deliver a customer. Rung 3: optional **featured placement from $99/mo**, bought after the order channel proves volume — and **never affecting Fit Scores**. Blended yield ~$1,050/location/yr.
+3. **B2B2C covered nutrition (durable).** Payer/employer contracts on broadly-covered medical nutrition therapy (CPT 97802–97804); GLP-1 companion programs; Medicaid expansion treated as optionality, not thesis.
 
 Full assumptions, five-year build, unit economics, and scenarios: `FINANCIAL_MODEL.md`.
 
