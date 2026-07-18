@@ -101,25 +101,31 @@ export default function ForRestaurants() {
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* How partnership works — every dollar earned, no flat fees */}
       <section className="mx-auto max-w-4xl px-4 pb-8 sm:px-6 lg:px-8">
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-3">
           <PriceCard
-            name="Listed"
+            name="Verified Partner"
             price="Free"
-            sub="Be discoverable"
-            features={["Auto per-dish nutrition", "Appears in discovery & search", "Fit Scores on every dish", "Basic listing analytics"]}
+            sub="forever"
+            features={["Order terminal with customer allergy flags", "Menu verification & public corrections", "Verified badge on your listing", "Listing analytics"]}
+          />
+          <PriceCard
+            name="Orders we bring you"
+            price="6%"
+            sub="per pickup order we originate"
+            features={["Pay only when we deliver a customer", "vs. 15–30% you pay delivery marketplaces", "No fee for walk-ins or your own channels"]}
+            highlight
           />
           <PriceCard
             name="Featured"
-            price="~$200"
-            sub="/month · per location"
-            features={["Everything in Listed", "Clearly-labeled featured placement", "Priority in goal-matched results", "Demand & competitor insights", "Promoted dishes"]}
-            highlight
+            price="From $99"
+            sub="/month · optional, later"
+            features={["Clearly-labeled placement", "Available once the order channel proves itself", "Never affects Fit Scores"]}
           />
         </div>
         <p className="mt-6 text-center text-sm text-ink/50">
-          Pricing is illustrative for the pilot. Sponsored placement is always labeled —
+          Pilot terms, subject to partner agreements. Sponsored placement is always labeled —
           recommendation integrity is the product.
         </p>
         <div className="mt-8 text-center">
