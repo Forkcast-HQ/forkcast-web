@@ -102,11 +102,12 @@ export async function POST(req: Request) {
   try {
     // Provider priority: DataRobot gateway → Gemini → Groq
     let reply: string | null = null;
-    if (datarobot) reply = await callDataRobot(datarobot, messages, context);
-    if (!reply && gemini) reply = await callGemini(gemini, messages, context);
-    if (!reply && groq) reply = await callGroq(groq, messages, context);
+    let provider = "";
+    if (datarobot) { reply = await callDataRobot(datarobot, messages, context); if (reply) provider = "datarobot"; }
+    if (!reply && gemini) { reply = await callGemini(gemini, messages, context); if (reply) provider = "gemini"; }
+    if (!reply && groq) { reply = await callGroq(groq, messages, context); if (reply) provider = "groq"; }
     if (!reply) return NextResponse.json({ error: "AI providers unavailable." }, { status: 502 });
-    return NextResponse.json({ reply });
+    return NextResponse.json({ reply, provider });
   } catch {
     return NextResponse.json({ error: "Chat request failed." }, { status: 502 });
   }
