@@ -30,6 +30,7 @@ export default function Discover() {
   const [dietOnly, setDietOnly] = useState(false);
   const [view, setView] = useState<View>("list");
   const [attrs, setAttrs] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
   // Real distances only with permission — never pretend we know where you are.
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [geoState, setGeoState] = useState<"idle" | "asking" | "granted" | "denied">("idle");
@@ -301,7 +302,25 @@ export default function Discover() {
               />
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <SlidersHorizontal className="h-4 w-4 text-ink/40" />
+              {/* One Filters button replaces two always-visible chip rows */}
+              <button
+                onClick={() => setShowFilters((v) => !v)}
+                aria-expanded={showFilters}
+                className={cls(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-semibold transition",
+                  showFilters || attrs.length || cuisine || dietOnly
+                    ? "border-ink bg-ink text-white"
+                    : "border-black/10 bg-white text-ink/70 hover:border-black/25",
+                )}
+              >
+                <SlidersHorizontal className="h-4 w-4" /> Filters
+                {(attrs.length + (cuisine ? 1 : 0) + (dietOnly ? 1 : 0)) > 0 && (
+                  <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">
+                    {attrs.length + (cuisine ? 1 : 0) + (dietOnly ? 1 : 0)}
+                  </span>
+                )}
+              </button>
+              <span className="mx-1 h-5 w-px bg-black/10" />
               {(["fit", "distance", "rating"] as Sort[]).map((s) => (
                 <button
                   key={s}
@@ -328,41 +347,67 @@ export default function Discover() {
             </div>
           </div>
 
-          {/* Dish-attribute chips (design handoff set) */}
-          <div className="mt-3 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Dish attribute filters">
-            {[
-              { key: "partner", label: "Verified data" },
-              { key: "high-protein", label: "High protein" },
-              { key: "under-500", label: "Under 500 kcal" },
-              { key: "low-sodium", label: "Low sodium" },
-              { key: "high-fiber", label: "High fiber" },
-            ].map((a) => (
-              <Chip key={a.key} active={attrs.includes(a.key)} onClick={() => toggleAttr(a.key)}>
-                {attrs.includes(a.key) ? "✓ " : ""}{a.label}
-              </Chip>
-            ))}
-          </div>
-
-          <div className="mt-3 flex items-center gap-3">
-            <div className="-mx-1 flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 pb-1" aria-label="Cuisine filters">
-              <Chip active={!cuisine} onClick={() => setCuisine(null)}>All</Chip>
-              {CUISINES.map((c) => (
-                <Chip key={c} active={cuisine === c} onClick={() => setCuisine(c)}>
-                  {c}
-                </Chip>
-              ))}
+          {/* Collapsible filter panel — chips live here instead of two permanent rows */}
+          {showFilters && (
+            <div className="mt-3 rounded-xl border border-black/5 bg-white p-4">
+              <p className="kicker text-ink/45">Dish attributes</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {[
+                  { key: "partner", label: "Verified data" },
+                  { key: "high-protein", label: "High protein" },
+                  { key: "under-500", label: "Under 500 kcal" },
+                  { key: "low-sodium", label: "Low sodium" },
+                  { key: "high-fiber", label: "High fiber" },
+                ].map((a) => (
+                  <Chip key={a.key} active={attrs.includes(a.key)} onClick={() => toggleAttr(a.key)}>
+                    {a.label}
+                  </Chip>
+                ))}
+              </div>
+              <p className="kicker mt-4 text-ink/45">Cuisine</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Chip active={!cuisine} onClick={() => setCuisine(null)}>All</Chip>
+                {CUISINES.map((c) => (
+                  <Chip key={c} active={cuisine === c} onClick={() => setCuisine(c)}>
+                    {c}
+                  </Chip>
+                ))}
+              </div>
               {profile?.dietary.length ? (
-                <Chip active={dietOnly} onClick={() => setDietOnly((v) => !v)}>
-                  {dietOnly ? "✓ " : ""}My diet ({profile.dietary.join(", ")})
-                </Chip>
+                <>
+                  <p className="kicker mt-4 text-ink/45">My diet</p>
+                  <div className="mt-2">
+                    <Chip active={dietOnly} onClick={() => setDietOnly((v) => !v)}>
+                      Only show {profile.dietary.join(" / ")} options
+                    </Chip>
+                  </div>
+                </>
               ) : null}
+              <div className="mt-4 flex items-center justify-between border-t border-black/5 pt-3">
+                <button onClick={clearFilters} className="text-xs font-bold text-ink/45 hover:text-brand-700">Clear all</button>
+                <button onClick={() => setShowFilters(false)} className="rounded-full bg-ink px-4 py-1.5 text-xs font-bold text-white hover:bg-black">Done</button>
+              </div>
             </div>
-            {hasFilters && (
-              <button onClick={clearFilters} className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-brand-700 hover:text-brand-900">
-                <X className="h-3.5 w-3.5" /> Clear
-              </button>
-            )}
-          </div>
+          )}
+
+          {/* Active filters as removable chips (when the panel is closed) */}
+          {!showFilters && hasFilters && (
+            <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+              {cuisine && (
+                <ActivePill label={cuisine} onClear={() => setCuisine(null)} />
+              )}
+              {attrs.map((a) => (
+                <ActivePill
+                  key={a}
+                  label={{ partner: "Verified data", "high-protein": "High protein", "under-500": "Under 500 kcal", "low-sodium": "Low sodium", "high-fiber": "High fiber" }[a] ?? a}
+                  onClear={() => toggleAttr(a)}
+                />
+              ))}
+              {dietOnly && <ActivePill label="My diet" onClear={() => setDietOnly(false)} />}
+              {q.trim() && <ActivePill label={`“${q.trim()}”`} onClear={() => setQ("")} />}
+              <button onClick={clearFilters} className="ml-1 text-xs font-bold text-ink/40 hover:text-brand-700">Clear all</button>
+            </div>
+          )}
         </div>
 
         <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
@@ -461,6 +506,17 @@ function MacroMini({ label, value, target }: { label: string; value: number; tar
       </div>
       <p className="mt-0.5 text-[10px] tabular-nums text-ink/50">{Math.round(value)}/{target}g</p>
     </div>
+  );
+}
+
+function ActivePill({ label, onClear }: { label: string; onClear: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-ink px-2.5 py-1 text-[11px] font-bold text-white">
+      {label}
+      <button onClick={onClear} aria-label={`Remove ${label} filter`} className="rounded-full p-0.5 hover:bg-white/20">
+        <X className="h-3 w-3" />
+      </button>
+    </span>
   );
 }
 

@@ -22,6 +22,7 @@ import {
 import type { ActivityLevel, Goal, HealthProfile, Sex } from "@/lib/types";
 import { MacroRing } from "@/components/MacroRing";
 import { Avatar } from "@/components/Avatar";
+import { usePremium, PRICE_LINE, TRIAL_DAYS } from "@/lib/premium";
 import { cls } from "@/lib/format";
 
 const DIETS = ["Vegetarian", "Vegan", "Pescatarian", "Gluten-free", "Halal", "Dairy-free"];
@@ -34,6 +35,7 @@ export default function Profile() {
   const router = useRouter();
   const { user, hydrated, logOut, updateName } = useAuth();
   const { profile, hydrated: storeHydrated, setProfile, resetAll } = useUser();
+  const { isPremium, trialActive, trialDaysLeft, upgradeDemo, cancelDemo } = usePremium();
 
   const [name, setName] = useState("");
   const [sex, setSex] = useState<Sex>("male");
@@ -216,6 +218,30 @@ export default function Profile() {
             <button onClick={save} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
               {saved ? <><Check className="h-4 w-4" /> Saved</> : <><Save className="h-4 w-4" /> Save changes</>}
             </button>
+          </Card>
+
+          <Card title="Membership">
+            <p className="text-sm text-ink/65">
+              {isPremium ? (
+                <><strong className="text-brand-700">Premium (demo)</strong> — unlimited coach chat and photo AI. </>
+              ) : trialActive ? (
+                <><strong className="text-ink">Free trial</strong> — {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} left of your {TRIAL_DAYS}-day full-access trial. </>
+              ) : (
+                <><strong className="text-ink">Free plan</strong> — trial ended. </>
+              )}
+              The core loop — Fit Scores, discovery, ordering, confirmed logging — is free forever. Premium ({PRICE_LINE})
+              adds the AI coach, unlimited photo AI, and calibration depth.
+            </p>
+            {isPremium ? (
+              <button onClick={cancelDemo} className="inline-flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/20">
+                Cancel Premium (demo)
+              </button>
+            ) : (
+              <button onClick={upgradeDemo} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+                Activate Premium (demo — no payment)
+              </button>
+            )}
+            <p className="text-xs text-ink/40">Demo prototype: no billing exists; this toggles a local flag so the gating flow can be evaluated.</p>
           </Card>
 
           <Card title="Danger zone" danger>

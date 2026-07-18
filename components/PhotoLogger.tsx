@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera, Check, Loader2, Sparkles, X, AlertTriangle } from "lucide-react";
+import { Camera, Check, Crown, Loader2, Sparkles, X, AlertTriangle } from "lucide-react";
 import { analyzeMealPhoto, mockEstimate, type MealEstimate } from "@/lib/ai";
 import { useUser } from "@/lib/store";
+import { usePremium, PRICE_LINE, TRIAL_DAYS } from "@/lib/premium";
 import { cls } from "@/lib/format";
 
 type Status = "idle" | "analyzing" | "review";
@@ -36,6 +37,7 @@ function resizeImage(file: File, maxEdge = 1024, quality = 0.82): Promise<string
 
 export function PhotoLogger() {
   const { logMeal } = useUser();
+  const { isPremium, trialActive, trialDaysLeft, hasAccess, upgradeDemo } = usePremium();
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [preview, setPreview] = useState<string | null>(null);
@@ -129,7 +131,7 @@ export function PhotoLogger() {
         <Sparkles className="h-4 w-4 text-brand-300" />
         <span className="font-semibold">Snap &amp; log a meal</span>
         <span className="ml-auto rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-medium text-white/70">
-          AI estimate
+          {isPremium ? "Premium · AI estimate" : trialActive ? `Trial ${trialDaysLeft}d · AI estimate` : "Premium feature"}
         </span>
       </div>
 
@@ -146,7 +148,21 @@ export function PhotoLogger() {
           }}
         />
 
-        {status === "idle" && (
+        {status === "idle" && !hasAccess && (
+          <div className="rounded-xl border-2 border-brand-300 bg-brand-50 px-6 py-8 text-center">
+            <Crown className="mx-auto h-8 w-8 text-brand-600" />
+            <p className="mt-2 font-display font-bold text-ink">Photo AI is a Premium feature</p>
+            <p className="mx-auto mt-1 max-w-xs text-sm text-ink/60">
+              Your {TRIAL_DAYS}-day trial has ended. Premium ({PRICE_LINE}) includes unlimited photo logging —
+              ordering and confirmed logging stay free forever.
+            </p>
+            <button onClick={upgradeDemo} className="mt-4 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700">
+              Activate Premium (demo — no payment)
+            </button>
+          </div>
+        )}
+
+        {status === "idle" && hasAccess && (
           <button
             onClick={() => inputRef.current?.click()}
             className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-black/15 px-6 py-10 text-center transition hover:border-brand-400 hover:bg-brand-50/40"

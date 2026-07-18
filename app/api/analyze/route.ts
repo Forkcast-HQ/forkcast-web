@@ -70,7 +70,7 @@ async function callDataRobotVision(token: string, image: string) {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: process.env.DATAROBOT_VISION_MODEL || "azure/gpt-5-5-2026-04-23",
+      model: process.env.DATAROBOT_VISION_MODEL || process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8",
       temperature: 0.2,
       max_tokens: 700,
       messages: [
@@ -199,7 +199,7 @@ export async function GET() {
         ? {
             configured: true,
             endpoint: process.env.DATAROBOT_ENDPOINT ?? "https://app.datarobot.com/api/v2",
-            visionModel: process.env.DATAROBOT_VISION_MODEL || "azure/gpt-5-5-2026-04-23",
+            visionModel: process.env.DATAROBOT_VISION_MODEL || process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8",
             chatModel: process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8",
           }
         : { configured: false },
@@ -237,7 +237,7 @@ export async function POST(req: Request) {
       if (r.ok) {
         const content: string = JSON.parse(r.raw)?.choices?.[0]?.message?.content ?? "";
         const parsed = extractJson(content);
-        if (parsed) return shapeResponse(parsed, `datarobot:${process.env.DATAROBOT_VISION_MODEL || "azure/gpt-5-5-2026-04-23"}`);
+        if (parsed) return shapeResponse(parsed, `datarobot:${process.env.DATAROBOT_VISION_MODEL || process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8"}`);
       } else if (!geminiKey && !key) {
         let detail = r.raw.slice(0, 300);
         try { detail = JSON.parse(r.raw)?.error?.message ?? detail; } catch { /* keep raw */ }

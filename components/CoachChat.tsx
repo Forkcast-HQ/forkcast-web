@@ -6,24 +6,33 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { Crown, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import { useUser } from "@/lib/store";
+import { usePremium, PRICE_LINE, TRIAL_DAYS, FREE_DAILY_MESSAGES } from "@/lib/premium";
 import { cls } from "@/lib/format";
 
 interface Msg { role: "user" | "assistant"; content: string }
 
 const HIDE_ON = ["/partner", "/login", "/signup", "/forgot-password", "/onboarding"];
-const QUICK = [
+// Personalized starters when a profile exists; general ones when not.
+const QUICK_PERSONAL = [
   "What should I order tonight?",
   "How is my Fit Score calculated?",
   "High-protein picks under 600 cal?",
+];
+const QUICK_GENERAL = [
+  "How does Forkcast work?",
+  "What makes a restaurant meal balanced?",
+  "Why should I set up a profile?",
 ];
 
 export function CoachChat() {
   const pathname = usePathname();
   const { user, hydrated: authHydrated } = useAuth();
   const { profile, targets, calibration, consumedToday, hydrated } = useUser();
+  const { isPremium, trialActive, trialDaysLeft, hasAccess, messagesLeftToday, consumeMessage, upgradeDemo } = usePremium();
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -39,7 +48,16 @@ export function CoachChat() {
 
   const send = async (text: string) => {
     const content = text.trim();
-    if (!content || busy) return;
+    if (!content || busy || !hasAccess) return;
+    // Daily allowance for non-premium (trial) users — Premium is unlimited.
+    if (messagesLeftToday <= 0) {
+      setMsgs((m) => [
+        ...m,
+        { role: "assistant", content: `You've used today's ${FREE_DAILY_MESSAGES} trial messages. Premium (${PRICE_LINE}) removes the limit — or come back tomorrow.` },
+      ]);
+      return;
+    }
+    consumeMessage();
     const next: Msg[] = [...msgs, { role: "user", content }];
     setMsgs(next);
     setInput("");
@@ -97,8 +115,17 @@ export function CoachChat() {
           <div className="flex items-center gap-2.5 border-b-2 border-ink/40 bg-ink px-4 py-3 text-white">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-600"><Sparkles className="h-4 w-4" /></span>
             <div className="min-w-0 flex-1">
-              <p className="font-display text-sm font-bold">Forkcast Coach</p>
-              <p className="text-[11px] text-white/60">AI guidance — not medical advice</p>
+              <p className="flex items-center gap-1.5 font-display text-sm font-bold">
+                Forkcast Coach
+                {isPremium ? (
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-brand-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"><Crown className="h-2.5 w-2.5" /> Premium</span>
+                ) : trialActive ? (
+                  <span className="rounded-full bg-white/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide">Trial · {trialDaysLeft}d left</span>
+                ) : null}
+              </p>
+              <p className="text-[11px] text-white/60">
+                {profile ? "Personalized to your plan" : "General guidance"} — not medical advice
+              </p>
             </div>
             <button onClick={() => setOpen(false)} aria-label="Close chat" className="rounded-full p-1.5 text-white/70 hover:bg-white/10 hover:text-white">
               <X className="h-4 w-4" />
@@ -106,14 +133,32 @@ export function CoachChat() {
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {msgs.length === 0 && (
+            {/* Trial expired: honest, demo-labeled upgrade gate */}
+            {!hasAccess && (
+              <div className="rounded-2xl border-2 border-brand-500 bg-brand-50 p-4">
+                <p className="flex items-center gap-1.5 font-display font-bold text-ink"><Crown className="h-4 w-4 text-brand-600" /> Your {TRIAL_DAYS}-day trial has ended</p>
+                <p className="mt-1.5 text-sm text-ink/65">
+                  The coach, unlimited photo AI, and metabolic calibration are part of <strong>Forkcast Premium</strong> ({PRICE_LINE}).
+                  Everything core stays free forever: Fit Scores, discovery, ordering, and confirmed meal logging.
+                </p>
+                <button
+                  onClick={upgradeDemo}
+                  className="mt-3 w-full rounded-full bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
+                >
+                  Activate Premium (demo — no payment)
+                </button>
+                <p className="mt-1.5 text-center text-[10px] text-ink/45">Demo prototype: this flips a local flag so the flow can be evaluated. Production uses real billing.</p>
+              </div>
+            )}
+            {hasAccess && msgs.length === 0 && (
               <div>
                 <p className="text-sm text-ink/60">
-                  Hi{profile?.name ? ` ${profile.name.split(" ")[0]}` : ""} — I can help you pick dishes for what&apos;s
-                  left of your day, explain your numbers, or navigate menus with your flags in mind.
+                  {profile
+                    ? <>Hi{profile.name ? ` ${profile.name.split(" ")[0]}` : ""} — I can help you pick dishes for what&apos;s left of your day, explain your numbers, or navigate menus with your flags in mind.</>
+                    : <>Hi — I can answer general nutrition and Forkcast questions. <Link href="/onboarding" className="font-semibold text-brand-700 underline" onClick={() => setOpen(false)}>Set up your profile</Link> and I&apos;ll tailor everything to your own targets, allergies, and remaining budget.</>}
                 </p>
                 <div className="mt-3 flex flex-col gap-1.5">
-                  {QUICK.map((qp) => (
+                  {(profile ? QUICK_PERSONAL : QUICK_GENERAL).map((qp) => (
                     <button key={qp} onClick={() => send(qp)} className="rounded-xl border border-neutral-300 bg-white px-3 py-2 text-left text-sm font-medium text-ink/70 transition hover:border-brand-600 hover:text-ink">
                       {qp}
                     </button>
@@ -137,12 +182,13 @@ export function CoachChat() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about your day, a dish, a goal…"
-              className="min-w-0 flex-1 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink/35 focus:border-brand-600 focus:outline-none"
+              placeholder={!hasAccess ? "Premium required — activate above" : !isPremium && Number.isFinite(messagesLeftToday) ? `Ask away — ${messagesLeftToday} trial messages left today` : "Ask about your day, a dish, a goal…"}
+              disabled={!hasAccess}
+              className="min-w-0 flex-1 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink/35 focus:border-brand-600 focus:outline-none disabled:opacity-50"
             />
             <button
               type="submit"
-              disabled={busy || !input.trim()}
+              disabled={busy || !input.trim() || !hasAccess}
               aria-label="Send"
               className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-600 text-white transition hover:bg-brand-700 disabled:opacity-40"
             >
