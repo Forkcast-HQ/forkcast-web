@@ -31,6 +31,11 @@ export default function SignUp() {
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Email verification step (demo-grade: no mail service yet, so the code is
+  // shown on screen, clearly labeled — production sends a real email).
+  const [step, setStep] = useState<"form" | "verify">("form");
+  const [sentCode, setSentCode] = useState("");
+  const [codeInput, setCodeInput] = useState("");
 
   useEffect(() => {
     if (hydrated && user) router.replace(user.role === "restaurant" ? "/partner" : "/dashboard");
@@ -38,15 +43,75 @@ export default function SignUp() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    const eNorm = email.trim().toLowerCase();
+    if (!eNorm.includes("@") || password.length < 6) {
+      setError(!eNorm.includes("@") ? "Enter a valid email." : "Password must be at least 6 characters.");
+      return;
+    }
+    // "Send" the verification code (displayed on screen in this demo).
+    setSentCode(String(Math.floor(100000 + Math.random() * 900000)));
+    setCodeInput("");
+    setStep("verify");
+  };
+
+  const verify = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (codeInput.trim() !== sentCode) {
+      setError("That code doesn't match. Check the 6 digits and try again.");
+      return;
+    }
     setBusy(true);
     const res = signUp({ name, email, password, role });
     if (!res.ok) {
       setError(res.error ?? "Something went wrong.");
       setBusy(false);
+      setStep("form");
       return;
     }
     router.push(role === "restaurant" ? "/partner" : "/onboarding");
   };
+
+  if (step === "verify") {
+    return (
+      <AuthShell
+        title="Verify your email"
+        subtitle={`We're confirming ${email.trim().toLowerCase()} before creating the account.`}
+        panel={role === "restaurant" ? RESTAURANT_PANEL : undefined}
+      >
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>Demo prototype:</strong> in production this code arrives by email. No mail service is connected yet,
+          so here it is — enter it below to continue: <span className="ml-1 rounded-lg bg-white px-2.5 py-1 font-display text-lg font-extrabold tracking-[0.2em] text-ink">{sentCode}</span>
+        </div>
+        <form onSubmit={verify} className="mt-5 space-y-4">
+          <AuthField label="6-digit verification code">
+            <input
+              className="field text-center font-display text-xl font-bold tracking-[0.35em]"
+              inputMode="numeric"
+              maxLength={6}
+              value={codeInput}
+              onChange={(e) => setCodeInput(e.target.value.replace(/\D/g, ""))}
+              placeholder="••••••"
+              autoFocus
+              required
+            />
+          </AuthField>
+          {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600">{error}</p>}
+          <button
+            type="submit"
+            disabled={busy}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700 disabled:opacity-60"
+          >
+            Verify &amp; create account <ArrowRight className="h-5 w-5" />
+          </button>
+          <button type="button" onClick={() => setStep("form")} className="w-full text-center text-sm font-medium text-ink/50 hover:text-ink">
+            Back — wrong email?
+          </button>
+        </form>
+      </AuthShell>
+    );
+  }
 
   return (
     <AuthShell

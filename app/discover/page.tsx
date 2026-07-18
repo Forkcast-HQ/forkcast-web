@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Search, SlidersHorizontal, Sparkles, ArrowRight, Map as MapIcon, List, Star, Clock, Info, X } from "lucide-react";
+import { Search, SlidersHorizontal, Sparkles, ArrowRight, Map as MapIcon, List, Star, Clock, Info, X, LocateFixed } from "lucide-react";
 import { RESTAURANTS, CUISINES, allMenuItems } from "@/data/restaurants";
 import { useUser } from "@/lib/store";
 import { fitScore, personalAdjust } from "@/lib/nutrition";
@@ -30,6 +30,27 @@ export default function Discover() {
   const [dietOnly, setDietOnly] = useState(false);
   const [view, setView] = useState<View>("list");
   const [attrs, setAttrs] = useState<string[]>([]);
+  // Real distances only with permission — never pretend we know where you are.
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [geoState, setGeoState] = useState<"idle" | "asking" | "granted" | "denied">("idle");
+
+  const askLocation = () => {
+    if (!("geolocation" in navigator)) { setGeoState("denied"); return; }
+    setGeoState("asking");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setGeoState("granted"); },
+      () => setGeoState("denied"),
+      { timeout: 10000, maximumAge: 300000 },
+    );
+  };
+
+  const haversineMi = (aLat: number, aLng: number, bLat: number, bLng: number) => {
+    const R = 3958.8;
+    const dLat = ((bLat - aLat) * Math.PI) / 180;
+    const dLng = ((bLng - aLng) * Math.PI) / 180;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+    return Math.round(R * 2 * Math.asin(Math.sqrt(h)) * 10) / 10;
+  };
 
   const toggleAttr = (key: string) =>
     setAttrs((prev) => (prev.includes(key) ? prev.filter((a) => a !== key) : [...prev, key]));
@@ -91,8 +112,16 @@ export default function Discover() {
     return map;
   }, [targets, profile]);
 
+  // With permission granted, distances become real (haversine from the user);
+  // otherwise the static values stand, clearly labeled as demo-center-based.
+  const located = useMemo(() => {
+    if (!coords) return RESTAURANTS;
+    return RESTAURANTS.map((r) => ({ ...r, distanceMi: haversineMi(coords.lat, coords.lng, r.lat, r.lng) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coords]);
+
   const restaurants = useMemo(() => {
-    let list = [...RESTAURANTS];
+    let list = [...located];
     if (cuisine) list = list.filter((r) => r.cuisine === cuisine);
     if (q.trim()) {
       const s = q.toLowerCase();
@@ -136,7 +165,7 @@ export default function Discover() {
       return b.rating - a.rating;
     });
     return list;
-  }, [q, cuisine, sort, dietOnly, attrs, bestFitOf, profile]);
+  }, [q, cuisine, sort, dietOnly, attrs, bestFitOf, profile, located]);
 
   const mapItems = useMemo(
     () =>
@@ -336,11 +365,28 @@ export default function Discover() {
           </div>
         </div>
 
-        <div className="mt-5 flex items-center justify-between gap-4">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <p className="text-sm text-ink/55" aria-live="polite">
             <span className="font-bold text-ink">{restaurants.length}</span> {restaurants.length === 1 ? "restaurant" : "restaurants"} in this view
           </p>
-          <p className="hidden text-xs text-ink/40 sm:block">Boston pilot catalog · demo + published + estimated tiers</p>
+          <div className="flex items-center gap-3">
+            {geoState === "granted" ? (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700">
+                <LocateFixed className="h-3.5 w-3.5" /> Distances from your location
+              </span>
+            ) : (
+              <button
+                onClick={askLocation}
+                disabled={geoState === "asking"}
+                className="inline-flex items-center gap-1 rounded-full border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold text-ink/70 transition hover:border-ink disabled:opacity-50"
+                title="Until you share location, distances are measured from downtown Boston (demo center)"
+              >
+                <LocateFixed className="h-3.5 w-3.5" />
+                {geoState === "asking" ? "Locating…" : geoState === "denied" ? "Location unavailable — distances from downtown Boston" : "Use my location for real distances"}
+              </button>
+            )}
+            <p className="hidden text-xs text-ink/40 sm:block">Boston pilot catalog · demo + published + estimated tiers</p>
+          </div>
         </div>
 
         {view === "list" ? (

@@ -14,7 +14,7 @@ const LINKS = [
   { href: "/discover", label: "Discover" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/for-restaurants", label: "For restaurants" },
-  { href: "/business", label: "The opportunity" },
+  { href: "/community", label: "Community" },
 ];
 
 export function Navbar() {

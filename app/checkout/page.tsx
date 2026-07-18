@@ -3,22 +3,23 @@
 // Checkout — fulfillment choice + prototype-safe integration state.
 // HONESTY: no live restaurant ordering API or payment processing exists.
 // This screen never pretends otherwise: totals are real math, the "Place
-// order" action is clearly labeled a demo, and partner handoff is shown as
+// order" action is clearly labeled a demo, and every missing integration is shown as
 // an integration-required state.
 
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Store, Bike, Handshake, Info, ShieldAlert, CreditCard, ExternalLink } from "lucide-react";
+import { ArrowLeft, Store, Bike, Info, ShieldAlert, CreditCard } from "lucide-react";
 import { useOrder, DELIVERY_FEE, MA_MEALS_TAX } from "@/lib/order";
 import { getRestaurant } from "@/data/restaurants";
 import { money, cls } from "@/lib/format";
 import type { Fulfillment } from "@/lib/types";
 
+// Pickup or delivery only — paying at the counter after ordering in-app was
+// a confusing third path (pilot feedback), so it's gone.
 const OPTIONS: { key: Fulfillment; label: string; desc: string; icon: React.ReactNode }[] = [
-  { key: "pickup", label: "Pickup", desc: "Free · collect at the restaurant", icon: <Store className="h-5 w-5" /> },
+  { key: "pickup", label: "Pickup", desc: "Free · pay in app, collect at the restaurant", icon: <Store className="h-5 w-5" /> },
   { key: "delivery", label: "Delivery", desc: `${money(DELIVERY_FEE)} fee · via delivery partner ($5–7/order, validated with restaurant owners)`, icon: <Bike className="h-5 w-5" /> },
-  { key: "partner", label: "Order through restaurant", desc: "Handoff to the restaurant's own checkout", icon: <Handshake className="h-5 w-5" /> },
 ];
 
 export default function CheckoutPage() {
@@ -148,12 +149,6 @@ export default function CheckoutPage() {
                 hidden={fulfill !== "delivery"}
               />
               <IntegrationRow
-                label={`Handoff to ${rest.name}'s checkout`}
-                state="Link not live"
-                detail="Once a partner agreement exists, this option opens the restaurant's own ordering flow with your basket attached."
-                hidden={fulfill !== "partner"}
-              />
-              <IntegrationRow
                 label="Kitchen status updates"
                 state="Simulated"
                 detail="The tracking timeline after you place this demo order advances on a timer, clearly labeled."
@@ -195,31 +190,12 @@ export default function CheckoutPage() {
                 <span>Total</span><span className="tabular-nums">{money(total)}</span>
               </div>
             </div>
-            {fulfill === "partner" ? (
-              <>
-                <button
-                  disabled
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-neutral-300 px-5 py-3 font-semibold text-ink/45"
-                  title="No partner handoff link is live yet"
-                >
-                  <ExternalLink className="h-4 w-4" /> Open {rest.name}&apos;s checkout
-                </button>
-                <p className="mt-1.5 text-center text-[11px] font-semibold text-amber-700">Integration required — link not live</p>
-                <button
-                  onClick={submit}
-                  className="mt-3 w-full rounded-full bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700"
-                >
-                  Simulate handoff (demo order)
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={submit}
-                className="mt-5 w-full rounded-full bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700"
-              >
-                Place order (demo)
-              </button>
-            )}
+            <button
+              onClick={submit}
+              className="mt-5 w-full rounded-full bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700"
+            >
+              Place order (demo)
+            </button>
             <p className="mt-2 text-center text-[11px] text-ink/40">No payment is charged. Demo order for flow validation.</p>
           </div>
         </aside>

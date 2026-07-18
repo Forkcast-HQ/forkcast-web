@@ -38,9 +38,12 @@ export default function Profile() {
   const [name, setName] = useState("");
   const [sex, setSex] = useState<Sex>("male");
   const [age, setAge] = useState("30");
+  const [units, setUnits] = useState<"imperial" | "metric">("imperial");
   const [ft, setFt] = useState("5");
   const [inch, setInch] = useState("9");
   const [lb, setLb] = useState("175");
+  const [cm, setCm] = useState("175");
+  const [kg, setKg] = useState("79");
   const [activity, setActivity] = useState<ActivityLevel>("moderate");
   const [goal, setGoal] = useState<Goal>("lose");
   const [dietary, setDietary] = useState<string[]>([]);
@@ -67,12 +70,14 @@ export default function Profile() {
       setFt(String(Math.floor(inches / 12)));
       setInch(String(Math.round(inches % 12)));
       setLb(String(Math.round(kgToLb(profile.weightKg))));
+      setCm(String(Math.round(profile.heightCm)));
+      setKg(String(Math.round(profile.weightKg)));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeHydrated]);
 
-  const heightCm = ftInToCm(clampNum(ft, 3, 8, 5), clampNum(inch, 0, 11, 9));
-  const weightKg = lbToKg(clampNum(lb, 70, 600, 175));
+  const heightCm = units === "imperial" ? ftInToCm(clampNum(ft, 3, 8, 5), clampNum(inch, 0, 11, 9)) : clampNum(cm, 120, 230, 175);
+  const weightKg = units === "imperial" ? lbToKg(clampNum(lb, 70, 600, 175)) : clampNum(kg, 35, 270, 79);
   const ageNum = clampNum(age, 14, 100, 30);
   const draft: HealthProfile = useMemo(
     () => ({ name, sex, age: ageNum, heightCm, weightKg, activity, goal, dietary, avoid, conditions, createdAt: profile?.createdAt ?? Date.now() }),
@@ -166,13 +171,26 @@ export default function Profile() {
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Age"><input className="field" type="number" inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} onBlur={() => setAge(String(clampNum(age, 14, 100, 30)))} /></Field>
               <Field label="Sex"><Toggle options={[{ value: "male", label: "Male" }, { value: "female", label: "Female" }]} value={sex} onChange={(v) => setSex(v as Sex)} /></Field>
-              <Field label="Height">
-                <div className="flex gap-2">
-                  <Suffixed v={ft} set={setFt} clamp={[3, 8, 5]} suffix="ft" />
-                  <Suffixed v={inch} set={setInch} clamp={[0, 11, 9]} suffix="in" />
-                </div>
+              <Field label="Units">
+                <Toggle options={[{ value: "imperial", label: "lb / ft" }, { value: "metric", label: "kg / cm" }]} value={units} onChange={(v) => setUnits(v as "imperial" | "metric")} />
               </Field>
-              <Field label="Weight"><Suffixed v={lb} set={setLb} clamp={[70, 600, 175]} suffix="lb" /></Field>
+              <div className="hidden sm:block" />
+              {units === "imperial" ? (
+                <>
+                  <Field label="Height">
+                    <div className="flex gap-2">
+                      <Suffixed v={ft} set={setFt} clamp={[3, 8, 5]} suffix="ft" />
+                      <Suffixed v={inch} set={setInch} clamp={[0, 11, 9]} suffix="in" />
+                    </div>
+                  </Field>
+                  <Field label="Weight"><Suffixed v={lb} set={setLb} clamp={[70, 600, 175]} suffix="lb" /></Field>
+                </>
+              ) : (
+                <>
+                  <Field label="Height"><Suffixed v={cm} set={setCm} clamp={[120, 230, 175]} suffix="cm" /></Field>
+                  <Field label="Weight"><Suffixed v={kg} set={setKg} clamp={[35, 270, 79]} suffix="kg" /></Field>
+                </>
+              )}
             </div>
             <Field label="Goal"><Toggle options={[{ value: "lose", label: GOAL_LABELS.lose }, { value: "maintain", label: GOAL_LABELS.maintain }, { value: "gain", label: GOAL_LABELS.gain }]} value={goal} onChange={(v) => setGoal(v as Goal)} /></Field>
             <Field label="Activity">

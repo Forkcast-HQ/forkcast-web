@@ -8,6 +8,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { TodayBar } from "@/components/TodayBar";
 import { CartBar } from "@/components/CartBar";
+import { CoachChat } from "@/components/CoachChat";
 
 export const metadata: Metadata = {
   title: "Forkcast — Know before you go",
@@ -41,6 +42,7 @@ export default function RootLayout({
               <Footer />
               <TodayBar />
               <CartBar />
+              <CoachChat />
             </OrderProvider>
           </UserProvider>
         </AuthProvider>
