@@ -230,6 +230,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing image data URL." }, { status: 400 });
   }
 
+  const failures: string[] = []; // per-provider reasons, surfaced if everything fails
+
   // ---- DataRobot gateway path (first priority) ----
   if (drToken) {
     try {
@@ -238,14 +240,15 @@ export async function POST(req: Request) {
         const content: string = JSON.parse(r.raw)?.choices?.[0]?.message?.content ?? "";
         const parsed = extractJson(content);
         if (parsed) return shapeResponse(parsed, `datarobot:${process.env.DATAROBOT_VISION_MODEL || process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8"}`);
-      } else if (!geminiKey && !key) {
-        let detail = r.raw.slice(0, 300);
+        failures.push("datarobot: responded but not with valid JSON nutrition");
+      } else {
+        let detail = r.raw.slice(0, 200);
         try { detail = JSON.parse(r.raw)?.error?.message ?? detail; } catch { /* keep raw */ }
-        return NextResponse.json({ error: `DataRobot ${r.status}: ${detail}` }, { status: 502 });
+        failures.push(`datarobot ${r.status}: ${detail}`);
       }
       // fall through to Gemini/Groq if configured
-    } catch {
-      if (!geminiKey && !key) return NextResponse.json({ error: "Request to DataRobot failed." }, { status: 502 });
+    } catch (e) {
+      failures.push(`datarobot: request failed (${e instanceof Error ? e.message : "network"})`);
     }
   }
 
@@ -256,23 +259,21 @@ export async function POST(req: Request) {
       if (r.ok) {
         const parsed = extractJson(geminiText(r.raw));
         if (parsed) return shapeResponse(parsed, `gemini:${model}`);
-        if (!key) return NextResponse.json({ error: "Gemini did not return valid JSON." }, { status: 502 });
-      } else if (!key) {
-        let detail = r.raw.slice(0, 300);
-        try {
-          detail = JSON.parse(r.raw)?.error?.message ?? detail;
-        } catch {
-          /* keep raw */
-        }
-        return NextResponse.json({ error: `Gemini ${r.status}: ${detail}` }, { status: 502 });
+        failures.push("gemini: responded but not with valid JSON nutrition");
+      } else {
+        let detail = r.raw.slice(0, 200);
+        try { detail = JSON.parse(r.raw)?.error?.message ?? detail; } catch { /* keep raw */ }
+        failures.push(`gemini ${r.status}: ${detail}`);
       }
       // fall through to Groq if configured
-    } catch {
-      if (!key) return NextResponse.json({ error: "Request to Gemini failed." }, { status: 502 });
+    } catch (e) {
+      failures.push(`gemini: request failed (${e instanceof Error ? e.message : "network"})`);
     }
   }
 
-  if (!key) return NextResponse.json({ error: "GROQ_API_KEY is not set on the server." }, { status: 500 });
+  if (!key) {
+    return NextResponse.json({ error: `All providers failed — ${failures.join(" | ") || "no provider configured"}` }, { status: 502 });
+  }
 
   try {
     let model = cachedModel || process.env.GROQ_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
@@ -283,8 +284,9 @@ export async function POST(req: Request) {
       const ids = await listModels(key);
       const picked = pickVisionModel(ids);
       if (!picked) {
+        failures.push(`groq: no vision-capable model on this account`);
         return NextResponse.json(
-          { error: `No vision-capable model is available on this Groq account. Models: ${ids.join(", ") || "(none)"}` },
+          { error: `All providers failed — ${failures.join(" | ")}` },
           { status: 502 },
         );
       }
@@ -299,7 +301,8 @@ export async function POST(req: Request) {
       } catch {
         /* keep raw */
       }
-      return NextResponse.json({ error: `Groq ${r.status}: ${detail}` }, { status: 502 });
+      failures.push(`groq ${r.status}: ${detail}`);
+      return NextResponse.json({ error: `All providers failed — ${failures.join(" | ")}` }, { status: 502 });
     }
 
     const content: string = JSON.parse(r.raw)?.choices?.[0]?.message?.content ?? "";
