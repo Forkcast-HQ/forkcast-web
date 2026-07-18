@@ -62,6 +62,31 @@ function pickVisionModel(ids: string[]): string | undefined {
   return ids.filter((id) => score(id) > 0).sort((a, b) => score(b) - score(a))[0];
 }
 
+// ---- DataRobot LLM Gateway (OpenAI-compatible, multimodal) ---------
+
+async function callDataRobotVision(token: string, image: string) {
+  const base = (process.env.DATAROBOT_ENDPOINT ?? "https://app.datarobot.com/api/v2").replace(/\/$/, "");
+  const res = await fetch(`${base}/genai/llmgw/chat/completions/`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: process.env.DATAROBOT_VISION_MODEL || "azure/gpt-5-5-2026-04-23",
+      temperature: 0.2,
+      max_tokens: 700,
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: PROMPT },
+            { type: "image_url", image_url: { url: image } },
+          ],
+        },
+      ],
+    }),
+  });
+  return { ok: res.ok, status: res.status, raw: await res.text() };
+}
+
 // ---- Gemini -------------------------------------------------------
 
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
@@ -164,25 +189,35 @@ function shapeResponse(parsed: Record<string, unknown>, model: string) {
 }
 
 export async function GET() {
+  const datarobot = Boolean(process.env.DATAROBOT_API_TOKEN);
   const gemini = Boolean(process.env.GEMINI_API_KEY);
   const groqKey = process.env.GROQ_API_KEY;
   const groqModels = groqKey ? await listModels(groqKey) : [];
   return NextResponse.json({
     providers: {
+      datarobot: datarobot
+        ? {
+            configured: true,
+            endpoint: process.env.DATAROBOT_ENDPOINT ?? "https://app.datarobot.com/api/v2",
+            visionModel: process.env.DATAROBOT_VISION_MODEL || "azure/gpt-5-5-2026-04-23",
+            chatModel: process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8",
+          }
+        : { configured: false },
       gemini: gemini ? { configured: true, model: process.env.GEMINI_MODEL || GEMINI_FALLBACKS[0] } : { configured: false },
       groq: groqKey
         ? { configured: true, available: groqModels.sort(), suggestedVisionModel: pickVisionModel(groqModels) ?? null }
         : { configured: false },
     },
-    active: gemini ? "gemini" : groqKey ? "groq" : null,
+    active: datarobot ? "datarobot" : gemini ? "gemini" : groqKey ? "groq" : null,
   });
 }
 
 export async function POST(req: Request) {
+  const drToken = process.env.DATAROBOT_API_TOKEN;
   const geminiKey = process.env.GEMINI_API_KEY;
   const key = process.env.GROQ_API_KEY;
-  if (!geminiKey && !key) {
-    return NextResponse.json({ error: "No AI key configured. Set GEMINI_API_KEY (preferred) or GROQ_API_KEY in .env.local." }, { status: 500 });
+  if (!drToken && !geminiKey && !key) {
+    return NextResponse.json({ error: "No AI key configured. Set DATAROBOT_API_TOKEN, GEMINI_API_KEY, or GROQ_API_KEY in .env.local." }, { status: 500 });
   }
 
   let image: string | undefined;
@@ -195,7 +230,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing image data URL." }, { status: 400 });
   }
 
-  // ---- Gemini path (preferred) ----
+  // ---- DataRobot gateway path (first priority) ----
+  if (drToken) {
+    try {
+      const r = await callDataRobotVision(drToken, image);
+      if (r.ok) {
+        const content: string = JSON.parse(r.raw)?.choices?.[0]?.message?.content ?? "";
+        const parsed = extractJson(content);
+        if (parsed) return shapeResponse(parsed, `datarobot:${process.env.DATAROBOT_VISION_MODEL || "azure/gpt-5-5-2026-04-23"}`);
+      } else if (!geminiKey && !key) {
+        let detail = r.raw.slice(0, 300);
+        try { detail = JSON.parse(r.raw)?.error?.message ?? detail; } catch { /* keep raw */ }
+        return NextResponse.json({ error: `DataRobot ${r.status}: ${detail}` }, { status: 502 });
+      }
+      // fall through to Gemini/Groq if configured
+    } catch {
+      if (!geminiKey && !key) return NextResponse.json({ error: "Request to DataRobot failed." }, { status: 502 });
+    }
+  }
+
+  // ---- Gemini path ----
   if (geminiKey) {
     try {
       const { r, model } = await analyzeWithGemini(geminiKey, image);

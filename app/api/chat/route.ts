@@ -46,6 +46,24 @@ async function callGemini(key: string, messages: ChatMessage[], ctx?: Record<str
   return text || null;
 }
 
+// DataRobot LLM Gateway (OpenAI-compatible) — routes to GPT/Claude/etc.
+async function callDataRobot(token: string, messages: ChatMessage[], ctx?: Record<string, unknown>) {
+  const base = (process.env.DATAROBOT_ENDPOINT ?? "https://app.datarobot.com/api/v2").replace(/\/$/, "");
+  const res = await fetch(`${base}/genai/llmgw/chat/completions/`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8",
+      temperature: 0.4,
+      max_tokens: 400,
+      messages: [{ role: "system", content: `${SYSTEM}\n\n${contextLine(ctx)}` }, ...messages],
+    }),
+  });
+  if (!res.ok) return null;
+  const body = await res.json();
+  return body?.choices?.[0]?.message?.content ?? null;
+}
+
 async function callGroq(key: string, messages: ChatMessage[], ctx?: Record<string, unknown>) {
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -63,9 +81,10 @@ async function callGroq(key: string, messages: ChatMessage[], ctx?: Record<strin
 }
 
 export async function POST(req: Request) {
+  const datarobot = process.env.DATAROBOT_API_TOKEN;
   const gemini = process.env.GEMINI_API_KEY;
   const groq = process.env.GROQ_API_KEY;
-  if (!gemini && !groq) {
+  if (!datarobot && !gemini && !groq) {
     return NextResponse.json({ error: "No AI key configured on the server." }, { status: 500 });
   }
 
@@ -81,8 +100,10 @@ export async function POST(req: Request) {
   if (!messages.length) return NextResponse.json({ error: "No messages." }, { status: 400 });
 
   try {
+    // Provider priority: DataRobot gateway → Gemini → Groq
     let reply: string | null = null;
-    if (gemini) reply = await callGemini(gemini, messages, context);
+    if (datarobot) reply = await callDataRobot(datarobot, messages, context);
+    if (!reply && gemini) reply = await callGemini(gemini, messages, context);
     if (!reply && groq) reply = await callGroq(groq, messages, context);
     if (!reply) return NextResponse.json({ error: "AI providers unavailable." }, { status: 502 });
     return NextResponse.json({ reply });

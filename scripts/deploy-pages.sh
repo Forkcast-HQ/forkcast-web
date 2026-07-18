@@ -14,7 +14,14 @@ BASE="/forkcast-live"
 # Static export cannot include server route handlers (POST /api/analyze).
 # Stash app/api for the export build, then restore it (SSR/dev keep it).
 API_DIR="$ROOT/app/api"; API_STASH="$ROOT/.api-stash"
-restore_api(){ [ -d "$API_STASH" ] && mv "$API_STASH" "$API_DIR" 2>/dev/null || true; }
+restore_api(){
+  # Robust restore: if app/api reappeared while stashed (e.g. new routes were
+  # added), merge stash contents back instead of nesting a second api/ inside.
+  [ -d "$API_STASH" ] || return 0
+  mkdir -p "$API_DIR"
+  cp -R "$API_STASH"/. "$API_DIR"/ 2>/dev/null || true
+  rm -rf "$API_STASH"
+}
 trap restore_api EXIT
 [ -d "$API_DIR" ] && mv "$API_DIR" "$API_STASH"
 
