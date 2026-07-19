@@ -76,6 +76,8 @@ export function CoachChat() {
             remainingCalories: consumed ? Math.max(0, targets.calories - consumed.calories) : targets.calories,
             allergies: profile.avoid,
             conditions: profile.conditions,
+            currentWeightKg: profile.weightKg,
+            goalWeightKg: profile.goalWeightKg,
             calibration: calibration?.status === "active" ? { observedTdee: calibration.observedTdee, blendedTdee: calibration.blendedTdee } : undefined,
           } : undefined,
         }),

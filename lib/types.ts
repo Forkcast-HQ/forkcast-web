@@ -17,6 +17,7 @@ export interface HealthProfile {
   weightKg: number;
   activity: ActivityLevel;
   goal: Goal;
+  goalWeightKg?: number; // optional target weight for trend coaching
   // Optional preferences
   dietary: string[]; // e.g. ["vegetarian", "gluten-free"]
   avoid: string[]; // allergens / dislikes

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -19,7 +19,7 @@ import {
 import { ArrowRight, Sparkles, Trash2, Camera, Utensils, PencilLine, Flame, Trophy, Target, ShoppingBag, MapPin, Clock, Info } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useUser } from "@/lib/store";
-import { GOAL_LABELS, bmiInfo, kgToLb, fitScore, personalAdjust } from "@/lib/nutrition";
+import { GOAL_LABELS, bmiInfo, kgToLb, lbToKg, fitScore, personalAdjust } from "@/lib/nutrition";
 import { allMenuItems } from "@/data/restaurants";
 import { coachTip } from "@/lib/ai";
 import { MacroRing, MacroBar } from "@/components/MacroRing";
@@ -40,7 +40,9 @@ function greeting() {
 export default function Dashboard() {
   const router = useRouter();
   const { user, hydrated: authHydrated } = useAuth();
-  const { profile, targets, calibration, hydrated, meals, weights, consumedToday, todaysMeals, removeMeal, streak } = useUser();
+  const { profile, targets, calibration, hydrated, meals, weights, consumedToday, todaysMeals, removeMeal, streak, addWeight } = useUser();
+  const [weighIn, setWeighIn] = useState("");
+  const [weighSaved, setWeighSaved] = useState(false);
 
   useEffect(() => {
     if (authHydrated && !user) router.replace("/login");
@@ -134,6 +136,34 @@ export default function Dashboard() {
       return { date: todayKey(d).slice(5), lb: Math.round((base + dir * (7 - i) * 0.6) * 10) / 10 };
     });
   }, [weights, profile]);
+
+  // Goal-weight coaching: trend from the user's own weigh-ins, an honest ETA,
+  // and a hard guardrail — never coach toward a goal below the healthy BMI range.
+  const goalKg = profile?.goalWeightKg;
+  const goalLb = goalKg ? Math.round(kgToLb(goalKg)) : null;
+  const goalNote = useMemo(() => {
+    if (!goalKg || !profile) return null;
+    const h = profile.heightCm / 100;
+    if (goalKg / (h * h) < 18.5) {
+      return "That goal weight is below the healthy BMI range, so Forkcast won't coach toward it. Consider discussing targets with a clinician.";
+    }
+    if (weights.length < 3) return "Log a few weigh-ins and your trend toward the goal will appear here.";
+    const first = weights[Math.max(0, weights.length - 8)];
+    const last = weights[weights.length - 1];
+    const days = (new Date(last.date).getTime() - new Date(first.date).getTime()) / 86400000;
+    if (days < 7) return "Keep logging — a weekly trend needs about a week of weigh-ins.";
+    const slopeKgWk = ((last.weightKg - first.weightKg) / days) * 7;
+    const remainingKg = goalKg - last.weightKg;
+    if (Math.abs(remainingKg) < 0.5) return "You're at your goal weight — nice. Maintenance mode: keep the streak.";
+    if (Math.abs(slopeKgWk) < 0.05) return "Weight is holding steady. To move toward your goal, adjust intake — ask the coach for meal-level suggestions.";
+    if (Math.sign(slopeKgWk) !== Math.sign(remainingKg)) {
+      return "The recent trend is moving away from your goal — worth reviewing this week's log. Estimates from your own data, not medical advice.";
+    }
+    const weeks = Math.abs(remainingKg / slopeKgWk);
+    if (weeks > 104) return "At the current pace the goal is more than two years out — small, sustainable changes compound.";
+    const eta = new Date(Date.now() + weeks * 7 * 86400000).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    return `Trending ${Math.abs(kgToLb(slopeKgWk)).toFixed(1)} lb/week ${remainingKg < 0 ? "down" : "up"} — at this pace you'd reach ${goalLb} lb around ${eta}. An estimate from your own logs, not medical advice.`;
+  }, [goalKg, profile, weights, goalLb]);
 
   // Next best meals — fit + safety + HABITS: dishes from categories and
   // restaurants you actually eat get a modest boost, with the reason shown.
@@ -435,15 +465,43 @@ export default function Dashboard() {
         <div className="rounded-2xl border border-black/5 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-bold text-ink">Weight</h2>
-            <span className="text-sm tabular-nums text-ink/50">{Math.round(kgToLb(profile.weightKg))} lb</span>
+            <span className="text-sm tabular-nums text-ink/50">
+              {Math.round(kgToLb(profile.weightKg))} lb
+              {goalLb ? <span className="text-ink/35"> · goal {goalLb} lb</span> : null}
+            </span>
           </div>
+          <form
+            className="mt-3 flex items-center gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const v = parseFloat(weighIn);
+              if (Number.isNaN(v) || v < 70 || v > 600) return;
+              addWeight(lbToKg(v));
+              setWeighIn("");
+              setWeighSaved(true);
+              setTimeout(() => setWeighSaved(false), 2000);
+            }}
+          >
+            <input
+              inputMode="decimal"
+              value={weighIn}
+              onChange={(e) => setWeighIn(e.target.value)}
+              placeholder="Today's weight (lb)"
+              className="w-40 rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-brand-500"
+              aria-label="Today's weight in pounds"
+            />
+            <button type="submit" className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-black">
+              {weighSaved ? "Logged ✓" : "Log"}
+            </button>
+            <span className="text-[11px] text-ink/40">Feeds your calibration</span>
+          </form>
           <div className="mt-4 h-56">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={weightData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" vertical={false} />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#7d7979" }} axisLine={false} tickLine={false} />
                 <YAxis
-                  domain={[(min: number) => Math.floor(min - 2), (max: number) => Math.ceil(max + 2)]}
+                  domain={[(min: number) => Math.floor(Math.min(min, goalLb ?? min) - 2), (max: number) => Math.ceil(Math.max(max, goalLb ?? max) + 2)]}
                   allowDecimals={false}
                   tickFormatter={(v: number) => String(Math.round(v))}
                   tick={{ fontSize: 11, fill: "#7d7979" }}
@@ -452,10 +510,12 @@ export default function Dashboard() {
                   width={44}
                 />
                 <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid rgba(0,0,0,0.08)", fontSize: 13 }} formatter={(v: number) => [`${v} lb`, "Weight"]} />
+                {goalLb && <ReferenceLine y={goalLb} stroke="#201e1d" strokeDasharray="6 4" strokeWidth={1.5} label={{ value: `goal ${goalLb}`, position: "insideTopRight", fontSize: 11, fill: "#605d5d" }} />}
                 <Line type="monotone" dataKey="lb" stroke="#ec3013" strokeWidth={2.5} dot={{ r: 3, fill: "#ec3013" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
+          {goalNote && <p className="mt-2 text-[11px] leading-relaxed text-ink/50">{goalNote}</p>}
         </div>
       </div>
 

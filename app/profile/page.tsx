@@ -48,6 +48,7 @@ export default function Profile() {
   const [kg, setKg] = useState("79");
   const [activity, setActivity] = useState<ActivityLevel>("moderate");
   const [goal, setGoal] = useState<Goal>("lose");
+  const [goalW, setGoalW] = useState(""); // in current display unit
   const [dietary, setDietary] = useState<string[]>([]);
   const [avoid, setAvoid] = useState<string[]>([]);
   const [conditions, setConditions] = useState<string[]>([]);
@@ -65,6 +66,7 @@ export default function Profile() {
       setAge(String(profile.age));
       setActivity(profile.activity);
       setGoal(profile.goal);
+      setGoalW(profile.goalWeightKg ? String(Math.round(kgToLb(profile.goalWeightKg))) : "");
       setDietary(profile.dietary || []);
       setAvoid(profile.avoid || []);
       setConditions(profile.conditions || []);
@@ -82,8 +84,12 @@ export default function Profile() {
   const weightKg = units === "imperial" ? lbToKg(clampNum(lb, 70, 600, 175)) : clampNum(kg, 35, 270, 79);
   const ageNum = clampNum(age, 14, 100, 30);
   const draft: HealthProfile = useMemo(
-    () => ({ name, sex, age: ageNum, heightCm, weightKg, activity, goal, dietary, avoid, conditions, createdAt: profile?.createdAt ?? Date.now() }),
-    [name, sex, ageNum, heightCm, weightKg, activity, goal, dietary, avoid, conditions, profile?.createdAt],
+    () => {
+      const gw = parseFloat(goalW);
+      const goalWeightKg = Number.isNaN(gw) || gw <= 0 ? undefined : units === "imperial" ? lbToKg(gw) : gw;
+      return { name, sex, age: ageNum, heightCm, weightKg, activity, goal, goalWeightKg, dietary, avoid, conditions, createdAt: profile?.createdAt ?? Date.now() };
+    },
+    [name, sex, ageNum, heightCm, weightKg, activity, goal, goalW, units, dietary, avoid, conditions, profile?.createdAt],
   );
   const targets = computeTargets(draft);
   const bmi = bmiInfo(weightKg, heightCm);
@@ -174,7 +180,14 @@ export default function Profile() {
               <Field label="Age"><input className="field" type="number" inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} onBlur={() => setAge(String(clampNum(age, 14, 100, 30)))} /></Field>
               <Field label="Sex"><Toggle options={[{ value: "male", label: "Male" }, { value: "female", label: "Female" }]} value={sex} onChange={(v) => setSex(v as Sex)} /></Field>
               <Field label="Units">
-                <Toggle options={[{ value: "imperial", label: "lb / ft" }, { value: "metric", label: "kg / cm" }]} value={units} onChange={(v) => setUnits(v as "imperial" | "metric")} />
+                <Toggle options={[{ value: "imperial", label: "lb / ft" }, { value: "metric", label: "kg / cm" }]} value={units} onChange={(v) => {
+                  const next = v as "imperial" | "metric";
+                  const gw = parseFloat(goalW);
+                  if (!Number.isNaN(gw) && gw > 0 && next !== units) {
+                    setGoalW(String(Math.round(next === "metric" ? lbToKg(gw) : kgToLb(gw))));
+                  }
+                  setUnits(next);
+                }} />
               </Field>
               <div className="hidden sm:block" />
               {units === "imperial" ? (
@@ -195,6 +208,9 @@ export default function Profile() {
               )}
             </div>
             <Field label="Goal"><Toggle options={[{ value: "lose", label: GOAL_LABELS.lose }, { value: "maintain", label: GOAL_LABELS.maintain }, { value: "gain", label: GOAL_LABELS.gain }]} value={goal} onChange={(v) => setGoal(v as Goal)} /></Field>
+            <Field label={`Goal weight (${units === "imperial" ? "lb" : "kg"}, optional)`}>
+              <input className="field" inputMode="decimal" value={goalW} onChange={(e) => setGoalW(e.target.value)} placeholder={units === "imperial" ? "e.g. 165" : "e.g. 75"} />
+            </Field>
             <Field label="Activity">
               <select className="field" value={activity} onChange={(e) => setActivity(e.target.value as ActivityLevel)}>
                 {(Object.keys(ACTIVITY_LABELS) as ActivityLevel[]).map((a) => (<option key={a} value={a}>{ACTIVITY_LABELS[a]}</option>))}
