@@ -37,4 +37,4 @@ Dishes live in `data/restaurants.ts` (see `mi()` helper). Collection worksheet c
 
 ## Delivery partnership note (comment #1, July 2026)
 
-Founder validation with restaurant owners puts third-party delivery cost at **$5–7 per order**; the demo checkout uses $5.99 within that range. Path: launch pickup-only (no delivery economics), evaluate DoorDash Drive (white-label dispatch API) once pilot order volume justifies it. The checkout integration-state board already lists the delivery API as "Not connected" until then.
+Founders' validation with restaurant owners puts third-party delivery cost at **$5–7 per order**; the demo checkout uses $5.99 within that range. Path: launch pickup-only (no delivery economics), evaluate DoorDash Drive (white-label dispatch API) once pilot order volume justifies it. The checkout integration-state board already lists the delivery API as "Not connected" until then.

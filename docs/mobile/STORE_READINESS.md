@@ -2,8 +2,8 @@
 
 Companion to [`MOBILE_HANDOFF.md`](./MOBILE_HANDOFF.md). That doc covers
 building the app; this one covers everything the stores require beyond the
-build. Items marked **(app change)** need code; items marked **(founder)**
-are Seymur's to produce; the rest is the developer's release work.
+build. Items marked **(app change)** need code; items marked **(founders)**
+are the founders' (Seymur & Rahman) to produce; the rest is the developer's release work.
 
 Forkcast collects health data (weight, height, conditions, allergies, meal
 logs), which puts it in the stricter review lane on both stores. Plan for
@@ -13,12 +13,12 @@ that from day one, not at submission.
 
 ## A. Required before EITHER store
 
-1. **Hosted privacy policy URL** **(founder + app change)** — mandatory for
+1. **Hosted privacy policy URL** **(founders + app change)** — mandatory for
    both stores; must name every data type collected (health profile, meal
    logs, weight history, photos, location), why, where it's stored
    (Supabase), retention, and deletion. Add a `/privacy` page to the web app
    so the URL is on your own domain. I can draft this.
-2. **Terms of service URL** **(founder)** — expected by reviewers for apps
+2. **Terms of service URL** **(founders)** — expected by reviewers for apps
    with subscriptions.
 3. **In-app account deletion** **(app change)** — both stores require that
    users can delete their account and data from inside the app. Backend needs
@@ -41,7 +41,7 @@ that from day one, not at submission.
 
 ## B. Google Play (first release)
 
-1. **Developer account** **(founder)** — one-time $25, plus D-U-N-S/identity
+1. **Developer account** **(founders)** — one-time $25, plus D-U-N-S/identity
    verification for organization accounts (allow ~1 week).
 2. **Data Safety form** — must exactly match the privacy policy and actual
    SDK behavior (Supabase, AI endpoints). Health data → declare "Health &
@@ -56,7 +56,7 @@ that from day one, not at submission.
 
 ## C. App Store (second release)
 
-1. **Apple Developer Program** **(founder)** — $99/yr; enroll early, identity
+1. **Apple Developer Program** **(founders)** — $99/yr; enroll early, identity
    verification can take days.
 2. **Privacy nutrition labels** — App Store Connect questionnaire mirroring
    the Data Safety form.
@@ -82,7 +82,7 @@ app now and a separate iOS app later, surface it immediately — it forfeits
 the shared TypeScript core (`lib/nutrition.ts` etc.), doubles long-term cost,
 and both apps must then be verified against the web app's numbers by hand.
 
-## E. Founder to-do summary
+## E. Founders' to-do summary
 
 - [ ] Play developer account + Apple Developer Program enrollment
 - [ ] Privacy policy + ToS drafted and hosted (ask me — I'll draft both and

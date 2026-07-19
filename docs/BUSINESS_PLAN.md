@@ -2,7 +2,7 @@
 
 **The trust layer for restaurant nutrition decisions.** Forkcast tells diners what to order *before* they order — scored against their own body and goals — then closes the loop: order, confirm, log, measure. It is the only product connecting pre-order decision support, verified independent-restaurant nutrition data, and post-order confirmed logging.
 
-*Version 2.0 — July 2026. Prepared for pre-seed conversations and as part of the founder's evidence record. All market figures are sourced (CDC, USDA ERS, AHRQ, peer-reviewed literature, company filings/press; see `RESEARCH.md`); competitive claims from live site captures dated July 15, 2026 (see `COMPETITIVE_SCAN_2026-07.md`). Nothing in this document claims users, partners, revenue, or outcomes that do not exist.*
+*Version 2.0 — July 2026. Prepared for pre-seed conversations and as part of the founders' evidence record. All market figures are sourced (CDC, USDA ERS, AHRQ, peer-reviewed literature, company filings/press; see `RESEARCH.md`); competitive claims from live site captures dated July 15, 2026 (see `COMPETITIVE_SCAN_2026-07.md`). Nothing in this document claims users, partners, revenue, or outcomes that do not exist.*
 
 ---
 
@@ -129,7 +129,7 @@ Full assumptions, five-year build, unit economics, and scenarios: `FINANCIAL_MOD
 
 ## 11. National-interest alignment
 
-*This section states the founder's case factually; it draws no legal conclusions.*
+*This section states the founders' case factually; it draws no legal conclusions.*
 
 - **Substantial merit.** Restaurant-nutrition transparency for the independent majority that federal labeling does not reach; pre-order decision support where labels demonstrably fail (~24 kcal/transaction); health literacy through explained, sourced, correctable numbers; small-restaurant menu digitization at documented cost.
 - **National importance.** A reproducible protocol — collection standard, provenance tiers, correction governance, pre-registered measurement — designed to scale across U.S. markets rather than serve one city; addressed at a diet-disease burden of ~$334B/yr.
@@ -138,7 +138,7 @@ Full assumptions, five-year build, unit economics, and scenarios: `FINANCIAL_MOD
 
 ## 12. Team
 
-Founder: Harvard SEAS (engineering); sole builder of the product to date. Pre-seed hires: registered dietitian/nutrition-science advisor (credibility + B2B2C), ML engineer (estimation engine), local GTM lead (restaurant density). Advisory targets: a fast-casual operator and a digital-health payer-contracting advisor.
+Founding team — two co-founders: **Seymur Hasanov** (Harvard SEAS engineering; product and engineering; builder of the product to date) and **Rahman [surname]** (co-founder; strategy, market validation, and regulatory-economic analysis). Pre-seed hires: registered dietitian/nutrition-science advisor (credibility + B2B2C), ML engineer (estimation engine), local GTM lead (restaurant density). Advisory targets: a fast-casual operator and a digital-health payer-contracting advisor.
 
 ---
 

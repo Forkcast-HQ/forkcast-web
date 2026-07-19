@@ -28,7 +28,7 @@ This framing is specific enough to evaluate. It does not claim that a consumer a
 |---|---|---|---|
 | Substantial merit | Federal nutrition-information gap; measured obesity burden; food-away-from-home spending; pre-order decision-support rationale | Primary sources identified | Counsel-reviewed endeavor statement with source exhibits |
 | National importance | A replicable data/verification protocol, national restaurant applicability, multi-market evaluation, potential public-health and small-business implications | Architecture and roadmap described | Second-market replication plan; institutional letters addressing prospective impact |
-| Well positioned | Founder education/experience, record of related work, working product, technical artifacts, restaurant/customer interest, funding, pilot execution | Working static prototype; founder-specific evidence not reviewed here | Source repository, dated product demos, founder CV/evidence, letters of interest, signed pilots, funding records |
+| Well positioned | Founders' education/experience, record of related work, working product, technical artifacts, restaurant/customer interest, funding, pilot execution | Working static prototype; founder-specific evidence not reviewed here | Source repository, dated product demos, founder CVs/evidence, letters of interest, signed pilots, funding records |
 | Progress toward endeavor | Product releases, validated datasets, accuracy benchmarks, users, retained cohorts, partner menus, corrections, public reports | Demonstration only; no live traction claimed | Versioned releases, analytics definitions, partner roster, pilot report, independent review |
 | Waiver benefits the U.S. | Why founder-led continuity, specialized expertise, and the endeavor's prospective benefit outweigh the normal job-offer/labor-certification framework | Not established by the website | Counsel-led argument tied to record evidence, not generic entrepreneurship language |
 
@@ -52,8 +52,8 @@ This framing is specific enough to evaluate. It does not claim that a consumer a
 - Accuracy comparisons against recipe analysis or qualified independent review.
 - Cohort-based activation, weekly use, D30 retention, and pre-order session metrics.
 - Evidence of customer and restaurant demand such as interviews, waitlists, paid pilots, or signed agreements, with methodology and denominators.
-- Independent letters from experts who understand both the founder's work and the specific endeavor.
-- Evidence of founder qualifications and a record of executing comparable technical, business, research, or public-interest work.
+- Independent letters from experts who understand both the founders' work and the specific endeavor.
+- Evidence of founders' qualifications and a record of executing comparable technical, business, research, or public-interest work.
 - Grants, accelerators, competitions, press, funding, or institutional interest—only to the extent actually obtained and documented.
 
 ## 90-day evidence sprint

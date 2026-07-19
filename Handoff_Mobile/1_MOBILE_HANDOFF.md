@@ -4,7 +4,7 @@
 (the shipped web app), not the original design mockups — the product has
 evolved substantially past them. Live reference: https://seymurhh.github.io/forkcast-live/
 
-Contact: Seymur Hasanov · shasanov@seas.harvard.edu
+Contact: Seymur Hasanov (co-founder) · shasanov@seas.harvard.edu
 
 ---
 

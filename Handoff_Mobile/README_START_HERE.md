@@ -1,6 +1,6 @@
 # Forkcast — Mobile Development Handoff Package
 
-Prepared July 19, 2026 · Seymur Hasanov · shasanov@seas.harvard.edu
+Prepared July 19, 2026 · Co-founders: Seymur Hasanov & Rahman · Contact: shasanov@seas.harvard.edu
 Live product reference: https://seymurhh.github.io/forkcast-live/
 
 This folder is the complete handoff for building the Forkcast mobile app
@@ -13,10 +13,10 @@ truth; repo access accompanies this folder.
 | # | File | What it is | For |
 |---|------|-----------|-----|
 | 1 | `1_MOBILE_HANDOFF` | The build spec: shared-code plan (which TypeScript modules port unchanged), 21-screen inventory, design tokens, business-logic spec, backend contract, milestones M0–M3 | Developer |
-| 2 | `2_BACKEND_SETUP` | Supabase backend: what syncs, sync model, project setup steps | Developer + founder |
+| 2 | `2_BACKEND_SETUP` | Supabase backend: what syncs, sync model, project setup steps | Developer + founders |
 | 3 | `3_supabase_migration_0001_init.sql` | The database schema with row-level security — apply as-is, do not redesign | Developer |
 | 4 | `4_APP_INFO_SPEC` | The Settings screen spec: required rows (incl. Delete Account, Restore Purchases), hosted policy URLs, product non-negotiables | Developer |
-| 5 | `5_STORE_READINESS` | Everything the stores require beyond the build: privacy/data-safety forms, health-app declarations, IAP, testing gates, founder to-dos | Both |
+| 5 | `5_STORE_READINESS` | Everything the stores require beyond the build: privacy/data-safety forms, health-app declarations, IAP, testing gates, founders' to-dos | Both |
 
 Each document is included as PDF (for reading) and Markdown (for copying).
 
