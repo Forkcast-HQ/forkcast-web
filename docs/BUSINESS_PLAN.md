@@ -138,7 +138,7 @@ Full assumptions, five-year build, unit economics, and scenarios: `FINANCIAL_MOD
 
 ## 12. Team
 
-Founding team — two co-founders: **Seymur Hasanov** (Harvard SEAS engineering; product and engineering; builder of the product to date) and **Rahman [surname]** (co-founder; strategy, market validation, and regulatory-economic analysis). Pre-seed hires: registered dietitian/nutrition-science advisor (credibility + B2B2C), ML engineer (estimation engine), local GTM lead (restaurant density). Advisory targets: a fast-casual operator and a digital-health payer-contracting advisor.
+Founding team — two co-founders: one leading product and engineering (builder of the product to date), one leading strategy, market validation, and regulatory-economic analysis. Founder credentials are shared with investors directly. Pre-seed hires: registered dietitian/nutrition-science advisor (credibility + B2B2C), ML engineer (estimation engine), local GTM lead (restaurant density). Advisory targets: a fast-casual operator and a digital-health payer-contracting advisor.
 
 ---
 

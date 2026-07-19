@@ -115,7 +115,7 @@ export default function PrivacyPage() {
         <p>
           We may update this policy; material changes will be flagged in the app and the
           date above updated. Questions or requests:{" "}
-          <a className="font-semibold text-brand-700 underline" href="mailto:shasanov@seas.harvard.edu">shasanov@seas.harvard.edu</a>.
+          <a className="font-semibold text-brand-700 underline" href="mailto:support@prosperiumars.com">support@prosperiumars.com</a>.
         </p>
       </LSection>
     </LegalPage>

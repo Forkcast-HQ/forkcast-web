@@ -1,6 +1,6 @@
 # Forkcast — Mobile Development Handoff Package
 
-Prepared July 19, 2026 · Co-founders: Seymur Hasanov & Rahman · Contact: shasanov@seas.harvard.edu
+Prepared July 19, 2026 · Contact: support@prosperiumars.com
 Live product reference: https://seymurhh.github.io/forkcast-live/
 
 This folder is the complete handoff for building the Forkcast mobile app
@@ -41,6 +41,6 @@ Each document is included as PDF (for reading) and Markdown (for copying).
 
 ## Questions
 
-Anything ambiguous: email shasanov@seas.harvard.edu rather than guessing —
+Anything ambiguous: email support@prosperiumars.com rather than guessing —
 especially anything touching nutrition numbers, provenance labels, or
 health-data handling.

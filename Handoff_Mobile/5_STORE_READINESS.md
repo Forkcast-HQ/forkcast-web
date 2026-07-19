@@ -3,7 +3,7 @@
 Companion to [`MOBILE_HANDOFF.md`](./MOBILE_HANDOFF.md). That doc covers
 building the app; this one covers everything the stores require beyond the
 build. Items marked **(app change)** need code; items marked **(founders)**
-are the founders' (Seymur & Rahman) to produce; the rest is the developer's release work.
+are the founders' to produce; the rest is the developer's release work.
 
 Forkcast collects health data (weight, height, conditions, allergies, meal
 logs), which puts it in the stricter review lane on both stores. Plan for

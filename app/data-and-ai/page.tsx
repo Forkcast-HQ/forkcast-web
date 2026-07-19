@@ -95,7 +95,7 @@ export default function DataAndAiPage() {
         <p>
           Found a wrong number? Restaurants can correct their menus through the partner
           tools; diners can flag values in the app or email{" "}
-          <a className="font-semibold text-brand-700 underline" href="mailto:shasanov@seas.harvard.edu">shasanov@seas.harvard.edu</a>.
+          <a className="font-semibold text-brand-700 underline" href="mailto:support@prosperiumars.com">support@prosperiumars.com</a>.
           Corrections are versioned with what changed and when — never applied silently.
         </p>
       </LSection>

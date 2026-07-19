@@ -101,7 +101,7 @@ export default function TermsPage() {
       <LSection title="Contact">
         <p>
           Questions:{" "}
-          <a className="font-semibold text-brand-700 underline" href="mailto:shasanov@seas.harvard.edu">shasanov@seas.harvard.edu</a>
+          <a className="font-semibold text-brand-700 underline" href="mailto:support@prosperiumars.com">support@prosperiumars.com</a>
         </p>
       </LSection>
     </LegalPage>
