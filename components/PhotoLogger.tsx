@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera, Check, Crown, Loader2, Sparkles, X, AlertTriangle } from "lucide-react";
-import { analyzeMealPhoto, mockEstimate, type MealEstimate } from "@/lib/ai";
+import { Camera, Check, Crown, Loader2, Sparkles, X, AlertTriangle, Minus, Plus, PencilLine, Wand2 } from "lucide-react";
+import { analyzeMeal, mockEstimate, type MealEstimate } from "@/lib/ai";
 import { useUser } from "@/lib/store";
 import { usePremium, PRICE_LINE, TRIAL_DAYS } from "@/lib/premium";
 import { cls } from "@/lib/format";
@@ -46,6 +46,12 @@ export function PhotoLogger() {
   const [err, setErr] = useState<string | null>(null);
   // Correctable copy of the estimate — the AI is a starting point, never the record.
   const [edit, setEdit] = useState<{ name: string; calories: string; protein: string; carbs: string; fat: string } | null>(null);
+  // Cal AI-class accuracy levers: describe the meal (biggest lever), fix
+  // results with a follow-up note, and a portion multiplier.
+  const [desc, setDesc] = useState("");
+  const [fixNote, setFixNote] = useState("");
+  const [fixing, setFixing] = useState(false);
+  const [portion, setPortion] = useState(1);
 
   const handleFile = async (file: File) => {
     setStatus("analyzing");
@@ -63,11 +69,12 @@ export function PhotoLogger() {
     }
     setPreview(dataUrl);
     let est: MealEstimate;
+    const note = desc.trim() || undefined;
     try {
-      est = await analyzeMealPhoto(dataUrl);
+      est = await analyzeMeal({ image: dataUrl, note });
     } catch (e) {
       setErr(e instanceof Error ? e.message : "AI analysis failed");
-      est = await mockEstimate(dataUrl);
+      est = await mockEstimate(dataUrl, note);
     }
     setEstimate(est);
     setEdit({
@@ -80,12 +87,63 @@ export function PhotoLogger() {
     setStatus("review");
   };
 
+  const applyEstimate = (est: MealEstimate) => {
+    setEstimate(est);
+    setEdit({
+      name: est.name,
+      calories: String(est.calories),
+      protein: String(est.protein),
+      carbs: String(est.carbs),
+      fat: String(est.fat),
+    });
+    setStatus("review");
+  };
+
+  // Describe-only estimation (no photo) — same engine, user's words as input.
+  const handleDescribe = async () => {
+    const note = desc.trim();
+    if (note.length < 3) return;
+    setStatus("analyzing");
+    setPreview(null);
+    setEstimate(null);
+    setErr(null);
+    let est: MealEstimate;
+    try {
+      est = await analyzeMeal({ note });
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "AI analysis failed");
+      est = await mockEstimate(note, note);
+    }
+    applyEstimate(est);
+  };
+
+  // "Fix results": tell the AI what it got wrong; it re-estimates with the
+  // previous answer + your correction as context.
+  const handleFix = async () => {
+    const note = fixNote.trim();
+    if (note.length < 3 || !estimate) return;
+    setFixing(true);
+    setErr(null);
+    try {
+      const est = await analyzeMeal({ image: preview ?? undefined, note, prior: estimate });
+      applyEstimate(est);
+      setFixNote("");
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "AI fix failed — edit the values directly instead");
+    }
+    setFixing(false);
+  };
+
   const reset = () => {
     setStatus("idle");
     setPreview(null);
     setEstimate(null);
     setEdit(null);
     setErr(null);
+    setDesc("");
+    setFixNote("");
+    setFixing(false);
+    setPortion(1);
     if (inputRef.current) inputRef.current.value = "";
   };
 
@@ -107,15 +165,16 @@ export function PhotoLogger() {
       num(edit.fat, estimate.fat) !== estimate.fat;
     logMeal({
       name: edit.name.trim() || estimate.name,
-      calories,
-      protein: num(edit.protein, estimate.protein),
-      carbs: num(edit.carbs, estimate.carbs),
-      fat: num(edit.fat, estimate.fat),
-      fiber: Math.round(estimate.fiber * ratio),
-      sodium: Math.round(estimate.sodium * ratio),
-      sugar: Math.round(estimate.sugar * ratio),
+      calories: Math.round(calories * portion),
+      protein: Math.round(num(edit.protein, estimate.protein) * portion),
+      carbs: Math.round(num(edit.carbs, estimate.carbs) * portion),
+      fat: Math.round(num(edit.fat, estimate.fat) * portion),
+      fiber: Math.round(estimate.fiber * ratio * portion),
+      sodium: Math.round(estimate.sodium * ratio * portion),
+      sugar: Math.round(estimate.sugar * ratio * portion),
       source: "photo",
       photo: preview ?? undefined,
+      portion: portion !== 1 ? portion : undefined,
       confidence: "estimated",
       userConfidence: changed ? "modified" : undefined,
       note: changed ? "AI estimate corrected by you" : undefined,
@@ -167,28 +226,53 @@ export function PhotoLogger() {
         )}
 
         {status === "idle" && hasAccess && (
-          <button
-            onClick={() => inputRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-black/15 px-6 py-10 text-center transition hover:border-brand-400 hover:bg-brand-50/40"
-          >
-            <span className="grid h-14 w-14 place-items-center rounded-full bg-brand-50 text-brand-600">
-              <Camera className="h-7 w-7" />
-            </span>
-            <span className="font-semibold text-ink">Upload or take a photo</span>
-            <span className="text-sm text-ink/50">
-              We&apos;ll estimate calories &amp; macros, then add it to today.
-            </span>
-            {justLogged && (
-              <span className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
-                <Check className="h-4 w-4" /> Logged to today
+          <div>
+            <button
+              onClick={() => inputRef.current?.click()}
+              className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-black/15 px-6 py-8 text-center transition hover:border-brand-400 hover:bg-brand-50/40"
+            >
+              <span className="grid h-14 w-14 place-items-center rounded-full bg-brand-50 text-brand-600">
+                <Camera className="h-7 w-7" />
               </span>
-            )}
-          </button>
+              <span className="font-semibold text-ink">Upload or take a photo</span>
+              <span className="text-sm text-ink/50">
+                We&apos;ll estimate calories &amp; macros, then add it to today.
+              </span>
+              {justLogged && (
+                <span className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
+                  <Check className="h-4 w-4" /> Logged to today
+                </span>
+              )}
+            </button>
+
+            {/* Description = the biggest accuracy lever. Works with a photo or alone. */}
+            <div className="mt-3">
+              <div className="flex items-center gap-2">
+                <PencilLine className="h-4 w-4 shrink-0 text-ink/40" />
+                <input
+                  value={desc}
+                  onChange={(e) => setDesc(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleDescribe(); }}
+                  placeholder={'What\u2019s in it? e.g. "chicken burrito, no cheese, large" — boosts accuracy'}
+                  className="w-full rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-sm outline-none placeholder:text-ink/35 focus:border-brand-500"
+                  aria-label="Describe the meal and quantity"
+                />
+              </div>
+              {desc.trim().length >= 3 && (
+                <button
+                  onClick={handleDescribe}
+                  className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-brand-300 bg-brand-50 px-4 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-100"
+                >
+                  <Wand2 className="h-4 w-4" /> Estimate from description — no photo needed
+                </button>
+              )}
+            </div>
+          </div>
         )}
 
         {status !== "idle" && (
           <div className="flex flex-col gap-4 sm:flex-row">
-            <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-xl bg-black/5 sm:w-40">
+            <div className={cls("relative h-40 w-full shrink-0 overflow-hidden rounded-xl bg-black/5 sm:w-40", !preview && status === "review" && "hidden")}>
               {preview && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={preview} alt="Meal" className="h-full w-full object-cover" />
@@ -247,16 +331,50 @@ export function PhotoLogger() {
                     <EditStat label="Fat" unit="g" value={edit.fat} onChange={(v) => setEdit({ ...edit, fat: v })} />
                   </div>
 
+                  {/* Portion multiplier — values above are per serving */}
+                  <div className="mt-3 flex items-center gap-3">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-ink/45">Portion</span>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => setPortion((p) => Math.max(0.25, Math.round((p - 0.25) * 4) / 4))} className="grid h-7 w-7 place-items-center rounded-full bg-black/5 text-ink/70 hover:bg-black/10" aria-label="Smaller portion">
+                        <Minus className="h-3.5 w-3.5" />
+                      </button>
+                      <span className="w-12 text-center font-display text-sm font-bold tabular-nums text-ink">×{portion}</span>
+                      <button onClick={() => setPortion((p) => Math.min(4, Math.round((p + 0.25) * 4) / 4))} className="grid h-7 w-7 place-items-center rounded-full bg-black/5 text-ink/70 hover:bg-black/10" aria-label="Larger portion">
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <span className="text-xs text-ink/45">of the serving shown</span>
+                  </div>
+
                   <p className="mt-3 text-xs text-ink/50">
-                    Detected: {estimate.items.join(", ")} — wrong? Fix the name and values above; corrections are recorded with the entry.
+                    Detected: {estimate.items.join(", ")} — wrong? Edit any value, or tell the AI below.
                   </p>
+
+                  {/* Fix results: correction note re-runs the estimate with context */}
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      value={fixNote}
+                      onChange={(e) => setFixNote(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") handleFix(); }}
+                      placeholder={'Fix it: e.g. "it\u2019s brown rice, add sour cream, half eaten"'}
+                      className="min-w-0 flex-1 rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm outline-none placeholder:text-ink/35 focus:border-brand-500"
+                      aria-label="Tell the AI what it got wrong"
+                    />
+                    <button
+                      onClick={handleFix}
+                      disabled={fixing || fixNote.trim().length < 3}
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand-300 bg-brand-50 px-3.5 py-2 text-sm font-semibold text-brand-700 transition hover:bg-brand-100 disabled:opacity-40"
+                    >
+                      {fixing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />} Fix
+                    </button>
+                  </div>
 
                   <div className="mt-4 flex gap-2">
                     <button
                       onClick={confirm}
                       className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
                     >
-                      <Check className="h-4 w-4" /> Log to today
+                      <Check className="h-4 w-4" /> Log {Math.round(num(edit.calories, estimate.calories) * portion)} cal to today
                     </button>
                     <button
                       onClick={() => inputRef.current?.click()}

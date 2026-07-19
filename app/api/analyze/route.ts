@@ -15,10 +15,25 @@ export const dynamic = "force-dynamic";
 
 const GROQ_BASE = "https://api.groq.com/openai/v1";
 
-const PROMPT = `You are a nutrition estimator. Look at this meal photo and estimate its nutrition for the portion actually shown.
-Return ONLY a JSON object (no prose, no code fences) with exactly these keys:
+const SCHEMA = `Return ONLY a JSON object (no prose, no code fences) with exactly these keys:
 {"name": string, "confidence": number 0-1, "calories": integer kcal, "protein": integer grams, "carbs": integer grams, "fat": integer grams, "fiber": integer grams, "sodium": integer mg, "sugar": integer grams, "items": string[] of the main components}
 Be realistic about portion size. If unsure, give your best estimate and lower the confidence.`;
+
+// The user's own description is the single biggest accuracy lever (it names
+// hidden ingredients and quantities a photo can't show), so it always
+// outranks visual guesses. `prior` supports "fix results" re-runs.
+function buildPrompt(note?: string, prior?: string, hasImage = true): string {
+  let p = hasImage
+    ? "You are a nutrition estimator. Look at this meal photo and estimate its nutrition for the portion actually shown."
+    : "You are a nutrition estimator. Estimate the nutrition of the meal the user describes, for the described portion.";
+  if (note) {
+    p += `\nThe user describes the meal as: "${note}". Trust the user's stated contents, preparation, and quantities over visual guesses — raise your confidence when the description is specific.`;
+  }
+  if (prior) {
+    p += `\nYour previous estimate was ${prior}. The user says it needs correcting per their description above; produce a corrected estimate rather than repeating it.`;
+  }
+  return p + "\n" + SCHEMA;
+}
 
 // Remember the model that worked (persists for the life of the dev server).
 let cachedModel: string | null = null;
@@ -64,7 +79,7 @@ function pickVisionModel(ids: string[]): string | undefined {
 
 // ---- DataRobot LLM Gateway (OpenAI-compatible, multimodal) ---------
 
-async function callDataRobotVision(token: string, image: string) {
+async function callDataRobotVision(token: string, image: string | undefined, prompt: string) {
   const base = (process.env.DATAROBOT_ENDPOINT ?? "https://app.datarobot.com/api/v2").replace(/\/$/, "");
   const res = await fetch(`${base}/genai/llmgw/chat/completions/`, {
     method: "POST",
@@ -76,10 +91,12 @@ async function callDataRobotVision(token: string, image: string) {
       messages: [
         {
           role: "user",
-          content: [
-            { type: "text", text: PROMPT },
-            { type: "image_url", image_url: { url: image } },
-          ],
+          content: image
+            ? [
+                { type: "text", text: prompt },
+                { type: "image_url", image_url: { url: image } },
+              ]
+            : prompt,
         },
       ],
     }),
@@ -97,9 +114,9 @@ function splitDataUrl(image: string): { mime: string; data: string } | null {
   return m ? { mime: m[1], data: m[2] } : null;
 }
 
-async function callGemini(key: string, model: string, image: string) {
-  const img = splitDataUrl(image);
-  if (!img) return { ok: false, status: 400, raw: "Unsupported image data URL" };
+async function callGemini(key: string, model: string, image: string | undefined, prompt: string) {
+  const img = image ? splitDataUrl(image) : null;
+  if (image && !img) return { ok: false, status: 400, raw: "Unsupported image data URL" };
   const res = await fetch(`${GEMINI_BASE}/models/${model}:generateContent`, {
     method: "POST",
     headers: { "x-goog-api-key": key, "Content-Type": "application/json" },
@@ -107,10 +124,9 @@ async function callGemini(key: string, model: string, image: string) {
       generationConfig: { temperature: 0.2, maxOutputTokens: 700 },
       contents: [
         {
-          parts: [
-            { text: PROMPT },
-            { inline_data: { mime_type: img.mime, data: img.data } },
-          ],
+          parts: img
+            ? [{ text: prompt }, { inline_data: { mime_type: img.mime, data: img.data } }]
+            : [{ text: prompt }],
         },
       ],
     }),
@@ -128,12 +144,12 @@ function geminiText(raw: string): string {
   }
 }
 
-async function analyzeWithGemini(key: string, image: string) {
+async function analyzeWithGemini(key: string, image: string | undefined, prompt: string) {
   const preferred = process.env.GEMINI_MODEL;
   const models = preferred ? [preferred, ...GEMINI_FALLBACKS.filter((m) => m !== preferred)] : GEMINI_FALLBACKS;
   let last = { ok: false, status: 0, raw: "" };
   for (const model of models) {
-    const r = await callGemini(key, model, image);
+    const r = await callGemini(key, model, image, prompt);
     if (r.ok) return { r, model };
     last = r;
     // Only fall through on model-availability errors; real errors surface immediately.
@@ -144,7 +160,7 @@ async function analyzeWithGemini(key: string, image: string) {
 
 // ---- Groq ---------------------------------------------------------
 
-async function callVision(key: string, model: string, image: string) {
+async function callVision(key: string, model: string, image: string | undefined, prompt: string) {
   const res = await fetch(`${GROQ_BASE}/chat/completions`, {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -155,10 +171,12 @@ async function callVision(key: string, model: string, image: string) {
       messages: [
         {
           role: "user",
-          content: [
-            { type: "text", text: PROMPT },
-            { type: "image_url", image_url: { url: image } },
-          ],
+          content: image
+            ? [
+                { type: "text", text: prompt },
+                { type: "image_url", image_url: { url: image } },
+              ]
+            : prompt,
         },
       ],
     }),
@@ -221,21 +239,30 @@ export async function POST(req: Request) {
   }
 
   let image: string | undefined;
+  let note: string | undefined;
+  let prior: string | undefined;
   try {
-    ({ image } = await req.json());
+    const body = await req.json();
+    image = body.image;
+    note = typeof body.note === "string" ? body.note.slice(0, 400).trim() || undefined : undefined;
+    prior = typeof body.prior === "string" ? body.prior.slice(0, 600) : undefined;
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
-  if (!image || !image.startsWith("data:image")) {
-    return NextResponse.json({ error: "Missing image data URL." }, { status: 400 });
+  if (image && !image.startsWith("data:image")) {
+    return NextResponse.json({ error: "Unsupported image data URL." }, { status: 400 });
   }
+  if (!image && (!note || note.length < 3)) {
+    return NextResponse.json({ error: "Provide a meal photo or a description." }, { status: 400 });
+  }
+  const prompt = buildPrompt(note, prior, Boolean(image));
 
   const failures: string[] = []; // per-provider reasons, surfaced if everything fails
 
   // ---- DataRobot gateway path (first priority) ----
   if (drToken) {
     try {
-      const r = await callDataRobotVision(drToken, image);
+      const r = await callDataRobotVision(drToken, image, prompt);
       if (r.ok) {
         const content: string = JSON.parse(r.raw)?.choices?.[0]?.message?.content ?? "";
         const parsed = extractJson(content);
@@ -255,7 +282,7 @@ export async function POST(req: Request) {
   // ---- Gemini path ----
   if (geminiKey) {
     try {
-      const { r, model } = await analyzeWithGemini(geminiKey, image);
+      const { r, model } = await analyzeWithGemini(geminiKey, image, prompt);
       if (r.ok) {
         const parsed = extractJson(geminiText(r.raw));
         if (parsed) return shapeResponse(parsed, `gemini:${model}`);
@@ -277,7 +304,7 @@ export async function POST(req: Request) {
 
   try {
     let model = cachedModel || process.env.GROQ_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
-    let r = await callVision(key, model, image);
+    let r = await callVision(key, model, image, prompt);
 
     // If the configured model isn't accessible, discover one that is and retry.
     if (!r.ok && isModelError(r.status, r.raw)) {
@@ -291,7 +318,7 @@ export async function POST(req: Request) {
         );
       }
       model = picked;
-      r = await callVision(key, model, image);
+      r = await callVision(key, model, image, prompt);
     }
 
     if (!r.ok) {

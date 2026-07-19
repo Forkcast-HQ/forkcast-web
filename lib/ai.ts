@@ -45,15 +45,34 @@ function hashStr(s: string): number {
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// Deterministic realistic estimate (no key needed). `seed` = the image data URL.
-export async function mockEstimate(seed: string): Promise<MealEstimate> {
+// Keyword routing so the demo mock respects a user's description.
+const KEYWORDS: [RegExp, number][] = [
+  [/burrito|mexican|taco/i, 2],
+  [/poke|salmon|sushi|fish/i, 1],
+  [/salad|greens|feta|greek/i, 3],
+  [/toast|avocado|egg|breakfast/i, 4],
+  [/burger|fries|cheeseburger/i, 5],
+  [/pad thai|noodle|shrimp|asian/i, 6],
+  [/pizza|slice|margherita/i, 7],
+  [/chicken|quinoa|bowl|grill/i, 0],
+];
+
+// Deterministic realistic estimate (no key needed). `seed` = image data URL or
+// description; `note` (the user's own words) steers dish choice and the name.
+export async function mockEstimate(seed: string, note?: string): Promise<MealEstimate> {
   const h = hashStr(seed);
   await delay(1100 + (h % 700)); // feels like inference
-  const base = LIBRARY[h % LIBRARY.length];
+  let base = LIBRARY[h % LIBRARY.length];
+  if (note) {
+    const hit = KEYWORDS.find(([re]) => re.test(note));
+    if (hit) base = LIBRARY[hit[1]];
+  }
   const j = (h % 11) - 5;
   const scale = 1 + j / 100;
   return {
     ...base,
+    name: note && note.length > 3 ? note.slice(0, 60) : base.name,
+    confidence: note ? Math.min(0.95, base.confidence + 0.06) : base.confidence,
     calories: Math.round((base.calories * scale) / 5) * 5,
     protein: Math.round(base.protein * scale),
     carbs: Math.round(base.carbs * scale),
@@ -62,15 +81,27 @@ export async function mockEstimate(seed: string): Promise<MealEstimate> {
   };
 }
 
-// Real analysis via the server route. `image` is a (downscaled) JPEG data URL.
-// Throws with a readable message on failure so the UI can surface it.
-export async function analyzeMealPhoto(image: string): Promise<MealEstimate> {
-  if (!USE_REAL_AI) return mockEstimate(image);
+export interface AnalyzeOpts {
+  image?: string; // (downscaled) JPEG data URL
+  note?: string; // user's description of contents/quantity — biggest accuracy lever
+  prior?: MealEstimate | null; // previous estimate, for "fix results" re-runs
+}
+
+// Real analysis via the server route. Works photo-only, description-only, or
+// both. Throws with a readable message on failure so the UI can surface it.
+export async function analyzeMeal({ image, note, prior }: AnalyzeOpts): Promise<MealEstimate> {
+  if (!USE_REAL_AI) return mockEstimate(image ?? note ?? "", note);
 
   const res = await fetch("/api/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ image }),
+    body: JSON.stringify({
+      image,
+      note,
+      prior: prior
+        ? JSON.stringify({ name: prior.name, calories: prior.calories, protein: prior.protein, carbs: prior.carbs, fat: prior.fat })
+        : undefined,
+    }),
   });
   if (!res.ok) {
     let msg = `Analysis failed (${res.status})`;
@@ -85,6 +116,9 @@ export async function analyzeMealPhoto(image: string): Promise<MealEstimate> {
   const data = (await res.json()) as MealEstimate;
   return { ...data, source: "ai" };
 }
+
+// Back-compat convenience.
+export const analyzeMealPhoto = (image: string) => analyzeMeal({ image });
 
 // AI coaching one-liner for the dashboard. Mock heuristic now; a real Claude
 // prompt later can make it conversational and goal-aware.
