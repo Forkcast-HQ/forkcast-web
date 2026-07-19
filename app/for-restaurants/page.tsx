@@ -36,13 +36,13 @@ export default function ForRestaurants() {
               more loyal customers — chains and independents alike.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="mailto:shasanov@seas.harvard.edu?subject=Forkcast%20restaurant%20partner"
+              <Link
+                href="/signup?role=restaurant"
                 className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white hover:bg-brand-700"
               >
                 Become a partner <ArrowRight className="h-5 w-5" />
-              </a>
-              <Link href="/discover" className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-6 py-3.5 text-base font-semibold text-ink hover:border-black/20">
+              </Link>
+              <Link href="/restaurant/verdant" className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-6 py-3.5 text-base font-semibold text-ink hover:border-black/20">
                 See a partner page
               </Link>
             </div>
@@ -129,12 +129,12 @@ export default function ForRestaurants() {
           recommendation integrity is the product.
         </p>
         <div className="mt-8 text-center">
-          <a
-            href="mailto:shasanov@seas.harvard.edu?subject=Forkcast%20restaurant%20partner"
+          <Link
+            href="/signup?role=restaurant"
             className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-7 py-4 text-base font-semibold text-white hover:bg-brand-700"
           >
             Partner with Forkcast <ArrowRight className="h-5 w-5" />
-          </a>
+          </Link>
         </div>
       </section>
     </div>

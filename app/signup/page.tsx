@@ -25,6 +25,15 @@ export default function SignUp() {
   const router = useRouter();
   const { signUp, user, hydrated } = useAuth();
   const [role, setRole] = useState<AccountRole>("customer");
+
+  // Deep link from /for-restaurants: /signup?role=restaurant preselects the
+  // restaurant account type. window.location (not useSearchParams) keeps the
+  // static export Suspense-free.
+  useEffect(() => {
+    try {
+      if (new URLSearchParams(window.location.search).get("role") === "restaurant") setRole("restaurant");
+    } catch { /* ignore */ }
+  }, []);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
