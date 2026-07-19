@@ -1,6 +1,23 @@
 # Forkcast — AI Photo Generation Brief
 
-Generate the images below (e.g., ChatGPT / GPT-image). **92 images total: 13 restaurant heroes + 79 dishes.** If you want the fastest visible win, do Tier 1 first.
+Generate the images below (e.g., ChatGPT / GPT-image / Codex). **92 images total: 13 restaurant heroes + 79 dishes.** If you want the fastest visible win, do Tier 1 first (46 images).
+
+## For AI agents (Codex etc.) — read this first
+
+- **Local repo:** `/Users/seymurhasanov/Desktop/DS:AI - Projects/Healthy_restaurant`
+  (git remote: `https://github.com/Seymurhh/forkcast.git`)
+- **Machine-readable job list:** [`docs/photo-manifest.json`](./photo-manifest.json) — one entry per image with the exact output `file` path (relative to repo root), `width`/`height`, `tier`, and the **complete, final prompt** (no assembly needed).
+- **Workflow per image:** take `prompt` from the manifest → generate → save as JPEG at `width`×`height` (quality ~80, target < 250 KB) → write to the manifest's `file` path inside the repo.
+- **Resumability — if you hit a usage/session limit:** completion state IS the filesystem. On any fresh session, run
+
+  ```bash
+  node scripts/photos-remaining.mjs          # human list: N done / N remaining
+  node scripts/photos-remaining.mjs --json   # remaining entries with prompts
+  node scripts/photos-remaining.mjs --next   # single next item to generate
+  ```
+
+  and continue from the first remaining item (tier 1 sorts first). Never regenerate a file that already exists.
+- **Do not** modify any code, rename files, or invent filenames not in the manifest. When a batch is done: `git add public/img/food && git commit -m "photos: batch N"`.
 
 **Tiers.** Tier 1 (36 images — everything a demo visitor actually sees): all 13 heroes + the dishes marked ★ (first 2 per demo restaurant, all Sweetgreen & Halal Guys dishes since those listings are the flagship real-data ones). Tier 2: the rest.
 
