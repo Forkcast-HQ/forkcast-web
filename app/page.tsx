@@ -10,21 +10,15 @@ import {
   Utensils,
 } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
-import { RestaurantCard } from "@/components/RestaurantCard";
 import { HeroDemo } from "@/components/HeroDemo";
 import { HeroSearch } from "@/components/HeroSearch";
 import { DishMarquee } from "@/components/DishMarquee";
-import { Rail } from "@/components/Rail";
-import { restaurantImg, foodImg } from "@/lib/images";
-import { RESTAURANTS, CUISINES } from "@/data/restaurants";
+import { ShowcaseCarousel } from "@/components/ShowcaseCarousel";
+import { restaurantImg, categoryImg, editorialImg } from "@/lib/images";
+import { RESTAURANTS } from "@/data/restaurants";
 
 export default function Home() {
   const featured = RESTAURANTS;
-  // Real plate photography for each cuisine tile (representative restaurant).
-  const cuisineTiles = CUISINES.map((c) => {
-    const r = RESTAURANTS.find((x) => x.cuisine === c)!;
-    return { cuisine: c, img: restaurantImg(r.category) };
-  });
 
   return (
     <>
@@ -87,35 +81,6 @@ export default function Home() {
       {/* ---------------- DISH TICKER ---------------- */}
       <DishMarquee />
 
-      {/* ---------------- CUISINE RAIL — real photography ---------------- */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8" aria-label="Browse by cuisine">
-        <div className="mb-5 flex items-end justify-between">
-          <h2 className="font-display text-xl font-extrabold text-ink">Browse by craving</h2>
-          <Link href="/discover" className="text-sm font-semibold text-brand-700 hover:text-brand-900">All restaurants →</Link>
-        </div>
-        <div className="-mx-4 flex snap-x gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {cuisineTiles.map(({ cuisine, img }) => (
-            <Link
-              key={cuisine}
-              href={`/discover?cuisine=${encodeURIComponent(cuisine)}`}
-              className="group flex shrink-0 snap-start flex-col items-center gap-2.5"
-            >
-              <span className="block h-24 w-24 overflow-hidden rounded-full ring-2 ring-transparent ring-offset-2 ring-offset-cream transition duration-300 group-hover:ring-brand-600 sm:h-28 sm:w-28">
-                <SmartImage
-                  src={img}
-                  alt={cuisine}
-                  label={cuisine}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-                />
-              </span>
-              <span className="max-w-[8.5rem] text-center text-xs font-bold leading-snug text-ink/70 transition group-hover:text-ink">
-                {cuisine}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {/* ---------------- STAT BAND ---------------- */}
       <section className="border-y border-black/5 bg-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px overflow-hidden px-4 py-2 sm:px-6 lg:grid-cols-4 lg:px-8">
@@ -146,11 +111,31 @@ export default function Home() {
           </div>
           <div className="relative">
             <div className="overflow-hidden rounded-3xl border border-black/5 card-shadow-lg">
+              <div className="relative">
+                <SmartImage
+                  src={editorialImg("dining-together", 1000, 750)}
+                  alt="Friends sharing a meal at a restaurant"
+                  label="Eating out"
+                  className="aspect-[4/3] w-full object-cover"
+                />
+                {/* On-image caption with scrim */}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent px-6 pb-5 pt-20">
+                  <p className="font-display text-xl font-extrabold leading-snug text-white">
+                    A third of America&apos;s calories are now eaten out.
+                  </p>
+                  <p className="mt-1 text-sm font-medium text-white/70">
+                    USDA ERS · food-away-from-home, 2023
+                  </p>
+                </div>
+              </div>
+            </div>
+            {/* Floating secondary photo */}
+            <div className="absolute -right-6 -top-10 hidden w-44 rotate-3 overflow-hidden rounded-2xl border-4 border-white card-shadow-lg transition duration-300 hover:rotate-1 sm:block">
               <SmartImage
-                src={foodImg("restaurant,table,food,friends", 902, 1000, 800)}
-                alt="Eating out"
-                label="Eating out"
-                className="aspect-[4/3] w-full object-cover"
+                src={editorialImg("healthy-table", 440, 550)}
+                alt="Fresh, healthy bowls on a table"
+                label="What fits"
+                className="aspect-[4/5] w-full object-cover"
               />
             </div>
             <div className="absolute -bottom-5 -left-5 max-w-[220px] rounded-2xl border border-black/5 bg-white p-4 card-shadow">
@@ -176,10 +161,10 @@ export default function Home() {
             </p>
           </div>
           <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <Step n="01" icon={<HeartPulse className="h-6 w-6" />} title="Build your profile" body="Height, weight, age, activity, and goal — we compute your targets with clinical formulas (Mifflin-St Jeor), plus allergies and conditions to watch." />
-            <Step n="02" icon={<Sparkles className="h-6 w-6" />} title="See what fits" body="Every nearby dish gets a personal Fit Score from calories, protein, fiber, sodium, and sugar — ranked against what's left of your day." />
-            <Step n="03" icon={<Utensils className="h-6 w-6" />} title="Order or dine in" body="Build a basket and send it to the restaurant, or just walk in — either way, your plan updates the moment you commit." />
-            <Step n="04" icon={<Camera className="h-6 w-6" />} title="Confirm the meal" body="Confirmed orders pre-fill your log; photos cover everything else. Every entry keeps its source, portion, and confidence." />
+            <Step n="01" img={categoryImg("breakfast", 1, 640, 420)} icon={<HeartPulse className="h-6 w-6" />} title="Build your profile" body="Height, weight, age, activity, and goal — we compute your targets with clinical formulas (Mifflin-St Jeor), plus allergies and conditions to watch." />
+            <Step n="02" img={categoryImg("salad", 2, 640, 420)} icon={<Sparkles className="h-6 w-6" />} title="See what fits" body="Every nearby dish gets a personal Fit Score from calories, protein, fiber, sodium, and sugar — ranked against what's left of your day." />
+            <Step n="03" img={categoryImg("mediterranean", 3, 640, 420)} icon={<Utensils className="h-6 w-6" />} title="Order or dine in" body="Build a basket and send it to the restaurant, or just walk in — either way, your plan updates the moment you commit." />
+            <Step n="04" img={categoryImg("poke", 4, 640, 420)} icon={<Camera className="h-6 w-6" />} title="Confirm the meal" body="Confirmed orders pre-fill your log; photos cover everything else. Every entry keeps its source, portion, and confidence." />
           </div>
           <div className="mt-12">
             <Link
@@ -256,15 +241,9 @@ export default function Home() {
             View all <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        {/* Full-catalog carousel with paging arrows */}
+        {/* Full-catalog showcase carousel */}
         <div className="mt-8">
-          <Rail>
-            {featured.map((r) => (
-              <div key={r.slug} className="w-[86%] min-w-[300px] max-w-md shrink-0 snap-start py-2 sm:w-[46%] lg:w-[32%]">
-                <RestaurantCard restaurant={r} />
-              </div>
-            ))}
-          </Rail>
+          <ShowcaseCarousel restaurants={featured} />
         </div>
       </section>
 
@@ -305,19 +284,28 @@ export default function Home() {
 
       {/* ---------------- FINAL CTA ---------------- */}
       <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-brand-200 bg-brand-50 p-10 text-center sm:p-16">
-          <h2 className="mx-auto max-w-2xl font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl text-balance">
-            Build your plan in 60 seconds.
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-ink/65">
-            See your numbers, then watch nearby menus reorder around your goals.
-          </p>
-          <Link
-            href="/signup"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand-600 px-7 py-4 text-base font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700"
-          >
-            Get started — it&apos;s free <ArrowRight className="h-5 w-5" />
-          </Link>
+        <div className="relative overflow-hidden rounded-3xl">
+          <SmartImage
+            src={editorialImg("restaurant-spread", 1600, 640)}
+            alt=""
+            label="Forkcast"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/70 to-ink/50" />
+          <div className="relative p-10 text-center sm:p-16">
+            <h2 className="mx-auto max-w-2xl font-display text-3xl font-bold tracking-tight text-white sm:text-4xl text-balance">
+              Build your plan in 60 seconds.
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-white/75">
+              See your numbers, then watch nearby menus reorder around your goals.
+            </p>
+            <Link
+              href="/signup"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand-600 px-7 py-4 text-base font-semibold text-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-500"
+            >
+              Get started — it&apos;s free <ArrowRight className="h-5 w-5" />
+            </Link>
+          </div>
         </div>
       </section>
     </>
@@ -354,15 +342,24 @@ function ProblemPoint({ icon, title, body }: { icon: React.ReactNode; title: str
   );
 }
 
-function Step({ n, icon, title, body }: { n: string; icon: React.ReactNode; title: string; body: string }) {
+function Step({ n, icon, title, body, img }: { n: string; icon: React.ReactNode; title: string; body: string; img: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-      <div className="flex items-center justify-between">
-        <div className="grid h-12 w-12 place-items-center rounded-xl bg-brand-500/20 text-brand-300">{icon}</div>
-        <span className="font-display text-2xl font-extrabold text-white/15">{n}</span>
+    <div className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+      <div className="relative h-36 overflow-hidden">
+        <SmartImage
+          src={img}
+          alt=""
+          label={title}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/30 to-transparent" />
+        <span className="absolute bottom-1 left-4 font-display text-4xl font-extrabold text-white/40">{n}</span>
+        <div className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-xl bg-brand-950/60 text-brand-300 backdrop-blur-sm">{icon}</div>
       </div>
-      <p className="mt-4 font-display text-lg font-bold">{title}</p>
-      <p className="mt-2 text-sm text-white/60">{body}</p>
+      <div className="p-6 pt-4">
+        <p className="font-display text-lg font-bold">{title}</p>
+        <p className="mt-2 text-sm text-white/60">{body}</p>
+      </div>
     </div>
   );
 }

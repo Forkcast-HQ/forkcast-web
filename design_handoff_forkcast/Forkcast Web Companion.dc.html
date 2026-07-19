@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-0e34c851-fce6-49f4-a021-94c4df541184/styles.css">
+  <script src="_ds/modernist-0e34c851-fce6-49f4-a021-94c4df541184/_ds_bundle.js"></script>
+  <script src="image-slot.js"></script>
+  <style>
+    body{margin:0;background:var(--color-neutral-200);}
+    a{color:var(--color-accent-700);} a:hover{color:var(--color-accent);}
+    .btn{border-radius:12px;} .tag{border-radius:999px;} .input{border-radius:12px;}
+    @keyframes fc-pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  </style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:40px;background:var(--color-neutral-200);">
+<x-import component-from-global-scope="ChromeWindow" from="./browser-window.jsx" width="{{ 1280 }}" height="{{ 860 }}" url="app.forkcast.com/today" hint-size="1280px,860px">
+<div data-screen-label="Web companion" style="height:100%;overflow-y:auto;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text);box-sizing:border-box;">
+
+  <div style="padding:14px 32px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:24px;">
+    <div style="font:800 20px var(--font-heading);letter-spacing:.03em;">FORKCAST</div>
+    <div style="display:flex;gap:4px;">
+      <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="3">
+        <button onClick="{{ tb.pick }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:12px;min-height:40px;padding:0 16px;display:flex;align-items:center;font:700 13px var(--font-body);color:{{ tb.color }};background:{{ tb.bg }};">{{ tb.label }}</button>
+      </sc-for>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:14px;">
+      <div style="text-align:right;">
+        <div style="font:600 9px var(--font-body);text-transform:uppercase;letter-spacing:.1em;color:var(--color-neutral-600);">Left today</div>
+        <div style="font:800 16px var(--font-heading);">{{ remainingCal }} kcal</div>
+      </div>
+      <span style="width:34px;height:34px;border-radius:50%;border:2px solid var(--color-text);display:flex;align-items:center;justify-content:center;font:800 13px var(--font-body);">A</span>
+    </div>
+  </div>
+
+  <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:0;">
+    <div style="border-right:2px solid var(--color-divider);">
+      <div style="padding:22px 32px;border-bottom:2px solid var(--color-divider);display:flex;gap:32px;align-items:center;">
+        <div style="position:relative;width:150px;height:150px;flex:none;">
+          <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="{{ dayConsumed }} of {{ targetCal }} kcal">
+            <circle cx="75" cy="75" r="64" fill="none" stroke="var(--color-neutral-300)" stroke-width="11"></circle>
+            <circle cx="75" cy="75" r="64" fill="none" stroke="{{ dayRingColor }}" stroke-width="11" stroke-dasharray="{{ dayRingDash }}" transform="rotate(-90 75 75)"></circle>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">
+            <div style="font:800 28px var(--font-heading);">{{ dayConsumed }}</div>
+            <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);">of {{ targetCal }} kcal</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:14px;">
+          <sc-for list="{{ dayMacros }}" as="m" hint-placeholder-count="3">
+            <div>
+              <div style="display:flex;justify-content:space-between;font:600 12px var(--font-body);color:var(--color-neutral-700);"><span>{{ m.label }}</span><span>{{ m.valStr }}</span></div>
+              <div style="height:8px;background:var(--color-neutral-300);margin-top:4px;border-radius:4px;overflow:hidden;"><div style="height:100%;background:var(--color-text);width:{{ m.pct }};"></div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding:18px 32px;border-bottom:2px solid var(--color-divider);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;">
+          <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">This week</div>
+          <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);">kcal vs {{ targetCal }} target</div>
+        </div>
+        <div style="position:relative;height:160px;">
+          <div style="position:absolute;left:0;right:0;bottom:{{ weekTargetPos }};border-top:2px dashed var(--color-neutral-500);z-index:1;"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:flex-end;gap:12px;">
+            <sc-for list="{{ weekBars }}" as="wb" hint-placeholder-count="7">
+              <div style="flex:1;height:{{ wb.h }};background:{{ wb.bg }};border-radius:6px 6px 0 0;" title="{{ wb.valStr }} kcal"></div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <sc-for list="{{ weekBars }}" as="wb" hint-placeholder-count="7">
+            <div style="flex:1;text-align:center;">
+              <div style="font:600 11px var(--font-body);color:{{ wb.labelColor }};">{{ wb.day }}</div>
+              <div style="font:500 10px var(--font-body);color:var(--color-neutral-600);">{{ wb.valStr }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="padding:18px 32px 28px;">
+        <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Meals today</div>
+        <sc-for list="{{ dayMeals }}" as="m" hint-placeholder-count="2">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--color-neutral-300);">
+            <div>
+              <div style="font:700 14px var(--font-body);">{{ m.name }}</div>
+              <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);margin-top:2px;">{{ m.meta }}</div>
+            </div>
+            <div style="font:800 14px var(--font-heading);flex:none;">{{ m.cal }} kcal</div>
+          </div>
+        </sc-for>
+        <div style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:12px;">{{ coachLine }} Meals log here automatically when a kitchen accepts your order — same data as your phone.</div>
+      </div>
+    </div>
+    <div>
+      <div style="padding:18px 24px;border-bottom:2px solid var(--color-divider);">
+        <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Live order</div>
+        <sc-if value="{{ hasLive }}" hint-placeholder-val="{{ false }}">
+          <div style="border:2px solid var(--color-accent);border-radius:16px;padding:12px 14px;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+              <div style="font:800 15px var(--font-heading);">{{ live.no }} &middot; {{ live.restName }}</div>
+              <span class="tag tag-accent" style="animation:{{ live.anim }};">{{ live.statusLabel }}</span>
+            </div>
+            <div style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-700);margin-top:4px;">{{ live.itemsStr }}</div>
+            <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);margin-top:6px;">{{ live.kcal }} kcal &middot; {{ live.fulfillLabel }} &middot; placed {{ live.placed }} &middot; synced from the restaurant&rsquo;s terminal</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noLive }}" hint-placeholder-val="{{ true }}">
+          <div style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-600);">No active order. Place one from your phone or the Discover tab &mdash; it will track here live.</div>
+        </sc-if>
+      </div>
+      <div style="padding:18px 24px;border-bottom:2px solid var(--color-divider);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+          <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">Gym &middot; Planet Fitness, Fenway</div>
+          <span class="{{ gymTagCls }}">{{ gymTagLabel }}</span>
+        </div>
+        <div style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-700);">{{ gymLine }}</div>
+      </div>
+      <div style="padding:18px 24px;border-bottom:2px solid var(--color-divider);">
+        <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Daily targets</div>
+        <sc-for list="{{ energyRows }}" as="er" hint-placeholder-count="4">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--color-neutral-300);">
+            <span style="font:500 13px var(--font-body);color:var(--color-neutral-700);">{{ er.label }}</span>
+            <span style="font:700 13px var(--font-body);">{{ er.val }}</span>
+          </div>
+        </sc-for>
+        <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:10px;">Mifflin-St Jeor &middot; edit metrics on your phone; the companion stays in sync.</div>
+      </div>
+      <div style="padding:18px 24px;">
+        <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Tonight&rsquo;s best fits</div>
+        <sc-for list="{{ shortlist }}" as="s" hint-placeholder-count="3">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--color-neutral-300);">
+            <div>
+              <div style="font:700 13px var(--font-body);">{{ s.name }}</div>
+              <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">{{ s.rest }} &middot; {{ s.cal }} kcal &middot; {{ s.priceStr }}</div>
+            </div>
+            <div style="font:800 14px var(--font-body);color:{{ s.scoreColor }};flex:none;">{{ s.score }}</div>
+          </div>
+        </sc-for>
+        <button class="btn btn-secondary btn-block" style="min-height:44px;margin-top:12px;" onClick="{{ goDiscover }}">Browse all restaurants</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isDiscover }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:18px 32px 8px;display:flex;justify-content:space-between;align-items:baseline;">
+    <div style="font:800 22px var(--font-heading);">Ranked for your remaining day</div>
+    <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);">Boston &middot; {{ remainingCal }} kcal left &middot; sponsored never affects Fit Scores</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:10px 32px 28px;">
+    <sc-for list="{{ restaurants }}" as="r" hint-placeholder-count="5">
+      <div style="border:2px solid var(--color-neutral-300);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;">
+        <div class="grayscale" style="height:130px;"><image-slot id="web-hero-{{ r.slug }}" src="assets/photos/hero-{{ r.slug }}.png" shape="rect" placeholder="Photo — {{ r.name }}"></image-slot></div>
+        <div style="padding:12px 16px 14px;flex:1;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+            <div style="font:800 16px var(--font-heading);">{{ r.name }}</div>
+            <div style="font:700 12px var(--font-body);color:var(--color-neutral-600);">{{ r.dist }} mi</div>
+          </div>
+          <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);margin-top:1px;">{{ r.cuisine }} &middot; {{ r.hood }}</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap;">
+            <span class="{{ r.badgeCls }}">{{ r.badge }}</span>
+            <sc-if value="{{ r.sponsored }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Sponsored</span></sc-if>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--color-neutral-300);flex:1;">
+            <sc-for list="{{ r.top3 }}" as="d" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:3px 0;">
+                <div style="font:600 12px var(--font-body);">{{ d.name }}</div>
+                <div style="font:800 12px var(--font-body);color:{{ d.scoreColor }};flex:none;">{{ d.score }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);margin-top:10px;">Order from your phone — carts sync at pickup.</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="padding:0 32px 24px;font:500 11px var(--font-body);color:var(--color-neutral-600);">Nutrition values are estimates, not laboratory measurements. Allergen flags are inferred and never guaranteed.</div>
+  </sc-if>
+
+  <sc-if value="{{ isOrders }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:18px 32px 28px;">
+    <div style="font:800 22px var(--font-heading);margin-bottom:14px;">Orders</div>
+    <table class="table" style="width:100%;">
+      <thead><tr><th>Order</th><th>Restaurant</th><th>Items</th><th>When</th><th>Status</th><th style="text-align:right;">Total</th><th style="text-align:right;">Logged</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ orderRows }}" as="o" hint-placeholder-count="3">
+          <tr>
+            <td style="font-weight:700;">{{ o.no }}</td><td>{{ o.rest }}</td><td>{{ o.itemsStr }}</td><td>{{ o.when }}</td>
+            <td><span class="{{ o.statusCls }}" style="animation:{{ o.anim }};">{{ o.status }}</span></td>
+            <td style="text-align:right;">{{ o.totalStr }}</td><td style="text-align:right;">{{ o.kcalStr }} kcal</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:12px;">Every order logs to its day automatically when the kitchen accepts. Past orders are demonstration data; the live row syncs from the restaurant terminal.</div>
+  </div>
+  </sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1380,&quot;height&quot;:960}}">
+class Component extends DCLogic {
+  state = { tab:'today', bus:null, gym:null };
+  BUS_KEY = 'forkcast-live-order';
+  // profile mirrors the phone app's defaults (synced account)
+  P = { sex:'male', age:31, heightCm:178, weightKg:82, activity:'moderate', goal:'lose' };
+
+  DATA = [
+    { slug:'verdant', name:'Verdant', cuisine:'Salads & Grain Bowls', hood:'Back Bay', dist:0.6, partner:true, sponsored:false,
+      menu:[['v1','Harvest Power Bowl',14.5,540,38,620,11,9],['v2','Green Goddess Salad',12.75,420,18,540,12,6],['v3','Steak & Farro Bowl',16.5,620,40,720,10,7],['v4','Buffalo Chicken Salad',13.95,510,42,980,6,5],['v5','Citrus Salmon Bowl',16.95,580,34,600,8,12]]},
+    { slug:'char-and-greens', name:'Char & Greens', cuisine:'Grill & Bowls', hood:'Seaport', dist:1.9, partner:true, sponsored:false,
+      menu:[['c1','Grilled Chicken & Greens',14.5,540,52,640,9,7],['c2','Turkey Burger (lettuce-wrap)',13.5,480,40,720,7,5],['c3','Blackened Salmon Bowl',17.0,580,40,600,8,5],['c4','Steak & Sweet Potato Frites',18.0,660,46,760,9,8],['c5','Buffalo Cauliflower Bowl',12.5,460,16,820,12,8]]},
+    { slug:'blue-bowl-poke', name:'Blue Bowl Poke', cuisine:'Hawaiian Poke', hood:'Fenway', dist:0.9, partner:true, sponsored:false,
+      menu:[['p1','Classic Ahi Poke',15.5,520,36,780,8,7],['p2','Double Protein Power',17.5,540,48,760,9,6],['p3','Spicy Salmon Bowl',15.75,640,32,820,7,9],['p4','Tofu Greens Bowl',13.0,430,22,560,10,12]]},
+    { slug:'sol-and-lima', name:'Sol & Lima', cuisine:'Modern Mexican', hood:'South End', dist:1.1, partner:false, sponsored:true,
+      menu:[['s1','Chicken Burrito Bowl',13.5,620,42,880,14,6],['s2','Baja Fish Tacos (3)',13.75,480,30,760,7,6],['s3','Carnitas Tacos (3)',13.0,560,34,940,8,5],['s4','Chicken Tortilla Soup',9.5,360,26,820,8,6]]},
+    { slug:'lavash', name:'Lavash', cuisine:'Armenian & Mediterranean', hood:'Central Sq', dist:1.4, partner:true, sponsored:false,
+      menu:[['l1','Chicken Shawarma Plate',15.0,640,45,880,9,6],['l2','Grilled Salmon Plate',18.0,590,38,640,11,6],['l3','Red Lentil Soup & Fattoush',11.0,380,18,760,16,9],['l4','Falafel Mezze',13.5,560,20,720,15,8]]}
+  ];
+  dishOf(row){ return { id:row[0], name:row[1], price:row[2], cal:row[3], p:row[4], sodium:row[5], fiber:row[6], sugar:row[7] }; }
+
+  componentDidMount(){ this.poll(); this._b = setInterval(()=>this.poll(), 1000); }
+  componentWillUnmount(){ clearInterval(this._b); }
+  poll(){
+    let bus = null, gym = null;
+    try{ bus = JSON.parse(localStorage.getItem(this.BUS_KEY)); }catch(e){}
+    try{ gym = JSON.parse(localStorage.getItem('forkcast-gym')); }catch(e){}
+    if (JSON.stringify(bus) !== JSON.stringify(this.state.bus) || JSON.stringify(gym) !== JSON.stringify(this.state.gym)) this.setState({ bus, gym });
+  }
+  gymBonus(){ const g = this.state.gym; return (g && g.checkedIn && g.adjust) ? (g.bonus || 310) : 0; }
+
+  targets(){
+    const p = this.P, AF = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725, very_active:1.9 };
+    const bmr = 10*p.weightKg + 6.25*p.heightCm - 5*p.age + (p.sex==='male'?5:-161);
+    const tdee = bmr * AF[p.activity];
+    const calories = Math.max(1500, Math.round((tdee-500)/10)*10);
+    const protein = Math.round(2.0*p.weightKg);
+    const fat = Math.round(calories*0.27/9);
+    const carbs = Math.round(Math.max(0, calories - protein*4 - calories*0.27)/4);
+    return { calories: calories + this.gymBonus(), protein, carbs, fat, bmr, tdee };
+  }
+  clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  fit(item, t, remaining){
+    const calT = Math.max(300, Math.min(t.calories*0.35, remaining>0 ? remaining*0.9 : 300));
+    const pd = (item.p*4)/Math.max(1,item.cal);
+    const sigma = item.cal>calT ? calT*0.5 : calT*0.85;
+    const z = (item.cal-calT)/sigma;
+    const w = { cal:.34, protein:.32, fiber:.12, sodium:.12, sugar:.1 };
+    return Math.round(this.clamp01(
+      w.cal*Math.exp(-0.5*z*z) + w.protein*this.clamp01(pd/0.3) + w.fiber*this.clamp01(item.fiber/8)
+      + w.sodium*this.clamp01(1-(item.sodium-600)/1400) + w.sugar*this.clamp01(1-(item.sugar-8)/27))*100);
+  }
+
+  LOGGED = [
+    { name:'Greek yogurt, berries & granola', cal:410, p:24, c:52, f:12, meta:'8:12 AM · Photo-logged · home' },
+    { name:'Turkey & avocado wrap', cal:520, p:32, c:44, f:22, meta:'12:40 PM · Logged · Flour Bakery' }
+  ];
+  PAST = [
+    { no:'F-1084', rest:'Blue Bowl Poke', itemsStr:'Classic Ahi Poke', when:'Sun, Jul 12', totalStr:'$16.59', kcalStr:'520' },
+    { no:'F-1063', rest:'Verdant', itemsStr:'Harvest Power Bowl · Green Goddess Salad', when:'Fri, Jul 10', totalStr:'$35.15', kcalStr:'960' }
+  ];
+
+  fmt(x){ return Math.round(x).toLocaleString('en-US'); }
+  money(x){ return '$' + x.toFixed(2); }
+  pctStr(v, t){ return Math.max(0, Math.min(100, Math.round(v/t*100))) + '%'; }
+
+  renderVals(){
+    const st = this.state, t = this.targets();
+    const bus = st.bus;
+    const busAccepted = bus && bus.status && bus.status !== 'new';
+    const busItems = bus && bus.items ? bus.items : [];
+    const busKcal = busItems.reduce((a,it)=>a+it.cal*it.qty,0);
+    const logged = this.LOGGED.concat(busAccepted ? busItems.map(it=>({ name:it.name, cal:it.cal*it.qty, p:0, c:0, f:0, meta:(bus.placed||'') + ' · Ordered · ' + (bus.restName||'') })) : []);
+    const cons = logged.reduce((a,m)=>({ cal:a.cal+m.cal, p:a.p+(m.p||0), c:a.c+(m.c||0), f:a.f+(m.f||0) }), { cal:0, p:0, c:0, f:0 });
+    const consP = cons.p + (busAccepted ? Math.round(busKcal*0.28/4) : 0);
+    const remaining = Math.max(0, t.calories - cons.cal);
+    const ring = (pct, r) => { const C = 2*Math.PI*r; return (Math.min(100,pct)/100*C).toFixed(1) + ' ' + C.toFixed(1); };
+    const scoreColor = s => s>=65 ? 'var(--color-accent-700)' : 'var(--color-neutral-600)';
+    const statusMeta = { new:'Sent to kitchen', preparing:'Preparing', ready:'Ready', done:'Completed' };
+
+    const restaurants = this.DATA.map(r=>{
+      const dishes = r.menu.map(row=>{ const d=this.dishOf(row); return { d, score:this.fit(d,t,remaining) }; }).sort((a,b)=>b.score-a.score);
+      return { slug:r.slug, name:r.name, cuisine:r.cuisine, hood:r.hood, dist:r.dist, sponsored:r.sponsored,
+        badge: r.partner ? 'Partner-verified' : 'Estimated', badgeCls: r.partner ? 'tag tag-accent' : 'tag tag-outline',
+        topScore: dishes[0].score,
+        top3: dishes.slice(0,3).map(x=>({ name:x.d.name, score:x.score, scoreColor:scoreColor(x.score) })),
+        _all: dishes.map(x=>({ ...x, rest:r.name })) };
+    }).sort((a,b)=>b.topScore-a.topScore);
+
+    const shortlist = restaurants.flatMap(r=>r._all).sort((a,b)=>b.score-a.score).slice(0,4)
+      .map(x=>({ name:x.d.name, rest:x.rest, cal:x.d.cal, priceStr:this.money(x.d.price), score:x.score, scoreColor:scoreColor(x.score) }));
+
+    const seeds = [1980, 2140, 1720, 1890, 2310, 1650];
+    const vals = seeds.concat(cons.cal);
+    const max = Math.max(t.calories*1.15, ...vals);
+    const now = new Date();
+    const weekBars = vals.map((v,i)=>{
+      const d = new Date(now); d.setDate(now.getDate()-(6-i));
+      const today = i===6;
+      return { day: today?'Today':d.toLocaleDateString('en-US',{ weekday:'short' }), valStr:this.fmt(v),
+        h: Math.round(v/max*100)+'%', bg: v>t.calories ? 'var(--color-accent)' : (today?'var(--color-neutral-500)':'var(--color-text)'),
+        labelColor: today?'var(--color-text)':'var(--color-neutral-600)' };
+    });
+
+    const liveRow = bus ? [{ no:bus.no, rest:bus.restName||'', itemsStr:busItems.map(it=>(it.qty>1?it.qty+'× ':'')+it.name).join(' · '),
+      when:'Today', status:statusMeta[bus.status]||'—', statusCls: bus.status==='done'?'tag tag-neutral':'tag tag-accent',
+      anim: (bus.status && bus.status!=='done') ? 'fc-pulse 1.2s infinite' : 'none',
+      totalStr:this.money(busItems.reduce((a,it)=>a+it.price*it.qty,0)*1.07), kcalStr: busAccepted? this.fmt(busKcal) : '—' }] : [];
+
+    return {
+      tabs: [['today','Today'],['discover','Discover'],['orders','Orders']].map(([k,label])=>({
+        label, pick:()=>this.setState({ tab:k }),
+        color: st.tab===k ? 'var(--color-bg)' : 'var(--color-text)',
+        bg: st.tab===k ? 'var(--color-text)' : 'transparent' })),
+      isToday: st.tab==='today', isDiscover: st.tab==='discover', isOrders: st.tab==='orders',
+      goDiscover: ()=>this.setState({ tab:'discover' }),
+      remainingCal: this.fmt(remaining), targetCal: this.fmt(t.calories),
+      dayConsumed: this.fmt(cons.cal),
+      dayRingDash: ring(cons.cal/t.calories*100, 64),
+      dayRingColor: cons.cal>t.calories ? 'var(--color-accent)' : 'var(--color-text)',
+      dayMacros: [
+        { label:'Protein', valStr:this.fmt(consP)+' / '+this.fmt(t.protein)+' g', pct:this.pctStr(consP,t.protein) },
+        { label:'Carbs', valStr:this.fmt(cons.c)+' / '+this.fmt(t.carbs)+' g', pct:this.pctStr(cons.c,t.carbs) },
+        { label:'Fat', valStr:this.fmt(cons.f)+' / '+this.fmt(t.fat)+' g', pct:this.pctStr(cons.f,t.fat) }
+      ],
+      weekBars, weekTargetPos: Math.round(t.calories/max*100)+'%',
+      dayMeals: logged.map(m=>({ name:m.name, meta:m.meta, cal:this.fmt(m.cal) })),
+      coachLine: remaining>400 ? 'Room for a full dinner tonight — protein is the macro to prioritize.' : 'Tight budget left — a soup or salad-sized dinner fits best.',
+      gymCheckedIn: !!(st.gym && st.gym.checkedIn), gymNotChecked: !(st.gym && st.gym.checkedIn),
+      gymTagCls: (st.gym && st.gym.checkedIn) ? 'tag tag-accent' : 'tag tag-outline',
+      gymTagLabel: (st.gym && st.gym.checkedIn) ? 'Checked in' : 'Linked',
+      gymLine: (st.gym && st.gym.checkedIn)
+        ? (st.gym.adjust ? 'Checked in today — +' + (st.gym.bonus||310) + ' kcal session credit applied to your budget (MET-based estimate).' : 'Checked in today — session credit is switched off on your phone; budget unchanged.')
+        : 'No check-in yet today. Check-ins sync here from your phone and the gym\u2019s door system.',
+      hasLive: !!bus, noLive: !bus,
+      live: bus ? { no:bus.no, restName:bus.restName||'', placed:bus.placed||'',
+        statusLabel: statusMeta[bus.status]||'—',
+        anim: (bus.status && bus.status!=='done') ? 'fc-pulse 1.2s infinite' : 'none',
+        itemsStr: busItems.map(it=>(it.qty>1?it.qty+'× ':'')+it.name).join(' · '),
+        kcal:this.fmt(busKcal), fulfillLabel: bus.fulfill==='delivery'?'Delivery via DoorDash':'Pickup' } : { no:'', restName:'', placed:'', statusLabel:'', anim:'none', itemsStr:'', kcal:'', fulfillLabel:'' },
+      energyRows: [
+        { label:'BMR (Mifflin-St Jeor)', val:this.fmt(t.bmr)+' kcal' },
+        { label:'TDEE (moderate activity)', val:this.fmt(t.tdee)+' kcal' },
+        { label:'Calorie target (cutting)', val:this.fmt(t.calories)+' kcal' },
+        { label:'Protein target', val:this.fmt(t.protein)+' g' }
+      ],
+      shortlist, restaurants,
+      orderRows: liveRow.concat(this.PAST.map(p=>({ ...p, status:'Completed', statusCls:'tag tag-neutral', anim:'none' })))
+    };
+  }
+}
+</script>
+</body>
+</html>

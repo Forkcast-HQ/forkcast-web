@@ -12,7 +12,7 @@
 // agreement). The catalog supports per-restaurant `photoUrl` for exactly that.
 
 const U = (id: string, w: number, h: number) =>
-  `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&fit=crop&auto=format&q=70`;
+  `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&fit=crop&auto=format&q=80`;
 
 export function foodImg(keywords: string, seed: number, w = 800, h = 600): string {
   const kw = encodeURIComponent(keywords.replace(/\s+/g, ","));
@@ -59,6 +59,39 @@ const RESTAURANT_IMG: Record<string, { ids: string[]; kw: string; seed: number }
   grill: { ids: ["1544025162-d76694265947"], kw: "grill,chicken,restaurant", seed: 277 },
   "juice-bar": { ids: ["1610970881699-44a5587cabec"], kw: "juice,bar,smoothie,fresh", seed: 288 },
 };
+
+// ---- Editorial photography for landing-page storytelling -------------------
+// Hand-picked, high-resolution lifestyle shots. Every fallback in the chain is
+// another curated Unsplash ID; LoremFlickr is only the very last resort, so
+// marketing pages never show a random low-quality photo.
+const EDITORIAL: Record<string, { ids: string[]; kw: string; seed: number }> = {
+  "dining-together": {
+    ids: ["1529156069898-49953e39b3ac", "1414235077428-338989a2e8c0", "1517248135467-4c7edcad34c4"],
+    kw: "friends,dinner,restaurant,table",
+    seed: 501,
+  },
+  "restaurant-spread": {
+    ids: ["1555396273-367ea4eb4db5", "1517248135467-4c7edcad34c4"],
+    kw: "restaurant,food,table,spread",
+    seed: 512,
+  },
+  "healthy-table": {
+    ids: ["1512621776951-a57141f2eefd", "1546069901-ba9599a7e63c"],
+    kw: "healthy,bowls,fresh,table",
+    seed: 523,
+  },
+};
+
+export function editorialImg(name: string, w = 1200, h = 900): string {
+  const e = EDITORIAL[name];
+  if (!e) return foodImg("restaurant,healthy,food", 900, w, h);
+  // Chain every curated ID before surrendering to LoremFlickr.
+  let url = foodImg(e.kw, e.seed, w, h);
+  for (let i = e.ids.length - 1; i >= 0; i--) {
+    url = `${U(e.ids[i], w, h)}#fb=${encodeURIComponent(url)}`;
+  }
+  return url;
+}
 
 // ---- Local-first resolution for generated/owned photography ---------------
 // Drop files into public/img/food/dishes/<slug>__<itemId>.jpg and

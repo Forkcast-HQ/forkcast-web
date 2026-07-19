@@ -1,0 +1,3 @@
+# Forkcast investor deck — title sequence
+Forkcast / Contents / The problem / The gap / The daily budget (hero −500) / The product / The loop / The Fit Score / Three surfaces, one prototype / The restaurant side / Business model / Revenue / Trust by design / Roadmap & ask / Milestones / The ask / Thank you
+Style: short noun-phrase titles. Honesty rules: no invented traction; ask amount + founder name are explicit placeholders; pilot metrics framed as "to be measured".

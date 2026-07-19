@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-0e34c851-fce6-49f4-a021-94c4df541184/styles.css">
+  <script src="_ds/modernist-0e34c851-fce6-49f4-a021-94c4df541184/_ds_bundle.js"></script>
+  <script src="image-slot.js"></script>
+  <style>
+    body{margin:0;background:var(--color-neutral-200);}
+    a{color:var(--color-accent-700);} a:hover{color:var(--color-accent);}
+    .btn{border-radius:12px;} .tag{border-radius:999px;} .input{border-radius:12px;}
+    .fc-scroll{scrollbar-width:none;} .fc-scroll::-webkit-scrollbar{display:none;}
+    @keyframes fc-pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  </style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;background:var(--color-neutral-200);">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="430px,890px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text);padding-top:58px;box-sizing:border-box;">
+
+  <sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Onboarding" class="fc-scroll" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;">
+    <div style="padding:14px 20px 12px;border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:center;">
+      <div style="font:800 20px var(--font-heading);letter-spacing:.03em;">FORKCAST</div>
+      <button onClick="{{ obSkip }}" style="all:unset;cursor:pointer;min-height:44px;display:flex;align-items:center;font:600 12px var(--font-body);color:var(--color-neutral-600);">Skip</button>
+    </div>
+    <div style="padding:16px 20px 0;">
+      <div style="display:flex;gap:6px;margin-bottom:14px;">
+        <sc-for list="{{ obDots }}" as="dt" hint-placeholder-count="4"><div style="height:6px;flex:1;background:{{ dt.bg }};border-radius:3px;"></div></sc-for>
+      </div>
+      <div style="font:600 10px var(--font-body);text-transform:uppercase;letter-spacing:.1em;color:var(--color-neutral-600);">{{ obStepLabel }}</div>
+      <div style="font:800 24px var(--font-heading);margin:2px 0 4px;">{{ obTitle }}</div>
+      <div style="font:500 13px/1.5 var(--font-body);color:var(--color-neutral-700);">{{ obSub }}</div>
+    </div>
+    <div style="flex:1;padding:16px 20px;">
+      <sc-if value="{{ obS0 }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+          <button onClick="{{ setMale }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;min-height:52px;text-align:center;font:800 14px var(--font-body);border:2px solid {{ maleBorder }};background:{{ maleBg }};">Male</button>
+          <button onClick="{{ setFemale }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;min-height:52px;text-align:center;font:800 14px var(--font-body);border:2px solid {{ femaleBorder }};background:{{ femaleBg }};">Female</button>
+        </div>
+        <sc-for list="{{ obAgeMetric }}" as="pm" hint-placeholder-count="1">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;">
+            <div style="font:700 14px var(--font-body);">{{ pm.label }}</div>
+            <div style="display:flex;align-items:center;border:2px solid var(--color-text);border-radius:12px;overflow:hidden;">
+              <button onClick="{{ pm.dec }}" aria-label="Decrease" style="all:unset;cursor:pointer;width:38px;height:38px;text-align:center;font:800 16px var(--font-body);">&minus;</button>
+              <div style="min-width:64px;text-align:center;font:800 14px var(--font-body);">{{ pm.val }}</div>
+              <button onClick="{{ pm.inc }}" aria-label="Increase" style="all:unset;cursor:pointer;width:38px;height:38px;text-align:center;font:800 16px var(--font-body);">+</button>
+            </div>
+          </div>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ obS1 }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ obBodyMetrics }}" as="pm" hint-placeholder-count="2">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;">
+            <div>
+              <div style="font:700 14px var(--font-body);">{{ pm.label }}</div>
+              <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">{{ pm.sub }}</div>
+            </div>
+            <div style="display:flex;align-items:center;border:2px solid var(--color-text);border-radius:12px;overflow:hidden;">
+              <button onClick="{{ pm.dec }}" aria-label="Decrease" style="all:unset;cursor:pointer;width:38px;height:38px;text-align:center;font:800 16px var(--font-body);">&minus;</button>
+              <div style="min-width:64px;text-align:center;font:800 14px var(--font-body);">{{ pm.val }}</div>
+              <button onClick="{{ pm.inc }}" aria-label="Increase" style="all:unset;cursor:pointer;width:38px;height:38px;text-align:center;font:800 16px var(--font-body);">+</button>
+            </div>
+          </div>
+        </sc-for>
+        <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);margin-top:8px;">Healthy weight for your height (CDC BMI 18.5&ndash;24.9): {{ healthyRange }}</div>
+      </sc-if>
+      <sc-if value="{{ obS2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <sc-for list="{{ activityOpts }}" as="op" hint-placeholder-count="5">
+            <button onClick="{{ op.pick }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:8px 12px;border:2px solid {{ op.border }};background:{{ op.bg }};">
+              <div>
+                <div style="font:800 14px var(--font-body);">{{ op.label }}</div>
+                <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">{{ op.sub }}</div>
+              </div>
+              <span style="width:12px;height:12px;flex:none;border-radius:50%;background:{{ op.dot }};border:2px solid var(--color-text);"></span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ obS3 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <sc-for list="{{ goalOpts }}" as="op" hint-placeholder-count="3">
+            <button onClick="{{ op.pick }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:8px 12px;border:2px solid {{ op.border }};background:{{ op.bg }};">
+              <div>
+                <div style="font:800 14px var(--font-body);">{{ op.label }}</div>
+                <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">{{ op.sub }}</div>
+              </div>
+              <span style="width:12px;height:12px;flex:none;border-radius:50%;background:{{ op.dot }};border:2px solid var(--color-text);"></span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ obS0 }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ toggleConsent }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;display:flex;gap:10px;align-items:flex-start;margin-top:16px;min-height:44px;">
+          <span style="width:18px;height:18px;flex:none;margin-top:1px;border-radius:6px;border:2px solid var(--color-text);background:{{ consentFill }};display:inline-block;"></span>
+          <span style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-700);">I consent to Forkcast processing my health profile and meal data to personalize recommendations, as described in the <span onClick="{{ goLegalFromOb }}" style="text-decoration:underline;cursor:pointer;color:var(--color-accent-700);">privacy &amp; consent notice</span>. Revocable anytime.</span>
+        </button>
+      </sc-if>
+    </div>
+    <div style="border-top:2px solid var(--color-divider);padding:12px 20px;">
+      <div style="font:600 10px var(--font-body);text-transform:uppercase;letter-spacing:.1em;color:var(--color-neutral-600);margin-bottom:8px;">Your numbers — live</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
+        <sc-for list="{{ obPreview }}" as="pv" hint-placeholder-count="4">
+          <div>
+            <div style="font:800 16px var(--font-heading);">{{ pv.val }}</div>
+            <div style="font:500 9px var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--color-neutral-600);">{{ pv.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <sc-if value="{{ obNotFirst }}" hint-placeholder-val="{{ false }}"><button class="btn btn-secondary" style="min-height:48px;" onClick="{{ obBack }}">Back</button></sc-if>
+        <button class="btn btn-primary btn-block" style="min-height:48px;flex:1;opacity:{{ obNextOpacity }};" onClick="{{ obNext }}">{{ obNextLabel }}</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isDiscover }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Discover" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:14px 20px 12px;border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:baseline;">
+      <div style="font:800 20px var(--font-heading);letter-spacing:.03em;">FORKCAST</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);">Boston &middot; {{ goalLabel }}</div>
+        <button onClick="{{ goProfile }}" aria-label="Profile" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:flex-end;"><span style="width:30px;height:30px;border-radius:50%;border:2px solid var(--color-text);display:flex;align-items:center;justify-content:center;font:800 12px var(--font-body);">A</span></button>
+      </div>
+    </div>
+    <div style="padding:16px 20px 14px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:600 10px var(--font-body);text-transform:uppercase;letter-spacing:.1em;color:var(--color-neutral-600);">Left today</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin:2px 0 10px;">
+        <div style="font:800 38px/1 var(--font-heading);">{{ remainingCal }}</div>
+        <div style="font:500 13px var(--font-body);color:var(--color-neutral-600);">kcal of {{ targetCal }}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <sc-for list="{{ macroMini }}" as="m" hint-placeholder-count="3">
+          <div>
+            <div style="display:flex;justify-content:space-between;font:600 10px var(--font-body);letter-spacing:.06em;color:var(--color-neutral-600);"><span>{{ m.label }}</span><span>{{ m.left }}g</span></div>
+            <div style="height:6px;background:var(--color-neutral-300);margin-top:4px;border-radius:3px;overflow:hidden;"><div style="height:100%;background:var(--color-text);width:{{ m.pct }};"></div></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);">
+      <input class="input" type="search" placeholder="Search restaurants or dishes" value="{{ query }}" onChange="{{ setQuery }}" aria-label="Search restaurants or dishes" style="width:100%;box-sizing:border-box;min-height:44px;">
+      <div class="fc-scroll" style="display:flex;gap:6px;margin-top:10px;overflow-x:auto;">
+        <sc-for list="{{ filterChips }}" as="fc" hint-placeholder-count="5">
+          <button class="{{ fc.cls }}" onClick="{{ fc.toggle }}" style="cursor:pointer;border:none;min-height:32px;white-space:nowrap;flex:none;">{{ fc.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:14px 20px 6px;font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">{{ discoverHeading }}</div>
+    <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:24px 20px;border-bottom:2px solid var(--color-divider);">
+        <div style="font:800 18px var(--font-heading);">Nothing matches</div>
+        <div style="font:500 13px/1.5 var(--font-body);color:var(--color-neutral-700);margin-top:4px;">No dishes fit that search and filter combination. Try loosening a filter.</div>
+        <button class="btn btn-secondary" style="min-height:44px;margin-top:12px;" onClick="{{ clearSearch }}">Clear search &amp; filters</button>
+      </div>
+    </sc-if>
+    <sc-for list="{{ discoverList }}" as="r" hint-placeholder-count="3">
+      <div onClick="{{ r.open }}" style="border-bottom:2px solid var(--color-divider);cursor:pointer;">
+        <div class="grayscale" style="height:148px;position:relative;margin:12px 20px 0;border-radius:16px;overflow:hidden;">
+          <image-slot id="{{ r.imgId }}" src="assets/photos/{{ r.imgId }}.png" shape="rect" placeholder="Photo — {{ r.name }}"></image-slot>
+        </div>
+        <div style="padding:12px 20px 14px;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+            <div style="font:800 18px var(--font-heading);">{{ r.name }}</div>
+            <div style="font:700 13px var(--font-body);color:var(--color-neutral-600);">{{ r.dist }} mi</div>
+          </div>
+          <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);margin-top:1px;">{{ r.cuisine }} &middot; {{ r.hood }} &middot; {{ r.eta }}</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap;">
+            <span class="{{ r.badgeCls }}">{{ r.badge }}</span>
+            <sc-if value="{{ r.sponsored }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">Sponsored</span></sc-if>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--color-neutral-300);">
+            <div>
+              <div style="font:600 10px var(--font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--color-neutral-600);">{{ r.matchLabel }}</div>
+              <div style="font:700 14px var(--font-body);">{{ r.topDish }}</div>
+            </div>
+            <div style="position:relative;width:46px;height:46px;flex:none;">
+              <svg width="46" height="46" viewBox="0 0 46 46" role="img" aria-label="Fit score {{ r.topScore }}">
+                <circle cx="23" cy="23" r="19" fill="none" stroke="var(--color-neutral-300)" stroke-width="4"></circle>
+                <circle cx="23" cy="23" r="19" fill="none" stroke="{{ r.ringColor }}" stroke-width="4" stroke-dasharray="{{ r.ringDash }}" transform="rotate(-90 23 23)"></circle>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 13px var(--font-body);">{{ r.topScore }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+    <div style="padding:14px 20px 20px;font:500 11px var(--font-body);color:var(--color-neutral-600);">Sponsored placement never changes Fit Scores. Nutrition values are estimates, not laboratory measurements.</div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isMenu }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Restaurant menu" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ goDiscover }}" aria-label="Back" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 18px var(--font-heading);">{{ rest.name }}</div>
+    </div>
+    <div class="grayscale" style="height:150px;margin:14px 20px 0;border-radius:16px;overflow:hidden;"><image-slot id="{{ rest.imgId }}" src="assets/photos/{{ rest.imgId }}.png" shape="rect" placeholder="Photo — {{ rest.name }}"></image-slot></div>
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);">{{ rest.cuisine }} &middot; {{ rest.hood }} &middot; {{ rest.dist }} mi &middot; {{ rest.eta }}</div>
+      <div style="display:flex;gap:6px;margin-top:8px;"><span class="{{ rest.badgeCls }}">{{ rest.badge }}</span><span class="tag tag-neutral" style="white-space:nowrap;">&plusmn;{{ rest.conf }}&percnt; estimates</span></div>
+      <sc-if value="{{ provenanceOn }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--color-neutral-300);font:500 11px/1.5 var(--font-body);color:var(--color-neutral-700);">{{ rest.sourceLine }}</div>
+      </sc-if>
+    </div>
+    <div style="padding:14px 20px 4px;font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">Sorted by fit &middot; {{ remainingCal }} kcal left</div>
+    <sc-for list="{{ dishes }}" as="d" hint-placeholder-count="4">
+      <div onClick="{{ d.open }}" style="display:grid;grid-template-columns:72px 1fr 46px;gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--color-neutral-300);cursor:pointer;min-height:44px;">
+        <div class="grayscale" style="width:72px;height:72px;border-radius:12px;overflow:hidden;"><image-slot id="{{ d.imgId }}" src="assets/photos/{{ d.imgId }}.png" shape="rect" placeholder="Photo"></image-slot></div>
+        <div>
+          <div style="font:700 14px var(--font-body);">{{ d.name }}</div>
+          <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);margin-top:2px;">{{ d.priceStr }} &middot; {{ d.cal }} kcal &middot; {{ d.p }}g protein</div>
+          <sc-if value="{{ d.hasFlag }}" hint-placeholder-val="{{ false }}"><div style="font:600 11px var(--font-body);color:var(--color-accent-700);margin-top:2px;">{{ d.flag }}</div></sc-if>
+        </div>
+        <div style="position:relative;width:46px;height:46px;flex:none;">
+          <svg width="46" height="46" viewBox="0 0 46 46" role="img" aria-label="Fit score {{ d.score }}">
+            <circle cx="23" cy="23" r="19" fill="none" stroke="var(--color-neutral-300)" stroke-width="4"></circle>
+            <circle cx="23" cy="23" r="19" fill="none" stroke="{{ d.ringColor }}" stroke-width="4" stroke-dasharray="{{ d.ringDash }}" transform="rotate(-90 23 23)"></circle>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 13px var(--font-body);">{{ d.score }}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isDish }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Dish detail" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ goMenu }}" aria-label="Back" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 16px var(--font-heading);">{{ dish.restName }}</div>
+    </div>
+    <div class="grayscale" style="height:200px;margin:14px 20px 0;border-radius:16px;overflow:hidden;"><image-slot id="{{ dish.imgId }}" src="assets/photos/{{ dish.imgId }}.png" shape="rect" placeholder="Photo — {{ dish.name }}"></image-slot></div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+      <div style="flex:1;">
+        <div style="font:800 20px var(--font-heading);">{{ dish.name }}</div>
+        <div style="font:500 13px/1.5 var(--font-body);color:var(--color-neutral-700);margin-top:4px;">{{ dish.desc }}</div>
+        <div style="font:800 16px var(--font-heading);margin-top:8px;">{{ dish.priceStr }}</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="position:relative;width:72px;height:72px;margin:0 auto;">
+          <svg width="72" height="72" viewBox="0 0 72 72" role="img" aria-label="Fit score {{ dish.score }} of 100">
+            <circle cx="36" cy="36" r="30" fill="none" stroke="var(--color-neutral-300)" stroke-width="6"></circle>
+            <circle cx="36" cy="36" r="30" fill="none" stroke="{{ dish.ringColor }}" stroke-width="6" stroke-dasharray="{{ dish.ringDash }}" transform="rotate(-90 36 36)"></circle>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:800 20px var(--font-body);">{{ dish.score }}</div>
+        </div>
+        <div style="font:600 10px var(--font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--color-neutral-600);margin-top:2px;">Fit score</div>
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Why this fits</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <sc-for list="{{ dish.reasons }}" as="x" hint-placeholder-count="2"><span class="tag tag-accent">{{ x.t }}</span></sc-for>
+        <sc-for list="{{ dish.warnings }}" as="x" hint-placeholder-count="1"><span class="tag tag-outline">{{ x.t }}</span></sc-for>
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Estimate &middot; &plusmn;{{ dish.conf }}% range</div>
+      <sc-for list="{{ dish.rows }}" as="n" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:76px 1fr 80px;gap:10px;align-items:center;padding:5px 0;">
+          <div style="font:600 12px var(--font-body);color:var(--color-neutral-700);">{{ n.label }}</div>
+          <div style="height:6px;background:var(--color-neutral-300);border-radius:3px;overflow:hidden;"><div style="height:100%;background:var(--color-text);width:{{ n.pct }};"></div></div>
+          <div style="font:700 12px var(--font-body);text-align:right;">{{ n.val }}</div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ provenanceOn }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:10px;font:500 11px/1.5 var(--font-body);color:var(--color-neutral-700);">{{ dish.sourceLine }}</div>
+      </sc-if>
+      <div style="margin-top:6px;font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);">Allergen information is inferred from listed ingredients and is not guaranteed — confirm with the restaurant.</div>
+    </div>
+    <div style="padding:14px 20px;">
+      <div style="font:600 12px var(--font-body);color:var(--color-neutral-700);margin-bottom:10px;">{{ dish.budgetLine }}</div>
+      <button class="btn btn-primary btn-block" style="min-height:48px;" onClick="{{ dish.add }}">{{ dish.addLabel }}</button>
+      <sc-if value="{{ dish.inCart }}" hint-placeholder-val="{{ false }}">
+        <button class="btn btn-secondary btn-block" style="min-height:48px;margin-top:8px;" onClick="{{ goCart }}">Review order &middot; {{ cartCount }} item(s)</button>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Cart" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ goBackFromCart }}" aria-label="Back" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 18px var(--font-heading);">Your order &middot; {{ cartRestName }}</div>
+    </div>
+    <sc-for list="{{ cartItems }}" as="it" hint-placeholder-count="2">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--color-neutral-300);">
+        <div style="flex:1;">
+          <div style="font:700 14px var(--font-body);">{{ it.name }}</div>
+          <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);">{{ it.cal }} kcal &middot; {{ it.p }}g protein &middot; {{ it.priceStr }}</div>
+        </div>
+        <div style="display:flex;align-items:center;border:2px solid var(--color-text);border-radius:12px;overflow:hidden;">
+          <button onClick="{{ it.dec }}" aria-label="Remove one" style="all:unset;cursor:pointer;width:36px;height:36px;text-align:center;font:800 16px var(--font-body);">&minus;</button>
+          <div style="width:26px;text-align:center;font:800 14px var(--font-body);">{{ it.qty }}</div>
+          <button onClick="{{ it.inc }}" aria-label="Add one" style="all:unset;cursor:pointer;width:36px;height:36px;text-align:center;font:800 16px var(--font-body);">+</button>
+        </div>
+      </div>
+    </sc-for>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Day impact &middot; logged + this order</div>
+      <sc-for list="{{ impact }}" as="b" hint-placeholder-count="4">
+        <div style="padding:5px 0;">
+          <div style="display:flex;justify-content:space-between;font:600 11px var(--font-body);color:var(--color-neutral-700);"><span>{{ b.label }}</span><span>{{ b.valStr }}</span></div>
+          <div style="height:8px;background:var(--color-neutral-300);margin-top:4px;display:flex;border-radius:4px;overflow:hidden;">
+            <div style="height:100%;background:var(--color-text);width:{{ b.nowPct }};"></div>
+            <div style="height:100%;background:var(--color-accent);width:{{ b.addPct }};"></div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="display:flex;gap:14px;margin-top:8px;font:500 10px var(--font-body);color:var(--color-neutral-600);">
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:var(--color-text);display:inline-block;border-radius:3px;"></span>Logged</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:var(--color-accent);display:inline-block;border-radius:3px;"></span>This order</span>
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Balance check</div>
+      <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="2">
+        <div style="display:flex;gap:8px;align-items:flex-start;padding:4px 0;">
+          <span style="width:10px;height:10px;margin-top:3px;flex:none;border-radius:50%;background:{{ a.color }};display:inline-block;"></span>
+          <span style="font:500 12px/1.45 var(--font-body);color:{{ a.textColor }};">{{ a.text }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:14px 20px 20px;">
+      <div style="display:flex;justify-content:space-between;font:600 13px var(--font-body);padding:3px 0;"><span>Subtotal</span><span>{{ cartSubtotalStr }}</span></div>
+      <button class="btn btn-primary btn-block" style="min-height:48px;margin-top:10px;" onClick="{{ goCheckout }}">Continue to checkout</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Checkout" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ goCart }}" aria-label="Back" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 18px var(--font-heading);">Checkout</div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Get it</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button onClick="{{ setPickup }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;min-height:64px;padding:10px 12px;border:2px solid {{ pickupBorder }};background:{{ pickupBg }};">
+          <div style="font:800 14px var(--font-body);">Pickup</div>
+          <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">Ready in {{ rest.pickupEta }} &middot; Free</div>
+        </button>
+        <button onClick="{{ setDelivery }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;min-height:64px;padding:10px 12px;border:2px solid {{ deliveryBorder }};background:{{ deliveryBg }};">
+          <div style="font:800 14px var(--font-body);">Delivery</div>
+          <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">via DoorDash &middot; {{ rest.eta }} &middot; {{ deliveryFeeStr }}</div>
+        </button>
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Pay with</div>
+      <button onClick="{{ setPayFpay }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;display:flex;justify-content:space-between;align-items:center;width:100%;min-height:52px;padding:10px 12px;border:2px solid {{ fpayBorder }};background:{{ fpayBg }};">
+        <div>
+          <div style="font:800 14px var(--font-body);">Forkcast Pay</div>
+          <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">Direct to the restaurant's Forkcast terminal — no POS middleman</div>
+        </div>
+        <span style="width:12px;height:12px;flex:none;border-radius:50%;background:{{ fpayDot }};border:2px solid var(--color-text);"></span>
+      </button>
+      <button onClick="{{ setPayCard }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;display:flex;justify-content:space-between;align-items:center;width:100%;min-height:52px;padding:10px 12px;border:2px solid {{ cardBorder }};background:{{ cardBg }};margin-top:8px;">
+        <div style="font:800 14px var(--font-body);">Card &middot;&middot;&middot;&middot; 4021</div>
+        <span style="width:12px;height:12px;flex:none;border-radius:50%;background:{{ cardDot }};border:2px solid var(--color-text);"></span>
+      </button>
+    </div>
+    <div style="padding:14px 20px 20px;">
+      <div style="display:flex;justify-content:space-between;font:500 13px var(--font-body);padding:3px 0;"><span>Subtotal</span><span>{{ cartSubtotalStr }}</span></div>
+      <sc-if value="{{ perkOn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;font:500 13px var(--font-body);padding:3px 0;color:var(--color-accent-700);"><span>Gym perk &middot; 10&percnt; partner discount</span><span>{{ perkDiscStr }}</span></div>
+      </sc-if>
+      <div style="display:flex;justify-content:space-between;font:500 13px var(--font-body);padding:3px 0;"><span>{{ feeLabel }}</span><span>{{ feeStr }}</span></div>
+      <div style="display:flex;justify-content:space-between;font:500 13px var(--font-body);padding:3px 0;"><span>MA meals tax (7%)</span><span>{{ taxStr }}</span></div>
+      <div style="display:flex;justify-content:space-between;font:800 16px var(--font-heading);padding:8px 0 0;border-top:2px solid var(--color-divider);margin-top:6px;"><span>Total</span><span>{{ totalStr }}</span></div>
+      <button class="btn btn-primary btn-block" style="min-height:48px;margin-top:14px;" onClick="{{ placeOrder }}">Place order — {{ totalStr }}</button>
+      <div style="margin-top:10px;font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);">Your meal will be logged to your day automatically once the kitchen accepts. Demo checkout — no payment is processed.</div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isTracking }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Order tracking" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;justify-content:space-between;align-items:center;">
+      <div style="font:800 18px var(--font-heading);">Order {{ orderNo }}</div>
+      <button onClick="{{ goDiscover }}" aria-label="Close" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:flex-end;font:800 18px var(--font-heading);">&times;</button>
+    </div>
+    <div style="padding:16px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:800 22px var(--font-heading);">{{ orderHeadline }}</div>
+      <div style="font:500 13px var(--font-body);color:var(--color-neutral-600);margin-top:4px;">{{ orderSub }}</div>
+    </div>
+    <div style="padding:16px 20px;border-bottom:2px solid var(--color-divider);">
+      <sc-for list="{{ orderSteps }}" as="s" hint-placeholder-count="4">
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:8px 0;">
+          <span style="width:14px;height:14px;flex:none;margin-top:2px;border-radius:50%;background:{{ s.fill }};border:2px solid var(--color-text);display:inline-block;animation:{{ s.anim }};"></span>
+          <div>
+            <div style="font:700 14px var(--font-body);color:{{ s.color }};">{{ s.label }}</div>
+            <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">{{ s.sub }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ orderLogged }}" hint-placeholder-val="{{ false }}">
+      <div style="margin:16px 20px;border:2px solid var(--color-accent);border-radius:16px;padding:14px;">
+        <div style="font:800 15px var(--font-heading);color:var(--color-accent-700);">Logged to your day — automatically</div>
+        <div style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-700);margin-top:4px;">{{ orderLogLine }}</div>
+        <button class="btn btn-primary btn-block" style="min-height:48px;margin-top:12px;" onClick="{{ goDashboard }}">View updated day</button>
+      </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Dashboard" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ goDiscover }}" aria-label="Back" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 18px var(--font-heading);">Today</div>
+      <div style="margin-left:auto;font:500 12px var(--font-body);color:var(--color-neutral-600);">{{ todayStr }}</div>
+      <button onClick="{{ goProfile }}" aria-label="Profile" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:flex-end;"><span style="width:30px;height:30px;border-radius:50%;border:2px solid var(--color-text);display:flex;align-items:center;justify-content:center;font:800 12px var(--font-body);">A</span></button>
+    </div>
+    <div style="padding:18px 20px;border-bottom:2px solid var(--color-divider);display:flex;gap:20px;align-items:center;">
+      <div style="position:relative;width:132px;height:132px;flex:none;">
+        <svg width="132" height="132" viewBox="0 0 132 132" role="img" aria-label="{{ dayConsumed }} of {{ targetCal }} kcal">
+          <circle cx="66" cy="66" r="56" fill="none" stroke="var(--color-neutral-300)" stroke-width="10"></circle>
+          <circle cx="66" cy="66" r="56" fill="none" stroke="{{ dayRingColor }}" stroke-width="10" stroke-dasharray="{{ dayRingDash }}" transform="rotate(-90 66 66)"></circle>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">
+          <div style="font:800 24px var(--font-heading);">{{ dayConsumed }}</div>
+          <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">of {{ targetCal }} kcal</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+        <sc-for list="{{ dayMacros }}" as="m" hint-placeholder-count="3">
+          <div>
+            <div style="display:flex;justify-content:space-between;font:600 11px var(--font-body);color:var(--color-neutral-700);"><span>{{ m.label }}</span><span>{{ m.valStr }}</span></div>
+            <div style="height:7px;background:var(--color-neutral-300);margin-top:3px;border-radius:4px;overflow:hidden;"><div style="height:100%;background:var(--color-text);width:{{ m.pct }};"></div></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+        <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">This week</div>
+        <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">kcal vs {{ targetCal }} target</div>
+      </div>
+      <div style="position:relative;height:120px;">
+        <div style="position:absolute;left:0;right:0;bottom:{{ weekTargetPos }};border-top:2px dashed var(--color-neutral-500);z-index:1;"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:flex-end;gap:8px;">
+          <sc-for list="{{ weekBars }}" as="wb" hint-placeholder-count="7">
+            <div style="flex:1;height:{{ wb.h }};background:{{ wb.bg }};position:relative;border-radius:5px 5px 0 0;" title="{{ wb.valStr }} kcal"></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <sc-for list="{{ weekBars }}" as="wb" hint-placeholder-count="7">
+          <div style="flex:1;text-align:center;">
+            <div style="font:600 10px var(--font-body);color:{{ wb.labelColor }};">{{ wb.day }}</div>
+            <div style="font:500 9px var(--font-body);color:var(--color-neutral-600);">{{ wb.valStr }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:10px;font:500 10px var(--font-body);color:var(--color-neutral-600);">
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:var(--color-text);display:inline-block;border-radius:3px;"></span>On budget</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;background:var(--color-accent);display:inline-block;border-radius:3px;"></span>Over target</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:14px;border-top:2px dashed var(--color-neutral-500);display:inline-block;"></span>Target</span>
+      </div>
+    </div>
+    <div style="padding:14px 20px 4px;font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">Meals</div>
+    <sc-for list="{{ dayMeals }}" as="m" hint-placeholder-count="2">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--color-neutral-300);">
+        <div>
+          <div style="font:700 14px var(--font-body);">{{ m.name }}</div>
+          <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);margin-top:2px;">{{ m.meta }}</div>
+        </div>
+        <div style="font:800 14px var(--font-heading);flex:none;">{{ m.cal }} kcal</div>
+      </div>
+    </sc-for>
+    <div style="padding:16px 20px 20px;">
+      <div style="font:600 12px/1.5 var(--font-body);color:var(--color-neutral-700);margin-bottom:10px;">{{ coachLine }}</div>
+      <button class="btn btn-secondary btn-block" style="min-height:48px;" onClick="{{ goDiscover }}">Find a dinner that fits — {{ remainingCal }} kcal left</button>
+      <button class="btn btn-primary btn-block" style="min-height:48px;margin-top:8px;" onClick="{{ goPhoto }}">Log a meal with a photo</button>
+      <button class="btn btn-ghost btn-block" style="min-height:44px;margin-top:6px;" onClick="{{ goOrders }}">Order history</button>
+      <button class="btn btn-ghost btn-block" style="min-height:44px;margin-top:6px;" onClick="{{ goGym }}">Gym &amp; activity &middot; {{ gymStatusShort }}</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isOrders }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Order history" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ goDashboard }}" aria-label="Back" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 18px var(--font-heading);">Orders</div>
+    </div>
+    <sc-for list="{{ orderHistory }}" as="o" hint-placeholder-count="3">
+      <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+          <div style="font:800 16px var(--font-heading);">{{ o.rest }}</div>
+          <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);">{{ o.when }}</div>
+        </div>
+        <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);margin-top:2px;">{{ o.itemsStr }}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+          <span class="{{ o.statusCls }}">{{ o.status }}</span>
+          <span style="font:500 12px var(--font-body);color:var(--color-neutral-600);">{{ o.fulfillStr }} &middot; {{ o.totalStr }} &middot; {{ o.kcalStr }} kcal logged</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <sc-if value="{{ o.isActive }}" hint-placeholder-val="{{ false }}">
+            <button class="btn btn-primary" style="min-height:44px;" onClick="{{ o.track }}">Track order</button>
+          </sc-if>
+          <button class="btn btn-secondary" style="min-height:44px;" onClick="{{ o.reorder }}">Reorder</button>
+        </div>
+      </div>
+    </sc-for>
+    <div style="padding:14px 20px;font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);">Every order is logged to its day automatically when the kitchen accepts. Past orders shown here are demonstration data.</div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isPhoto }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Photo meal logging" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ goDashboard }}" aria-label="Back" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 18px var(--font-heading);">Photo log</div>
+      <span class="tag tag-outline" style="margin-left:auto;">AI estimate</span>
+    </div>
+    <div class="grayscale" style="height:210px;margin:14px 20px 0;border-radius:16px;overflow:hidden;"><image-slot id="photo-log" src="assets/photos/photo-log.png" shape="rect" placeholder="Drop a photo of your meal"></image-slot></div>
+    <sc-if value="{{ photoIdle }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:16px 20px;">
+        <button class="btn btn-primary btn-block" style="min-height:48px;" onClick="{{ analyzePhoto }}">Analyze photo</button>
+        <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:10px;">Recognition is an AI estimate with confidence ranges, not a measurement. Review and correct every item before logging.</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ photoAnalyzing }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:24px 20px;">
+        <div style="font:800 16px var(--font-heading);animation:fc-pulse 1.2s infinite;">Recognizing your meal&hellip;</div>
+        <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);margin-top:4px;">Identifying items, portions and preparation method</div>
+        <div style="height:8px;background:var(--color-neutral-300);margin-top:14px;border-radius:4px;overflow:hidden;"><div style="height:100%;width:60%;background:var(--color-accent);animation:fc-pulse 1.2s infinite;"></div></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ photoResult }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 20px 4px;display:flex;justify-content:space-between;align-items:baseline;">
+        <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">Recognized &middot; correct anything wrong</div>
+      </div>
+      <sc-for list="{{ photoItems }}" as="pi" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid var(--color-neutral-300);">
+          <div style="flex:1;">
+            <div style="font:700 14px var(--font-body);">{{ pi.name }}</div>
+            <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);margin-top:2px;">{{ pi.portionStr }} &middot; {{ pi.cal }} kcal &middot; {{ pi.conf }} confidence</div>
+          </div>
+          <div style="display:flex;align-items:center;border:2px solid var(--color-text);border-radius:12px;overflow:hidden;">
+            <button onClick="{{ pi.dec }}" aria-label="Smaller portion" style="all:unset;cursor:pointer;width:36px;height:36px;text-align:center;font:800 16px var(--font-body);">&minus;</button>
+            <div style="min-width:44px;text-align:center;font:800 12px var(--font-body);">{{ pi.qtyStr }}</div>
+            <button onClick="{{ pi.inc }}" aria-label="Larger portion" style="all:unset;cursor:pointer;width:36px;height:36px;text-align:center;font:800 16px var(--font-body);">+</button>
+          </div>
+        </div>
+      </sc-for>
+      <div style="padding:14px 20px 20px;">
+        <div style="display:flex;justify-content:space-between;font:800 16px var(--font-heading);"><span>Meal total</span><span>{{ photoTotal }} kcal</span></div>
+        <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);margin-top:2px;">Range {{ photoRange }} kcal &middot; {{ photoMacros }}</div>
+        <div style="font:600 12px var(--font-body);color:var(--color-neutral-700);margin-top:8px;">{{ photoBudgetLine }}</div>
+        <button class="btn btn-primary btn-block" style="min-height:48px;margin-top:12px;" onClick="{{ logPhoto }}">Log meal — {{ photoTotal }} kcal</button>
+        <button class="btn btn-ghost btn-block" style="min-height:44px;margin-top:6px;" onClick="{{ resetPhoto }}">Re-analyze</button>
+        <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:8px;">Your corrections are saved with the log and help improve future estimates. Allergen detection from photos is not supported.</div>
+      </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isLegal }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Legal and consent" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ legalBack }}" aria-label="Back" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 18px var(--font-heading);">Legal &amp; consent</div>
+    </div>
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);font:500 12px/1.5 var(--font-body);color:var(--color-neutral-700);">These policies are working drafts pending review by qualified counsel. Nothing here is legal or medical advice.</div>
+    <sc-for list="{{ legalItems }}" as="li" hint-placeholder-count="7">
+      <div style="border-bottom:1px solid var(--color-neutral-300);">
+        <button onClick="{{ li.toggle }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;display:flex;justify-content:space-between;align-items:center;width:100%;min-height:52px;padding:10px 20px;">
+          <div style="font:700 14px var(--font-body);">{{ li.title }}</div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="tag tag-outline">Draft</span><span style="font:800 16px var(--font-heading);">{{ li.chev }}</span></div>
+        </button>
+        <sc-if value="{{ li.open }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 20px 14px;font:500 12px/1.6 var(--font-body);color:var(--color-neutral-700);">{{ li.body }}</div>
+        </sc-if>
+      </div>
+    </sc-for>
+    <div style="padding:14px 20px;font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);">Questions or data requests: privacy@forkcast.app &middot; You can withdraw consent and delete your data at any time from this screen in the production app.</div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Profile" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ goDiscover }}" aria-label="Back" style="all:unset;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 18px var(--font-heading);">Profile</div>
+      <div style="margin-left:auto;font:500 12px var(--font-body);color:var(--color-neutral-600);">Alex &middot; {{ goalLabel }}</div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Body metrics</div>
+      <sc-for list="{{ profileMetrics }}" as="pm" hint-placeholder-count="3">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;">
+          <div>
+            <div style="font:700 14px var(--font-body);">{{ pm.label }}</div>
+            <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">{{ pm.sub }}</div>
+          </div>
+          <div style="display:flex;align-items:center;border:2px solid var(--color-text);border-radius:12px;overflow:hidden;">
+            <button onClick="{{ pm.dec }}" aria-label="Decrease {{ pm.label }}" style="all:unset;cursor:pointer;width:38px;height:38px;text-align:center;font:800 16px var(--font-body);">&minus;</button>
+            <div style="min-width:64px;text-align:center;font:800 14px var(--font-body);">{{ pm.val }}</div>
+            <button onClick="{{ pm.inc }}" aria-label="Increase {{ pm.label }}" style="all:unset;cursor:pointer;width:38px;height:38px;text-align:center;font:800 16px var(--font-body);">+</button>
+          </div>
+        </div>
+      </sc-for>
+      <div style="font:500 12px var(--font-body);color:var(--color-neutral-600);margin-top:4px;">{{ profileSummary }}</div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">Health details</div>
+      <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin:4px 0 12px;">Used only to flag dishes across the app — never to diagnose or treat. Share what you're comfortable with.</div>
+      <div style="font:600 10px var(--font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--color-neutral-600);margin-bottom:6px;">Dietary preference</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+        <sc-for list="{{ dietChips }}" as="ch" hint-placeholder-count="4"><button class="{{ ch.cls }}" onClick="{{ ch.toggle }}" style="cursor:pointer;border:none;min-height:32px;">{{ ch.label }}</button></sc-for>
+      </div>
+      <div style="font:600 10px var(--font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--color-neutral-600);margin-bottom:6px;">Allergies</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+        <sc-for list="{{ allergenChips }}" as="ch" hint-placeholder-count="4"><button class="{{ ch.cls }}" onClick="{{ ch.toggle }}" style="cursor:pointer;border:none;min-height:32px;">{{ ch.label }}</button></sc-for>
+      </div>
+      <div style="font:600 10px var(--font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--color-neutral-600);margin-bottom:6px;">Conditions</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <sc-for list="{{ condChips }}" as="ch" hint-placeholder-count="4"><button class="{{ ch.cls }}" onClick="{{ ch.toggle }}" style="cursor:pointer;border:none;min-height:32px;">{{ ch.label }}</button></sc-for>
+      </div>
+      <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:10px;">Allergen flags are inferred from listed ingredients and are never guaranteed — always confirm directly with the restaurant.</div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+        <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">BMI &middot; CDC adult categories</div>
+        <div style="font:800 22px var(--font-heading);">{{ bmiVal }}</div>
+      </div>
+      <div style="position:relative;padding-top:12px;">
+        <div style="position:absolute;top:0;left:{{ bmiPos }};transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid var(--color-accent);"></div>
+        <div style="display:flex;height:12px;border-radius:6px;overflow:hidden;">
+          <sc-for list="{{ bmiSegs }}" as="sg" hint-placeholder-count="6">
+            <div style="width:{{ sg.w }};background:{{ sg.bg }};border-right:2px solid var(--color-bg);"></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;font:500 10px var(--font-body);color:var(--color-neutral-600);margin-top:4px;"><span>15</span><span>18.5</span><span>25</span><span>30</span><span>35</span><span>40</span><span>45</span></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+        <span class="tag tag-accent">{{ bmiClass }}</span>
+        <span style="font:500 12px var(--font-body);color:var(--color-neutral-600);">Healthy range: {{ healthyRange }}</span>
+      </div>
+      <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:10px;">Categories follow CDC adult guidelines (BMI, kg/m&sup2;): Underweight &lt;18.5 &middot; Healthy 18.5&ndash;24.9 &middot; Overweight 25.0&ndash;29.9 &middot; Obesity 30+ (Class 1: 30&ndash;34.9, Class 2: 35&ndash;39.9, Class 3 &ldquo;severe&rdquo;: 40+). BMI is a screening measure, not a diagnosis.</div>
+    </div>
+    <div style="padding:14px 20px 20px;">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Energy &amp; daily targets</div>
+      <sc-for list="{{ energyRows }}" as="er" hint-placeholder-count="6">
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--color-neutral-300);">
+          <span style="font:500 13px var(--font-body);color:var(--color-neutral-700);">{{ er.label }}</span>
+          <span style="font:700 13px var(--font-body);">{{ er.val }}</span>
+        </div>
+      </sc-for>
+      <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:10px;">BMR via Mifflin-St Jeor &middot; TDEE via activity factor &middot; protein per ISSN guidance. Changing your metrics re-ranks every Fit Score.</div>
+      <button class="btn btn-secondary btn-block" style="min-height:48px;margin-top:14px;" onClick="{{ goLegal }}">Legal, privacy &amp; consent</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isGym }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Gym and activity" class="fc-scroll" style="flex:1;overflow-y:auto;">
+    <div style="padding:12px 20px;border-bottom:2px solid var(--color-divider);display:flex;align-items:center;gap:10px;">
+      <button onClick="{{ goDashboard }}" aria-label="Back" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;min-width:44px;min-height:44px;display:flex;align-items:center;font:800 20px var(--font-heading);">&larr;</button>
+      <div style="font:800 18px var(--font-heading);">Gym &amp; activity</div>
+      <span class="tag tag-outline" style="margin-left:auto;">Partner demo</span>
+    </div>
+    <div style="margin:14px 20px;border:2px solid var(--color-text);border-radius:16px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <div>
+        <div style="font:800 15px var(--font-heading);">Planet Fitness &middot; Fenway</div>
+        <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:2px;">Membership linked &middot; check-ins normally arrive automatically from the door system</div>
+      </div>
+      <span class="tag tag-accent" style="flex:none;">Linked</span>
+    </div>
+    <sc-if value="{{ gymNotChecked }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:0 20px 14px;border-bottom:2px solid var(--color-divider);">
+        <button class="btn btn-primary btn-block" style="min-height:48px;" onClick="{{ gymCheckIn }}">Check in — I&rsquo;m at the gym</button>
+        <div style="font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);margin-top:8px;">Manual check-in for this demo. A check-in credits an estimated session to today&rsquo;s energy budget.</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ gymChecked }}" hint-placeholder-val="{{ false }}">
+      <div style="margin:0 20px 14px;border:2px solid var(--color-accent);border-radius:16px;padding:12px 14px;">
+        <div style="font:800 15px var(--font-heading);color:var(--color-accent-700);">Checked in today</div>
+        <div style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-700);margin-top:4px;">45-min session, estimated ~310 kcal (MET-based from your weight — an estimate, not a measurement).</div>
+        <sc-if value="{{ gymAdjustOn }}" hint-placeholder-val="{{ true }}">
+          <div style="font:600 12px var(--font-body);margin-top:8px;">Today&rsquo;s budget raised to {{ targetCal }} kcal — includes the +310 gym credit.</div>
+        </sc-if>
+        <sc-if value="{{ gymAdjustOff }}" hint-placeholder-val="{{ false }}">
+          <div style="font:600 12px var(--font-body);color:var(--color-neutral-600);margin-top:8px;">Gym credit is off — budget stays at {{ targetCal }} kcal.</div>
+        </sc-if>
+      </div>
+      <div style="padding:0 20px 14px;border-bottom:2px solid var(--color-divider);">
+        <button onClick="{{ toggleGymAdjust }}" style="all:unset;box-sizing:border-box;cursor:pointer;border-radius:14px;display:flex;gap:10px;align-items:flex-start;min-height:44px;">
+          <span style="width:18px;height:18px;flex:none;margin-top:1px;border-radius:6px;border:2px solid var(--color-text);background:{{ gymAdjustFill }};display:inline-block;"></span>
+          <span style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-700);">Raise my calorie budget on gym days. Fit Scores and every screen re-rank instantly when this changes.</span>
+        </button>
+      </div>
+    </sc-if>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+        <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">This week</div>
+        <div style="font:500 11px var(--font-body);color:var(--color-neutral-600);">{{ gymWeekSummary }}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <sc-for list="{{ gymWeek }}" as="gd" hint-placeholder-count="7">
+          <div style="flex:1;text-align:center;">
+            <div style="width:26px;height:26px;margin:0 auto;border-radius:50%;border:2px solid var(--color-text);background:{{ gd.fill }};"></div>
+            <div style="font:600 10px var(--font-body);color:{{ gd.labelColor }};margin-top:4px;">{{ gd.day }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:700 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">Recovery</div>
+      <div style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-700);margin:4px 0 10px;">After training, protein is the macro to prioritize. See tonight&rsquo;s dishes ranked for recovery.</div>
+      <button class="btn btn-primary btn-block" style="min-height:48px;" onClick="{{ gymRecovery }}">High-protein dinners near you</button>
+    </div>
+    <div style="margin:14px 20px 0;border:2px solid var(--color-divider);border-radius:16px;padding:12px 14px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+        <div style="font:800 13px var(--font-heading);">Member perk</div>
+        <span class="tag tag-outline">{{ gymPerkTag }}</span>
+      </div>
+      <div style="font:500 12px/1.5 var(--font-body);color:var(--color-neutral-700);margin-top:4px;">10&percnt; off partner-verified restaurants after a check-in, applied automatically at checkout. Funded by the gym partnership — never by ranking changes.</div>
+    </div>
+    <div style="padding:14px 20px 20px;font:500 11px/1.5 var(--font-body);color:var(--color-neutral-600);">Session calories are MET-based estimates from duration and your weight — not device measurements. Check-in data is used only to adjust your budget and is deletable anytime.</div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ showDayBar }}" hint-placeholder-val="{{ true }}">
+  <div style="border-top:2px solid var(--color-divider);background:var(--color-bg);padding:10px 16px;display:flex;align-items:center;gap:12px;">
+    <button onClick="{{ goDashboard }}" style="all:unset;cursor:pointer;flex:1;min-height:44px;display:flex;flex-direction:column;justify-content:center;">
+      <span style="font:600 9px var(--font-body);text-transform:uppercase;letter-spacing:.1em;color:var(--color-neutral-600);">Left today</span>
+      <span style="font:800 17px var(--font-heading);">{{ remainingCal }} kcal</span>
+    </button>
+    <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}">
+      <button class="btn btn-primary" style="min-height:44px;" onClick="{{ goCart }}">Order &middot; {{ cartCount }} &middot; {{ cartSubtotalStr }}</button>
+    </sc-if>
+    <sc-if value="{{ noCart }}" hint-placeholder-val="{{ true }}">
+      <button class="btn btn-secondary" style="min-height:44px;" onClick="{{ goDashboard }}">Today</button>
+    </sc-if>
+  </div>
+  </sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:560,&quot;height&quot;:980},&quot;goal&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;lose&quot;,&quot;maintain&quot;,&quot;gain&quot;],&quot;default&quot;:&quot;lose&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Profile&quot;},&quot;deliveryFee&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:5.99,&quot;min&quot;:0,&quot;max&quot;:12,&quot;step&quot;:0.5,&quot;section&quot;:&quot;Ordering&quot;},&quot;showProvenance&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Trust&quot;}}">
+class Component extends DCLogic {
+  state = { screen: 'onboarding', obStep: 0, sex: 'male', activity: 'moderate', goalSel: null, slug: null, dishId: null, cart: [], fulfill: 'pickup', pay: 'fpay', order: null, orderStep: 0, logged: [], weightKg: 82, heightCm: 178, age: 31, photoStage: 'idle', photoItems: [], diet: [], allg: [], conds: [], consent: false, legalOpen: null, legalFrom: 'profile', query: '', filters: [], gymCheckedIn: false, gymAdjust: true };
+
+  GYM_BONUS = 310; // 45 min · ~5 MET · MET*kg*hours, rounded
+  gymBonus(){ return (this.state.gymAdjust && this.state.gymCheckedIn) ? this.GYM_BONUS : 0; }
+  writeGym(next){ try{ localStorage.setItem('forkcast-gym', JSON.stringify({ checkedIn:next.gymCheckedIn, adjust:next.gymAdjust, bonus:this.GYM_BONUS, ts:Date.now() })); }catch(e){} }
+
+  FILTER_OPTS = ['Partner-verified','High protein','Under 500 kcal','Low sodium','High fiber'];
+
+  dishPass(d, ignoreQuery){
+    const q = this.state.query.trim().toLowerCase();
+    const fl = this.state.filters;
+    return (ignoreQuery || !q || (d.name+' '+d.desc).toLowerCase().includes(q))
+      && (!fl.includes('High protein') || d.p>=30 || (d.p*4)/d.cal>=0.3)
+      && (!fl.includes('Under 500 kcal') || d.cal<=500)
+      && (!fl.includes('Low sodium') || d.sodium<=700)
+      && (!fl.includes('High fiber') || d.fiber>=8);
+  }
+
+  DIET_OPTS = ['Vegetarian','Vegan','Pescatarian','Halal','Gluten-free'];
+  ALLG_OPTS = ['Dairy','Peanut','Tree nut','Shellfish','Soy','Egg','Sesame','Wheat'];
+  COND_OPTS = ['Hypertension','Heart disease','Type 2 diabetes','High cholesterol','Kidney disease'];
+  ALLG_KEYS = { 'Dairy':['feta','yogurt','cheese','paneer','halloumi','crema','parmesan','ranch','raita','tzatziki'],
+    'Peanut':['peanut'], 'Tree nut':['almond','cashew','walnut','pecan'], 'Shellfish':['shrimp','crab','lobster'],
+    'Soy':['edamame','tofu','soy','ponzu','tempeh'], 'Egg':['egg','mayo','aioli'], 'Sesame':['sesame','tahini','hummus'],
+    'Wheat':['farro','wrap','baguette','lavash','roti','bulgur','freekeh','sourdough','granola','fattoush','tabbouleh'] };
+  MEAT_KEYS = ['chicken','steak','sirloin','lamb','pork','carnitas','turkey','shawarma','kebab','burger'];
+  FISH_KEYS = ['salmon','tuna','ahi','fish','shrimp','poke'];
+
+  LEGAL = [
+    ['Privacy Policy','Your health profile and meal logs are sensitive personal data. In this demo they live only on your device; in production they are encrypted, never sold, and you can export or permanently delete them at any time.'],
+    ['Consent to Health Data Processing','We process your metrics (sex, age, height, weight, activity, goal, conditions, allergies) solely to compute targets and rank dishes. Consent is granular and revocable; withdrawing it stops personalization but keeps the app usable.'],
+    ['Terms of Service','Forkcast is a nutrition decision-support tool, not a medical device. It does not diagnose, treat, or replace advice from a clinician or registered dietitian.'],
+    ['Nutrition Estimate Methodology','Values come from partner-provided recipes or Forkcast estimation, each labeled with source, serving assumption, confidence range, and review date. Estimates are never presented as laboratory measurements.'],
+    ['Allergen Limitations','Allergen flags are inferred from listed ingredients and can be wrong or incomplete. They are never a guarantee — always confirm directly with the restaurant before ordering.'],
+    ['Corrections Policy','Restaurants and users can submit corrections. Every accepted correction is timestamped and versioned; we never silently change published nutrition data.'],
+    ['Sponsored Placement Policy','Sponsored placement is always labeled and can never modify a Fit Score, ranking weight, or nutrition value.'],
+    ['Accessibility Statement','Forkcast targets WCAG 2.2 AA: keyboard access, visible focus, 44px touch targets, reduced motion, and screen-reader-labeled charts. Report issues to access@forkcast.app.']
+  ];
+
+  PAST_ORDERS = [
+    { no:'F-1084', slug:'blue-bowl-poke', when:'Sun, Jul 12 · 7:04 PM', fulfill:'pickup', items:[{ id:'p1', qty:1 }] },
+    { no:'F-1063', slug:'verdant', when:'Fri, Jul 10 · 12:22 PM', fulfill:'delivery', items:[{ id:'v1', qty:1 }, { id:'v2', qty:1 }] }
+  ];
+
+  reorder(slug, items){
+    this.setState({ cart: items.map(it=>({ slug, id:it.id, qty:it.qty })), slug, screen:'cart' });
+  }
+
+  toggleIn(key, val){ this.setState(s=>({ [key]: s[key].includes(val) ? s[key].filter(x=>x!==val) : s[key].concat(val) })); }
+
+  dietConflict(text){
+    const t = text.toLowerCase();
+    const d = this.state.diet;
+    const meat = this.MEAT_KEYS.some(k=>t.includes(k)), fish = this.FISH_KEYS.some(k=>t.includes(k));
+    if ((d.includes('Vegan') || d.includes('Vegetarian')) && (meat||fish)) return 'Not ' + (d.includes('Vegan')?'vegan':'vegetarian');
+    if (d.includes('Pescatarian') && meat) return 'Not pescatarian';
+    return null;
+  }
+
+  allergenHits(text){
+    const t = text.toLowerCase();
+    return this.state.allg.filter(a=>this.ALLG_KEYS[a].some(k=>t.includes(k)));
+  }
+
+  condWarnings(item){
+    const c = this.state.conds, out = [];
+    if ((c.includes('Hypertension')||c.includes('Heart disease')||c.includes('Kidney disease')) && item.sodium>800) out.push('High sodium for your profile');
+    if (c.includes('Type 2 diabetes') && item.sugar>15) out.push('High sugar for your profile');
+    if ((c.includes('High cholesterol')||c.includes('Heart disease')) && item.f>28) out.push('High fat for your profile');
+    return out;
+  }
+
+  PHOTO_MOCK = [
+    { name:'Grilled chicken breast', portion:'6 oz', cal:280, p:53, c:0, f:6, conf:'High' },
+    { name:'Brown rice', portion:'1 cup', cal:220, p:5, c:46, f:2, conf:'High' },
+    { name:'Roasted broccoli', portion:'1 cup', cal:80, p:5, c:8, f:4, conf:'Medium' },
+    { name:'Olive oil (drizzle)', portion:'1 tbsp', cal:60, p:0, c:0, f:7, conf:'Low' }
+  ];
+
+  analyzePhoto = () => {
+    clearTimeout(this._pt);
+    this.setState({ photoStage:'analyzing' });
+    this._pt = setTimeout(()=>this.setState({ photoStage:'result', photoItems:this.PHOTO_MOCK.map(m=>({ ...m, qty:1 })) }), 1800);
+  };
+
+  photoQty(i, delta){
+    this.setState(s=>{
+      const items = s.photoItems.map((it,j)=>j===i?{ ...it, qty:Math.round((it.qty+delta)*2)/2 }:it).filter(it=>it.qty>0);
+      return { photoItems: items, photoStage: items.length? 'result' : 'idle' };
+    });
+  }
+
+  logPhoto = () => {
+    const time = new Date().toLocaleTimeString('en-US',{ hour:'numeric', minute:'2-digit' });
+    const add = this.state.photoItems.map(it=>({ name:it.name, cal:Math.round(it.cal*it.qty), p:Math.round(it.p*it.qty), c:Math.round(it.c*it.qty), f:Math.round(it.f*it.qty), meta:time + ' · Photo · AI estimate (corrected by you)' }));
+    this.setState(s=>({ logged:s.logged.concat(add), photoStage:'idle', photoItems:[], screen:'dashboard' }));
+  };
+
+  DATA = [
+    { slug:'verdant', name:'Verdant', cuisine:'Salads & Grain Bowls', hood:'Back Bay', dist:0.6, partner:true, conf:8, eta:'18–28 min', pickupEta:'15–20 min', reviewed:'Jun 12, 2026', corrections:2, sponsored:false,
+      menu:[
+        ['v1','Harvest Power Bowl','Kale, quinoa, roasted chicken, sweet potato, almonds, lemon-tahini.',14.5,540,38,48,20,11,620,9],
+        ['v2','Green Goddess Salad','Romaine, avocado, cucumber, edamame, pumpkin seeds, herb dressing.',12.75,420,18,30,26,12,540,6],
+        ['v3','Steak & Farro Bowl','Grilled steak, farro, roasted broccoli, feta, balsamic.',16.5,620,40,52,26,10,720,7],
+        ['v4','Buffalo Chicken Salad','Grilled buffalo chicken, romaine, carrot, blue-cheese yogurt.',13.95,510,42,22,28,6,980,5],
+        ['v5','Citrus Salmon Bowl','Brown rice, seared salmon, snap peas, mango, sesame.',16.95,580,34,56,24,8,600,12]]},
+    { slug:'char-and-greens', name:'Char & Greens', cuisine:'Grill & Bowls', hood:'Seaport', dist:1.9, partner:true, conf:8, eta:'16–26 min', pickupEta:'12–18 min', reviewed:'Jul 2, 2026', corrections:1, sponsored:false,
+      menu:[
+        ['c1','Grilled Chicken & Greens','Double chicken breast, mixed greens, sweet potato, chimichurri.',14.5,540,52,38,18,9,640,7],
+        ['c2','Turkey Burger (lettuce-wrap)','Turkey patty, avocado, tomato, side salad.',13.5,480,40,18,28,7,720,5],
+        ['c3','Blackened Salmon Bowl','Salmon, quinoa, asparagus, lemon.',17.0,580,40,42,26,8,600,5],
+        ['c4','Steak & Sweet Potato Frites','Grilled sirloin, baked sweet potato fries, greens.',18.0,660,46,52,28,9,760,8],
+        ['c5','Buffalo Cauliflower Bowl','Roasted cauliflower, farro, slaw, ranch yogurt.',12.5,460,16,58,18,12,820,8]]},
+    { slug:'blue-bowl-poke', name:'Blue Bowl Poke', cuisine:'Hawaiian Poke', hood:'Fenway', dist:0.9, partner:true, conf:8, eta:'15–25 min', pickupEta:'10–15 min', reviewed:'Jun 28, 2026', corrections:0, sponsored:false,
+      menu:[
+        ['p1','Classic Ahi Poke','Ahi tuna, brown rice, edamame, seaweed, ponzu.',15.5,520,36,60,12,8,780,7],
+        ['p2','Double Protein Power','Ahi + salmon, cauliflower rice, edamame.',17.5,540,48,28,22,9,760,6],
+        ['p3','Spicy Salmon Bowl','Salmon, white rice, cucumber, avocado, spicy mayo.',15.75,640,32,62,28,7,820,9],
+        ['p4','Tofu Greens Bowl','Tofu, mixed greens, edamame, mango, sesame-ginger.',13.0,430,22,44,18,10,560,12]]},
+    { slug:'sol-and-lima', name:'Sol & Lima', cuisine:'Modern Mexican', hood:'South End', dist:1.1, partner:false, conf:15, eta:'20–30 min', pickupEta:'15–22 min', reviewed:'May 30, 2026', corrections:0, sponsored:true,
+      menu:[
+        ['s1','Chicken Burrito Bowl','Grilled chicken, brown rice, black beans, pico, guac.',13.5,620,42,64,22,14,880,6],
+        ['s2','Baja Fish Tacos (3)','Grilled white fish, cabbage slaw, lime crema.',13.75,480,30,46,18,7,760,6],
+        ['s3','Carnitas Tacos (3)','Pork carnitas, corn tortillas, onion, cilantro, salsa.',13.0,560,34,48,26,8,940,5],
+        ['s4','Chicken Tortilla Soup','Chicken, hominy, tomato, avocado.',9.5,360,26,34,14,8,820,6]]},
+    { slug:'lavash', name:'Lavash', cuisine:'Armenian & Mediterranean', hood:'Central Sq', dist:1.4, partner:true, conf:8, eta:'22–34 min', pickupEta:'18–25 min', reviewed:'Jun 20, 2026', corrections:3, sponsored:false,
+      menu:[
+        ['l1','Chicken Shawarma Plate','Marinated chicken, brown rice, salad, garlic sauce.',15.0,640,45,58,24,9,880,6],
+        ['l2','Grilled Salmon Plate','Salmon, freekeh, roasted vegetables, yogurt-dill.',18.0,590,38,44,28,11,640,6],
+        ['l3','Red Lentil Soup & Fattoush','Red lentil soup with a crisp fattoush salad.',11.0,380,18,52,10,16,760,9],
+        ['l4','Falafel Mezze','Falafel, hummus, tabbouleh, warm lavash.',13.5,560,20,64,26,15,720,8]]}
+  ];
+
+  dishOf(row){ return { id:row[0], name:row[1], desc:row[2], price:row[3], cal:row[4], p:row[5], c:row[6], f:row[7], fiber:row[8], sodium:row[9], sugar:row[10] }; }
+
+  goal(){ return this.state.goalSel ?? this.props.goal ?? 'lose'; }
+
+  ACT_OPTS = [
+    ['sedentary','Sedentary','Desk job, little exercise'],
+    ['light','Light','Exercise 1–3 days/week'],
+    ['moderate','Moderate','Exercise 3–5 days/week'],
+    ['active','Active','Exercise 6–7 days/week'],
+    ['very_active','Very active','Hard training / physical job']
+  ];
+
+  targets(){
+    const p = { sex:this.state.sex, age:this.state.age, heightCm:this.state.heightCm, weightKg:this.state.weightKg, activity:this.state.activity, goal:this.goal() };
+    const AF = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725, very_active:1.9 };
+    const bmr = 10*p.weightKg + 6.25*p.heightCm - 5*p.age + (p.sex==='male'?5:-161);
+    const tdee = bmr * AF[p.activity];
+    const delta = { lose:-500, maintain:0, gain:300 }[p.goal];
+    const calories = Math.max(p.sex==='male'?1500:1200, Math.round((tdee+delta)/10)*10);
+    const protein = Math.round({ lose:2.0, maintain:1.6, gain:1.8 }[p.goal] * p.weightKg);
+    const fatCal = calories*0.27;
+    const fat = Math.round(fatCal/9);
+    const carbs = Math.round(Math.max(0, calories - protein*4 - fatCal)/4);
+    return { calories: calories + this.gymBonus(), protein, carbs, fat };
+  }
+
+  baseLogged(){ return [{ name:'Greek yogurt, berries & granola', cal:410, p:24, c:52, f:12, meta:'8:12 AM · Photo-logged · home' },
+    { name:'Turkey & avocado wrap', cal:520, p:32, c:44, f:22, meta:'12:40 PM · Logged · Flour Bakery' }]; }
+
+  allLogged(){ return this.baseLogged().concat(this.state.logged); }
+
+  consumed(){
+    return this.allLogged().reduce((a,m)=>({ cal:a.cal+m.cal, p:a.p+m.p, c:a.c+m.c, f:a.f+m.f }), { cal:0, p:0, c:0, f:0 });
+  }
+
+  clamp01(x){ return Math.max(0, Math.min(1, x)); }
+
+  fit(item, t, remainingCal){
+    const goal = this.goal();
+    const calT = Math.max(300, Math.min(t.calories*0.35, remainingCal>0 ? remainingCal*0.9 : 300));
+    const pd = (item.p*4)/Math.max(1,item.cal);
+    const sigma = item.cal>calT ? calT*0.5 : calT*0.85;
+    const z = (item.cal-calT)/sigma;
+    const calScore = Math.exp(-0.5*z*z);
+    const proteinScore = this.clamp01(pd/0.3);
+    const fiberScore = this.clamp01(item.fiber/8);
+    const sodiumScore = this.clamp01(1-(item.sodium-600)/1400);
+    const sugarScore = this.clamp01(1-(item.sugar-8)/27);
+    let w = { cal:.3, protein:.3, fiber:.12, sodium:.14, sugar:.14 };
+    if (goal==='lose') w = { cal:.34, protein:.32, fiber:.12, sodium:.12, sugar:.1 };
+    if (goal==='gain') w = { cal:.22, protein:.36, fiber:.12, sodium:.16, sugar:.14 };
+    const score = Math.round(this.clamp01(w.cal*calScore + w.protein*proteinScore + w.fiber*fiberScore + w.sodium*sodiumScore + w.sugar*sugarScore)*100);
+    const reasons = [], warnings = [];
+    if (pd>=0.3 || item.p>=30) reasons.push('High protein');
+    if (item.fiber>=6) reasons.push('Good fiber');
+    if (item.cal<=calT*1.05) reasons.push('Fits your remaining budget');
+    if (item.sodium<=600) reasons.push('Low sodium');
+    if (item.sugar<=8) reasons.push('Low sugar');
+    if (item.cal>calT*1.3) warnings.push('Calorie-heavy for your remaining day');
+    if (item.sodium>1400) warnings.push('High sodium');
+    if (item.sugar>25) warnings.push('High sugar');
+    if (pd<0.15 && item.p<20) warnings.push('Low protein');
+    return { score, reasons:reasons.slice(0,3), warnings:warnings.slice(0,2) };
+  }
+
+  bmiClass(v){
+    if (v < 18.5) return 'Underweight';
+    if (v < 25) return 'Healthy weight';
+    if (v < 30) return 'Overweight';
+    if (v < 35) return 'Obesity — Class 1';
+    if (v < 40) return 'Obesity — Class 2';
+    return 'Obesity — Class 3 (severe)';
+  }
+
+  bump(key, delta, min, max){ this.setState(s=>({ [key]: Math.max(min, Math.min(max, s[key]+delta)) })); }
+
+  restBySlug(slug){ return this.DATA.find(r=>r.slug===slug); }
+
+  cartTotals(){
+    let sub=0, cal=0, p=0, c=0, f=0, n=0;
+    this.state.cart.forEach(e=>{
+      const r = this.restBySlug(e.slug); const d = this.dishOf(r.menu.find(m=>m[0]===e.id));
+      sub += d.price*e.qty; cal += d.cal*e.qty; p += d.p*e.qty; c += d.c*e.qty; f += d.f*e.qty; n += e.qty;
+    });
+    return { sub, cal, p, c, f, n };
+  }
+
+  money(x){ return '$' + x.toFixed(2); }
+  fmt(x){ return Math.round(x).toLocaleString('en-US'); }
+  pctStr(v, t){ return Math.max(0, Math.min(100, Math.round(v/t*100))) + '%'; }
+
+  go = (screen, extra) => this.setState(Object.assign({ screen }, extra||{}));
+
+  addToCart = (slug, id) => this.setState(s=>{
+    const cart = s.cart.filter(e=>e.slug===slug); // one restaurant per order
+    const ex = cart.find(e=>e.id===id);
+    const next = ex ? cart.map(e=>e.id===id?{ ...e, qty:e.qty+1 }:e) : cart.concat({ slug, id, qty:1 });
+    return { cart: next };
+  });
+
+  changeQty(slug, id, delta){
+    this.setState(s=>{
+      const next = s.cart.map(e=>e.id===id&&e.slug===slug?{ ...e, qty:e.qty+delta }:e).filter(e=>e.qty>0);
+      return { cart: next, screen: next.length? s.screen : 'menu' };
+    });
+  }
+
+  BUS_KEY = 'forkcast-live-order';
+  readBus(){ try{ return JSON.parse(localStorage.getItem(this.BUS_KEY)); }catch(e){ return null; } }
+  writeBus(bus){ try{ localStorage.setItem(this.BUS_KEY, JSON.stringify(bus)); }catch(e){} }
+
+  placeOrder = () => {
+    const ct = this.cartTotals();
+    if (!ct.n) return;
+    const slug = this.state.cart[0].slug;
+    const r = this.restBySlug(slug);
+    const items = this.state.cart.map(e=>{ const d=this.dishOf(r.menu.find(m=>m[0]===e.id)); return { ...d, qty:e.qty }; });
+    const no = 'F-' + (1000+Math.floor(Math.random()*900));
+    clearInterval(this._t);
+    this.setState({ order:{ no, slug, items, fulfill:this.state.fulfill, totals:ct, perk:this.state.gymCheckedIn && r.partner, logged:false }, orderStep:0, screen:'tracking', cart:[] });
+    const flags = [];
+    items.forEach(it=>{
+      const txt = it.name+' '+it.desc;
+      this.allergenHits(txt).forEach(a=>flags.push(a + ' allergy on the customer\u2019s profile — ' + it.name + ' may contain ' + a.toLowerCase() + '. Confirm before preparing.'));
+      const dc = this.dietConflict(txt);
+      if (dc) flags.push(dc + ' — preference conflict acknowledged by the customer for ' + it.name + '. No action needed.');
+    });
+    this.writeBus({ no, slug, restName:r.name, customer:'Alex M.',
+      placed:new Date().toLocaleTimeString('en-US',{ hour:'numeric', minute:'2-digit' }),
+      fulfill:this.state.fulfill, perk:this.state.gymCheckedIn && r.partner,
+      items: items.map(it=>({ name:it.name, qty:it.qty, price:it.price, cal:it.cal })),
+      flags, status:'new', claimed:false, ts:Date.now() });
+    this._placedAt = Date.now();
+    this._t = setInterval(()=>this.syncOrder(), 1000);
+  };
+
+  syncOrder(){
+    const bus = this.readBus();
+    if (!bus || !this.state.order || bus.no !== this.state.order.no) return;
+    // fallback: if no terminal has claimed the order, simulate the kitchen
+    if (!bus.claimed){
+      const age = Date.now() - (this._placedAt || 0);
+      let ns = bus.status;
+      if (bus.status==='new' && age > 22000) ns = 'preparing';
+      else if (bus.status==='preparing' && age > 40000) ns = 'ready';
+      if (ns !== bus.status){ bus.status = ns; this.writeBus(bus); }
+    }
+    const step = { new:0, preparing:2, ready:3, done:3 }[bus.status] ?? 0;
+    this.setState(s=>{
+      if (!s.order) return null;
+      let logged = s.logged, order = s.order;
+      if (step>=1 && !s.order.logged){
+        const time = new Date().toLocaleTimeString('en-US',{ hour:'numeric', minute:'2-digit' });
+        const add = s.order.items.map(it=>({ name:it.name, cal:it.cal*it.qty, p:it.p*it.qty, c:it.c*it.qty, f:it.f*it.qty, meta:time + ' · Ordered · ' + this.restBySlug(s.order.slug).name }));
+        logged = s.logged.concat(add);
+        order = { ...s.order, logged:true };
+      } else if (step === s.orderStep) return null;
+      return { orderStep:step, logged, order };
+    });
+  }
+
+  componentWillUnmount(){ clearInterval(this._t); clearTimeout(this._pt); }
+
+  renderVals(){
+    const st = this.state;
+    const t = this.targets();
+    const cons = this.consumed();
+    const remaining = Math.max(0, t.calories - cons.cal);
+    const ct = this.cartTotals();
+    const provenanceOn = this.props.showProvenance ?? true;
+    const deliveryFee = this.props.deliveryFee ?? 5.99;
+    const ring = (score, r) => { const C = 2*Math.PI*r; return (score/100*C).toFixed(1) + ' ' + C.toFixed(1); };
+    const ringColor = s => s>=65 ? 'var(--color-accent)' : 'var(--color-neutral-500)';
+
+    const restaurants = this.DATA.map(r=>{
+      const dishes = r.menu.map(row=>{ const d=this.dishOf(row); return { d, fit:this.fit(d,t,remaining) }; }).sort((a,b)=>b.fit.score-a.fit.score);
+      const top = dishes[0];
+      return {
+        slug:r.slug, name:r.name, cuisine:r.cuisine, hood:r.hood, dist:r.dist, eta:r.eta, sponsored:r.sponsored,
+        imgId:'hero-'+r.slug,
+        badge: r.partner ? 'Partner-verified menu' : 'Estimated from menu',
+        badgeCls: r.partner ? 'tag tag-accent' : 'tag tag-outline',
+        topDish: top.d.name, topScore: top.fit.score,
+        ringDash: ring(top.fit.score,19), ringColor: ringColor(top.fit.score),
+        open: ()=>this.go('menu',{ slug:r.slug }),
+        _sorted: dishes
+      };
+    }).sort((a,b)=>b.topScore-a.topScore);
+
+    const curSlug = st.slug || this.DATA[0].slug;
+    const rRaw = this.restBySlug(curSlug);
+    const rView = restaurants.find(x=>x.slug===curSlug);
+    const rest = {
+      name:rRaw.name, cuisine:rRaw.cuisine, hood:rRaw.hood, dist:rRaw.dist, eta:rRaw.eta, pickupEta:rRaw.pickupEta,
+      conf:rRaw.conf, imgId:'hero-'+rRaw.slug, badge:rView.badge, badgeCls:rView.badgeCls,
+      sourceLine: rRaw.partner
+        ? 'Recipe-level data provided by ' + rRaw.name + ' and verified on their Forkcast terminal · reviewed ' + rRaw.reviewed + ' · ' + rRaw.corrections + ' correction(s) on record'
+        : 'Estimated by Forkcast from the public menu — not yet partner-verified · last reviewed ' + rRaw.reviewed
+    };
+
+    const dishes = rView._sorted.map(({ d, fit })=>({
+      id:d.id, name:d.name, priceStr:this.money(d.price), cal:d.cal, p:d.p,
+      score:fit.score, ringDash:ring(fit.score,19), ringColor:ringColor(fit.score),
+      imgId:'dish-'+d.id,
+      hasFlag: !!(this.dietConflict(d.name+' '+d.desc) || this.allergenHits(d.name+' '+d.desc).length || fit.score>=80 || d.cal>remaining),
+      flag: this.dietConflict(d.name+' '+d.desc)
+        || (this.allergenHits(d.name+' '+d.desc).length ? 'May contain ' + this.allergenHits(d.name+' '+d.desc).join(', ').toLowerCase() : null)
+        || (d.cal>remaining ? 'Over your remaining budget' : 'Top pick for your day'),
+      open: ()=>this.go('dish',{ slug:curSlug, dishId:d.id })
+    }));
+
+    const curDishRow = rRaw.menu.find(m=>m[0]===(st.dishId||rRaw.menu[0][0])) || rRaw.menu[0];
+    const dd = this.dishOf(curDishRow);
+    const df = this.fit(dd, t, remaining);
+    const inCartQty = st.cart.filter(e=>e.id===dd.id).reduce((a,e)=>a+e.qty,0);
+    const rng = (v)=>{ const lo=Math.round(v*(1-rRaw.conf/100)), hi=Math.round(v*(1+rRaw.conf/100)); return lo + '–' + hi; };
+    const dish = {
+      name:dd.name, desc:dd.desc, priceStr:this.money(dd.price), restName:rRaw.name,
+      imgId:'dish-'+dd.id, score:df.score, ringDash:ring(df.score,30), ringColor:ringColor(df.score),
+      conf:rRaw.conf,
+      reasons: df.reasons.map(x=>({ t:x })),
+      warnings: df.warnings
+        .concat(this.condWarnings(dd))
+        .concat(this.dietConflict(dd.name+' '+dd.desc) ? [this.dietConflict(dd.name+' '+dd.desc)] : [])
+        .concat(this.allergenHits(dd.name+' '+dd.desc).map(a=>'May contain ' + a.toLowerCase() + ' — ask the restaurant'))
+        .map(x=>({ t:x })),
+      rows: [
+        { label:'Calories', val: dd.cal + ' (' + rng(dd.cal) + ')', pct:this.pctStr(dd.cal, Math.max(remaining,1)) },
+        { label:'Protein', val: dd.p + ' g', pct:this.pctStr(dd.p, Math.max(t.protein-cons.p,1)) },
+        { label:'Carbs', val: dd.c + ' g', pct:this.pctStr(dd.c, Math.max(t.carbs-cons.c,1)) },
+        { label:'Fat', val: dd.f + ' g', pct:this.pctStr(dd.f, Math.max(t.fat-cons.f,1)) },
+        { label:'Fiber', val: dd.fiber + ' g', pct:this.pctStr(dd.fiber, 8) },
+        { label:'Sodium', val: dd.sodium + ' mg', pct:this.pctStr(dd.sodium, 2000) }
+      ],
+      sourceLine: rest.sourceLine,
+      budgetLine: dd.cal<=remaining
+        ? 'Leaves ' + this.fmt(remaining-dd.cal) + ' kcal for the rest of your day.'
+        : 'Runs ' + this.fmt(dd.cal-remaining) + ' kcal past your remaining budget.',
+      addLabel: inCartQty ? 'Add another — ' + this.money(dd.price) : 'Add to order — ' + this.money(dd.price),
+      inCart: inCartQty>0,
+      add: ()=>this.addToCart(curSlug, dd.id)
+    };
+
+    const cartSlug = st.cart.length ? st.cart[0].slug : curSlug;
+    const cartRest = this.restBySlug(cartSlug);
+    const cartItems = st.cart.map(e=>{
+      const d = this.dishOf(cartRest.menu.find(m=>m[0]===e.id));
+      return { name:d.name, qty:e.qty, cal:d.cal*e.qty, p:d.p*e.qty, priceStr:this.money(d.price*e.qty),
+        inc:()=>this.changeQty(e.slug,e.id,1), dec:()=>this.changeQty(e.slug,e.id,-1) };
+    });
+
+    const proj = { cal:cons.cal+ct.cal, p:cons.p+ct.p, c:cons.c+ct.c, f:cons.f+ct.f };
+    const impact = [
+      ['Calories', proj.cal, t.calories, cons.cal, ct.cal, 'kcal'],
+      ['Protein', proj.p, t.protein, cons.p, ct.p, 'g'],
+      ['Carbs', proj.c, t.carbs, cons.c, ct.c, 'g'],
+      ['Fat', proj.f, t.fat, cons.f, ct.f, 'g']
+    ].map(([label, v, tgt, now, add, unit])=>({
+      label, valStr: this.fmt(v) + ' / ' + this.fmt(tgt) + ' ' + unit,
+      nowPct: this.pctStr(now, tgt),
+      addPct: Math.min(100-Math.min(100,Math.round(now/tgt*100)), Math.round(add/tgt*100)) + '%'
+    }));
+
+    const alerts = [];
+    if (ct.n){
+      if (proj.cal > t.calories) alerts.push({ w:1, text:'This order puts you ' + this.fmt(proj.cal-t.calories) + ' kcal over today\u2019s budget — consider a smaller portion or splitting it.' });
+      else if (proj.cal > t.calories*0.95) alerts.push({ w:1, text:'Close to your ceiling — only ' + this.fmt(t.calories-proj.cal) + ' kcal would remain for the rest of the day.' });
+      const calPct = proj.cal/t.calories;
+      [['p','Protein'],['f','Fat'],['c','Carbs']].forEach(([k,label])=>{
+        const tgt = { p:t.protein, f:t.fat, c:t.carbs }[k];
+        const pct = proj[k]/tgt;
+        if (pct < calPct-0.18) alerts.push({ w:1, text:label + ' is falling behind your day — about ' + this.fmt(tgt*calPct-proj[k]) + ' g short of pace.' });
+      });
+      if (proj.p >= t.protein*0.85 && proj.cal <= t.calories) alerts.push({ w:0, text:'Protein is on track for the day.' });
+      if (!alerts.length) alerts.push({ w:0, text:'This order keeps your day balanced.' });
+    }
+    const alertVals = alerts.map(a=>({ text:a.text, color:a.w?'var(--color-accent)':'var(--color-text)', textColor:a.w?'var(--color-accent-700)':'var(--color-neutral-800)' }));
+
+    const isDelivery = st.fulfill==='delivery';
+    const fee = isDelivery ? deliveryFee : 0;
+    const perkOn = st.gymCheckedIn && cartRest.partner;
+    const perkDisc = perkOn ? ct.sub*0.10 : 0;
+    const tax = (ct.sub-perkDisc)*0.07;
+    const total = ct.sub - perkDisc + fee + tax;
+    const sel = on => on ? 'var(--color-text)' : 'var(--color-neutral-300)';
+    const selBg = on => on ? 'var(--color-neutral-100)' : 'transparent';
+
+    const order = st.order;
+    const orderRest = order ? this.restBySlug(order.slug) : rRaw;
+    const stepDefs = order ? [
+      { label:'Sent to ' + orderRest.name + '\u2019s Forkcast terminal', sub:'Order placed from your app straight to their in-store iPad' },
+      { label:'Accepted by the kitchen', sub:'Meal logged to your day automatically' },
+      { label:'Preparing', sub:'Estimated ' + (order.fulfill==='delivery'?orderRest.eta:orderRest.pickupEta) },
+      order.fulfill==='delivery' ? { label:'Out for delivery', sub:'DoorDash partner courier' } : { label:'Ready for pickup', sub:orderRest.hood + ' — show your order number' }
+    ] : [];
+    const orderSteps = stepDefs.map((s,i)=>({
+      label:s.label, sub:s.sub,
+      fill: i<st.orderStep ? 'var(--color-text)' : (i===st.orderStep ? 'var(--color-accent)' : 'transparent'),
+      color: i<=st.orderStep ? 'var(--color-text)' : 'var(--color-neutral-500)',
+      anim: i===st.orderStep && st.orderStep<3 ? 'fc-pulse 1.2s infinite' : 'none'
+    }));
+    const orderCal = order ? order.items.reduce((a,it)=>a+it.cal*it.qty,0) : 0;
+
+    const macroLeft = [
+      { label:'Protein', left:this.fmt(Math.max(0,t.protein-cons.p)), pct:this.pctStr(cons.p,t.protein) },
+      { label:'Carbs', left:this.fmt(Math.max(0,t.carbs-cons.c)), pct:this.pctStr(cons.c,t.carbs) },
+      { label:'Fat', left:this.fmt(Math.max(0,t.fat-cons.f)), pct:this.pctStr(cons.f,t.fat) }
+    ];
+
+    const hM = st.heightCm/100;
+    const bmiV = st.weightKg/(hM*hM);
+    const bmiPct = Math.max(0, Math.min(100, (bmiV-15)/30*100));
+    const bmiSegs = [[15,18.5],[18.5,25],[25,30],[30,35],[35,40],[40,45]].map(([lo,hi])=>({
+      w: ((hi-lo)/30*100).toFixed(1)+'%',
+      bg: (bmiV>=lo && bmiV<hi) ? 'var(--color-text)' : 'var(--color-neutral-400)'
+    }));
+    const totalIn = Math.round(st.heightCm/2.54);
+    const profileMetrics = [
+      { label:'Weight', sub:(st.weightKg*2.20462).toFixed(0)+' lb', val:st.weightKg+' kg', inc:()=>this.bump('weightKg',1,40,220), dec:()=>this.bump('weightKg',-1,40,220) },
+      { label:'Height', sub:Math.floor(totalIn/12)+'\u2032'+(totalIn%12)+'\u2033', val:st.heightCm+' cm', inc:()=>this.bump('heightCm',1,130,220), dec:()=>this.bump('heightCm',-1,130,220) },
+      { label:'Age', sub:'years', val:String(st.age), inc:()=>this.bump('age',1,18,100), dec:()=>this.bump('age',-1,18,100) }
+    ];
+    const AFMAP = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725, very_active:1.9 };
+    const AF = AFMAP[st.activity];
+    const actLabel = this.ACT_OPTS.find(a=>a[0]===st.activity)[1];
+    const bmrV = 10*st.weightKg + 6.25*st.heightCm - 5*st.age + (st.sex==='male'?5:-161);
+    const energyRows = [
+      { label:'BMR (Mifflin-St Jeor)', val:this.fmt(bmrV)+' kcal' },
+      { label:'TDEE ('+actLabel.toLowerCase()+' activity)', val:this.fmt(bmrV*AF)+' kcal' },
+      { label:'Daily calorie target', val:this.fmt(t.calories)+' kcal' },
+      { label:'Protein target', val:this.fmt(t.protein)+' g' },
+      { label:'Carb target', val:this.fmt(t.carbs)+' g' },
+      { label:'Fat target', val:this.fmt(t.fat)+' g' }
+    ];
+    const healthyLo = 18.5*hM*hM, healthyHi = 24.9*hM*hM;
+
+    const pTot = st.photoItems.reduce((a,it)=>({ cal:a.cal+it.cal*it.qty, p:a.p+it.p*it.qty, c:a.c+it.c*it.qty, f:a.f+it.f*it.qty }), { cal:0, p:0, c:0, f:0 });
+    const photoItems = st.photoItems.map((it,i)=>({
+      name:it.name, portionStr:it.portion, cal:this.fmt(it.cal*it.qty), conf:it.conf,
+      qtyStr:it.qty+'\u00d7', inc:()=>this.photoQty(i,0.5), dec:()=>this.photoQty(i,-0.5)
+    }));
+
+    const selBg2 = on => on ? 'var(--color-neutral-100)' : 'transparent';
+    const obTitles = [
+      ['Step 1 of 4','About you','Your BMR formula needs sex and age — nothing is shared.'],
+      ['Step 2 of 4','Your body','We compute BMI and calibrate your calorie budget.'],
+      ['Step 3 of 4','How active are you?','Sets your TDEE — total daily energy expenditure.'],
+      ['Step 4 of 4','Your goal','Sets the daily calorie delta and protein target.']
+    ][st.obStep];
+    const GOAL_OPTS = [
+      ['lose','Lose weight','−500 kcal/day ≈ 1 lb per week'],
+      ['maintain','Maintain','Eat at your TDEE'],
+      ['gain','Build muscle','+300 kcal/day lean surplus']
+    ];
+
+    return {
+      query: st.query,
+      setQuery: (e)=>this.setState({ query: e.target.value }),
+      filterChips: this.FILTER_OPTS.map(o=>({ label:o, cls: st.filters.includes(o)?'tag tag-accent':'tag tag-outline', toggle:()=>this.toggleIn('filters',o) })),
+      clearSearch: ()=>this.setState({ query:'', filters:[] }),
+      ...(()=>{
+        const q = st.query.trim().toLowerCase();
+        const active = q || st.filters.length;
+        const list = restaurants.filter(r=>{
+          if (st.filters.includes('Partner-verified') && r.badgeCls!=='tag tag-accent') return false;
+          return true;
+        }).map(r=>{
+          const rRawX = this.restBySlug(r.slug);
+          const rMatch = q && (rRawX.name+' '+rRawX.cuisine+' '+rRawX.hood).toLowerCase().includes(q);
+          const matches = r._sorted.filter(({ d })=>this.dishPass(d, rMatch));
+          if (!matches.length) return null;
+          const top = matches[0];
+          const ring = s => (s/100*2*Math.PI*19).toFixed(1)+' '+(2*Math.PI*19).toFixed(1);
+          return { ...r,
+            topDish: top.d.name, topScore: top.fit.score,
+            ringDash: ring(top.fit.score), ringColor: top.fit.score>=65?'var(--color-accent)':'var(--color-neutral-500)',
+            matchLabel: active ? matches.length + ' of ' + r._sorted.length + ' dishes match' : 'Best fit for you'
+          };
+        }).filter(Boolean).sort((a,b)=>b.topScore-a.topScore);
+        return {
+          discoverList: list,
+          noResults: list.length===0,
+          discoverHeading: active ? 'Results · ranked for your remaining day' : 'Ranked for your remaining day'
+        };
+      })(),
+      isOnboarding: st.screen==='onboarding',
+      obDots: [0,1,2,3].map(i=>({ bg: i<=st.obStep ? 'var(--color-accent)' : 'var(--color-neutral-300)' })),
+      obStepLabel: obTitles[0], obTitle: obTitles[1], obSub: obTitles[2],
+      obS0: st.obStep===0, obS1: st.obStep===1, obS2: st.obStep===2, obS3: st.obStep===3,
+      setMale: ()=>this.setState({ sex:'male' }), setFemale: ()=>this.setState({ sex:'female' }),
+      maleBorder: sel(st.sex==='male'), maleBg: selBg2(st.sex==='male'),
+      femaleBorder: sel(st.sex==='female'), femaleBg: selBg2(st.sex==='female'),
+      obAgeMetric: [{ label:'Age', val:String(st.age), inc:()=>this.bump('age',1,18,100), dec:()=>this.bump('age',-1,18,100) }],
+      obBodyMetrics: profileMetrics.slice(0,2),
+      activityOpts: this.ACT_OPTS.map(([k,label,sub])=>({ label, sub,
+        border: sel(st.activity===k), bg: selBg2(st.activity===k), dot: st.activity===k?'var(--color-accent)':'transparent',
+        pick: ()=>this.setState({ activity:k }) })),
+      goalOpts: GOAL_OPTS.map(([k,label,sub])=>({ label, sub,
+        border: sel(this.goal()===k), bg: selBg2(this.goal()===k), dot: this.goal()===k?'var(--color-accent)':'transparent',
+        pick: ()=>this.setState({ goalSel:k }) })),
+      obPreview: [
+        { label:'BMI', val:(Math.round(bmiV*10)/10).toFixed(1) },
+        { label:'BMR', val:this.fmt(bmrV) },
+        { label:'TDEE', val:this.fmt(bmrV*AF) },
+        { label:'Target', val:this.fmt(t.calories) }
+      ],
+      obNotFirst: st.obStep>0,
+      obBack: ()=>this.setState(s=>({ obStep:Math.max(0,s.obStep-1) })),
+      obNext: ()=>{ if (st.obStep===0 && !st.consent) return; st.obStep<3 ? this.setState(s=>({ obStep:s.obStep+1 })) : this.go('discover'); },
+      obNextLabel: st.obStep===0 && !st.consent ? 'Agree above to continue' : (st.obStep<3 ? 'Next' : 'Start discovering'),
+      obNextOpacity: st.obStep===0 && !st.consent ? '0.45' : '1',
+      toggleConsent: ()=>this.setState(s=>({ consent:!s.consent })),
+      consentFill: st.consent ? 'var(--color-accent)' : 'transparent',
+      goLegalFromOb: (e)=>{ e && e.stopPropagation && e.stopPropagation(); this.setState({ legalFrom:'onboarding', screen:'legal' }); },
+      isLegal: st.screen==='legal',
+      goLegal: ()=>this.setState({ legalFrom:'profile', screen:'legal' }),
+      legalBack: ()=>this.go(st.legalFrom),
+      legalItems: this.LEGAL.map(([title, body], i)=>({
+        title, body,
+        open: st.legalOpen===i,
+        chev: st.legalOpen===i ? '−' : '+',
+        toggle: ()=>this.setState(s=>({ legalOpen: s.legalOpen===i ? null : i }))
+      })),
+      obSkip: ()=>this.go('discover'),
+      profileSummary: (st.sex==='male'?'Male':'Female') + ' · ' + actLabel + ' activity · goal set in onboarding',
+      isOrders: st.screen==='orders',
+      goOrders: ()=>this.go('orders'),
+      orderHistory: (st.order ? [{ live:true, o:st.order }] : []).concat(this.PAST_ORDERS.map(p=>({ live:false, o:p }))).map(({ live, o })=>{
+        const r0 = this.restBySlug(o.slug);
+        const its = live ? o.items.map(it=>({ id:it.id, qty:it.qty })) : o.items;
+        const detail = its.map(it=>{ const d=this.dishOf(r0.menu.find(m=>m[0]===it.id)); return { d, qty:it.qty }; });
+        const sub = detail.reduce((a,x)=>a+x.d.price*x.qty,0);
+        const kcal = detail.reduce((a,x)=>a+x.d.cal*x.qty,0);
+        const fee = o.fulfill==='delivery' ? (this.props.deliveryFee ?? 5.99) : 0;
+        const disc = (live && o.perk) ? sub*0.10 : 0;
+        const done = !live || st.orderStep>=3;
+        return {
+          rest: r0.name,
+          when: live ? 'Today' : o.when,
+          itemsStr: detail.map(x=>(x.qty>1?x.qty+'× ':'')+x.d.name).join(' · '),
+          status: live ? (done?'Completed':'In progress') : 'Completed',
+          statusCls: (live && !done) ? 'tag tag-accent' : 'tag tag-neutral',
+          fulfillStr: o.fulfill==='delivery' ? 'Delivery' : 'Pickup',
+          totalStr: this.money(sub - disc + fee + (sub-disc)*0.07),
+          kcalStr: this.fmt(kcal),
+          isActive: live && !done,
+          track: ()=>this.go('tracking'),
+          reorder: ()=>this.reorder(o.slug, its)
+        };
+      }),
+      isPhoto: st.screen==='photo',
+      goPhoto: ()=>this.go('photo'),
+      photoIdle: st.photoStage==='idle', photoAnalyzing: st.photoStage==='analyzing', photoResult: st.photoStage==='result',
+      analyzePhoto: this.analyzePhoto, logPhoto: this.logPhoto,
+      resetPhoto: ()=>this.setState({ photoStage:'idle', photoItems:[] }),
+      photoItems,
+      photoTotal: this.fmt(pTot.cal),
+      photoRange: this.fmt(pTot.cal*0.88)+'–'+this.fmt(pTot.cal*1.12),
+      photoMacros: this.fmt(pTot.p)+'g P · '+this.fmt(pTot.c)+'g C · '+this.fmt(pTot.f)+'g F',
+      photoBudgetLine: pTot.cal<=remaining
+        ? 'Leaves ' + this.fmt(remaining-pTot.cal) + ' kcal for the rest of your day.'
+        : 'Runs ' + this.fmt(pTot.cal-remaining) + ' kcal past your remaining budget.',
+      isProfile: st.screen==='profile',
+      goProfile: ()=>this.go('profile'),
+      profileMetrics,
+      bmiVal: (Math.round(bmiV*10)/10).toFixed(1),
+      bmiClass: this.bmiClass(bmiV),
+      bmiPos: bmiPct.toFixed(1)+'%',
+      bmiSegs,
+      healthyRange: Math.round(healthyLo)+'–'+Math.round(healthyHi)+' kg',
+      energyRows,
+      dietChips: this.DIET_OPTS.map(o=>({ label:o, cls: st.diet.includes(o)?'tag tag-accent':'tag tag-outline', toggle:()=>this.toggleIn('diet',o) })),
+      allergenChips: this.ALLG_OPTS.map(o=>({ label:o, cls: st.allg.includes(o)?'tag tag-accent':'tag tag-outline', toggle:()=>this.toggleIn('allg',o) })),
+      condChips: this.COND_OPTS.map(o=>({ label:o, cls: st.conds.includes(o)?'tag tag-accent':'tag tag-outline', toggle:()=>this.toggleIn('conds',o) })),
+      isDiscover: st.screen==='discover', isMenu: st.screen==='menu', isDish: st.screen==='dish',
+      isCart: st.screen==='cart', isCheckout: st.screen==='checkout', isTracking: st.screen==='tracking', isDashboard: st.screen==='dashboard',
+      showDayBar: ['discover','menu','dish'].includes(st.screen),
+      goalLabel: { lose:'Cutting', maintain:'Maintaining', gain:'Building' }[this.goal()],
+      targetCal: this.fmt(t.calories), remainingCal: this.fmt(remaining),
+      macroMini: macroLeft, restaurants, rest, dishes, dish, provenanceOn,
+      hasCart: ct.n>0, noCart: ct.n===0, cartCount: ct.n,
+      cartSubtotalStr: this.money(ct.sub), cartRestName: cartRest.name,
+      cartItems, impact, alerts: alertVals,
+      pickupBorder: sel(!isDelivery), pickupBg: selBg(!isDelivery),
+      deliveryBorder: sel(isDelivery), deliveryBg: selBg(isDelivery),
+      deliveryFeeStr: this.money(deliveryFee),
+      fpayBorder: sel(st.pay==='fpay'), fpayBg: selBg(st.pay==='fpay'), fpayDot: st.pay==='fpay'?'var(--color-accent)':'transparent',
+      cardBorder: sel(st.pay==='card'), cardBg: selBg(st.pay==='card'), cardDot: st.pay==='card'?'var(--color-accent)':'transparent',
+      feeLabel: isDelivery ? 'Delivery (DoorDash partner)' : 'Pickup', feeStr: isDelivery ? this.money(fee) : 'Free',
+      taxStr: this.money(tax), totalStr: this.money(total),
+      perkOn, perkDiscStr: '\u2212' + this.money(perkDisc),
+      gymPerkTag: st.gymCheckedIn ? 'Active \u00b7 applies at checkout' : 'Activates on check-in',
+      setPickup: ()=>this.setState({ fulfill:'pickup' }), setDelivery: ()=>this.setState({ fulfill:'delivery' }),
+      setPayFpay: ()=>this.setState({ pay:'fpay' }), setPayCard: ()=>this.setState({ pay:'card' }),
+      placeOrder: this.placeOrder,
+      orderNo: order ? order.no : '', orderLogged: !!(order && order.logged),
+      orderHeadline: order ? (st.orderStep===0?'Sending to the restaurant…':st.orderStep===1?'Kitchen accepted your order':st.orderStep===2?'Your food is being prepared':(order.fulfill==='delivery'?'Out for delivery':'Ready for pickup')) : '',
+      orderSub: order ? orderRest.name + ' · ' + (order.fulfill==='delivery'?'Delivery via DoorDash':'Pickup · ' + orderRest.hood) : '',
+      orderSteps,
+      orderLogLine: order ? this.fmt(orderCal) + ' kcal added to today — no manual logging needed. Snap a photo later only if you didn\u2019t finish it.' : '',
+      dayConsumed: this.fmt(cons.cal),
+      dayRingDash: ring(Math.min(100, cons.cal/t.calories*100), 56),
+      dayRingColor: cons.cal>t.calories ? 'var(--color-accent)' : 'var(--color-text)',
+      dayMacros: [
+        { label:'Protein', valStr:this.fmt(cons.p)+' / '+this.fmt(t.protein)+' g', pct:this.pctStr(cons.p,t.protein) },
+        { label:'Carbs', valStr:this.fmt(cons.c)+' / '+this.fmt(t.carbs)+' g', pct:this.pctStr(cons.c,t.carbs) },
+        { label:'Fat', valStr:this.fmt(cons.f)+' / '+this.fmt(t.fat)+' g', pct:this.pctStr(cons.f,t.f||t.fat) }
+      ],
+      weekBars: (()=>{
+        const seeds = [1980, 2140, 1720, 1890, 2310, 1650];
+        const vals = seeds.concat(cons.cal);
+        const max = Math.max(t.calories*1.15, ...vals);
+        const now = new Date();
+        return vals.map((v,i)=>{
+          const d = new Date(now); d.setDate(now.getDate()-(6-i));
+          const today = i===6;
+          return {
+            day: today ? 'Today' : d.toLocaleDateString('en-US',{ weekday:'short' }),
+            valStr: this.fmt(v),
+            h: Math.round(v/max*100)+'%',
+            bg: v>t.calories ? 'var(--color-accent)' : (today ? 'var(--color-neutral-500)' : 'var(--color-text)'),
+            labelColor: today ? 'var(--color-text)' : 'var(--color-neutral-600)'
+          };
+        });
+      })(),
+      weekTargetPos: Math.round(t.calories/Math.max(t.calories*1.15, 2310, cons.cal)*100)+'%',
+      dayMeals: this.allLogged().map(m=>({ name:m.name, meta:m.meta, cal:this.fmt(m.cal) })),
+      todayStr: new Date().toLocaleDateString('en-US',{ weekday:'short', month:'short', day:'numeric' }),
+      coachLine: remaining>400
+        ? 'You have room for a full dinner. Protein is the macro to prioritize tonight.'
+        : 'Tight budget left — a soup or salad-sized dinner fits best.',
+      isGym: st.screen==='gym',
+      goGym: ()=>this.go('gym'),
+      gymStatusShort: st.gymCheckedIn ? (st.gymAdjust ? '+'+this.GYM_BONUS+' kcal today' : 'checked in') : 'linked',
+      gymNotChecked: !st.gymCheckedIn, gymChecked: st.gymCheckedIn,
+      gymCheckIn: ()=>{ this.writeGym({ gymCheckedIn:true, gymAdjust:st.gymAdjust }); this.setState({ gymCheckedIn:true }); },
+      gymAdjustOn: st.gymAdjust, gymAdjustOff: !st.gymAdjust,
+      gymAdjustFill: st.gymAdjust ? 'var(--color-accent)' : 'transparent',
+      toggleGymAdjust: ()=>{ this.writeGym({ gymCheckedIn:st.gymCheckedIn, gymAdjust:!st.gymAdjust }); this.setState(s=>({ gymAdjust:!s.gymAdjust })); },
+      gymRecovery: ()=>this.setState({ filters:['High protein'], query:'', screen:'discover' }),
+      ...(()=>{
+        const now = new Date(), checkins = [true,false,true,false,true,false];
+        const week = checkins.concat(st.gymCheckedIn).map((on,i)=>{
+          const d = new Date(now); d.setDate(now.getDate()-(6-i));
+          const today = i===6;
+          return { day: today ? 'Today' : d.toLocaleDateString('en-US',{ weekday:'short' }),
+            fill: on ? 'var(--color-accent)' : 'transparent',
+            labelColor: today ? 'var(--color-text)' : 'var(--color-neutral-600)' };
+        });
+        const n = week.filter(w=>w.fill!=='transparent').length;
+        return { gymWeek: week, gymWeekSummary: n + ' check-in' + (n===1?'':'s') + ' · 5-week streak' };
+      })(),
+      goDiscover: ()=>this.go('discover'), goMenu: ()=>this.go('menu'),
+      goCart: ()=>this.go('cart'), goCheckout: ()=>this.go('checkout'),
+      goDashboard: ()=>this.go('dashboard'),
+      goBackFromCart: ()=>this.go('menu')
+    };
+  }
+}
+</script>
+</body>
+</html>

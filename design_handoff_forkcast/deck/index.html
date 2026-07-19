@@ -1,0 +1,695 @@
+<!-- @template name="Deck" description="A twenty-one-slide presentation starter: cover, contents, dividers, bullets, column and quadrant layouts, a data table, charts and a timeline in static SVG, full- and half-bleed imagery, a quote and a close, with page furniture, on the theme's tokens" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Forkcast — investor overview</title>
+<script src="./ds-base.js"></script>
+<style>
+deck-stage:not(:defined) { visibility: hidden; }
+
+/* Template scaffolding — slide layout and projection-scale sizing only; every
+   color, font, radius and shadow comes from ../../styles.css. Change one
+   number here to re-size the whole deck. */
+deck-stage {
+  --type-display: 124px;
+  --type-title: 64px;
+  --type-subtitle: 40px;
+  --type-body: 34px;
+  --type-small: 28px;
+  --type-kicker: 24px;
+  --pad-x: 120px;
+  --pad-top: 96px;
+  --pad-bottom: 120px;
+  --page-foot-note: "Forkcast · Confidential — July 2026"; /* the deck-wide folio text (page furniture; see the PAGE FURNITURE note below) */
+  --baseline: 48px; /* grid unit — one default-text line: the 34px Archivo body at its ~1.41
+     deck leading (a compact sans). The strong 120px pad-bottom puts the pinned footer
+     baseline on the 20th gridline (960) — the Swiss poster's firm foot. */
+}
+
+.slide {
+  display: flex; flex-direction: column;
+  background: var(--color-bg); color: var(--color-text);
+  font-family: var(--font-body);
+  text-wrap: pretty; /* inherited: better breaks, no orphans on wrapped blocks */
+  padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+
+/* — shared pieces — */
+/* Baseline grid: text sits on a 48px rhythm (--baseline) measured from the
+   slide's top edge. Snapped text blocks are trimmed to their cap and baseline
+   edges (text-box), so a block's bottom edge IS its last baseline and the next
+   block's first baseline lands N gridlines down with
+   margin-top: calc(N * var(--baseline) - 1cap). Compact rhythms (table rows,
+   chart axes and ticks) sit on the 24px half-step. Review the rhythm with
+   ?baselines in the URL, or press B (script at the end of the page) —
+   half-step lines draw fainter than full ones. */
+/* The structure is drawn: this system organises the page with strong rules
+   in its 40%-ink divider token — so the deck rules its header band (the 2px
+   rule under the kicker row — suppressed on the bleed slides, where it
+   would cut the photograph), its contents rows (2px, the section-divider
+   weight), and keeps the table component's 2px/1px rules, all ON gridlines
+   and flush with the text edge. Red is the one accent and stays sparing on
+   content slides — small marks and single highlights; its one full-page
+   statement is the section divider. */
+.kicker {
+  position: absolute; top: calc(1.5 * var(--baseline) - 1cap); /* baseline on the half-step at 72 — review round 3 (Barron: the top line and the band sat too low); the header cluster rides the 24px half-step lattice, a compact rhythm like the table rows */
+  left: var(--pad-x); text-box: trim-both cap alphabetic;
+  font-size: var(--type-kicker); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--color-accent);
+  font-feature-settings: "tnum" 1; /* Archivo's text digits are proportional by default —
+     columns and furniture take tabular */
+}
+/* The header band: a 2px rule on the half-step at 120 (review round 3 —
+   risen with the kicker, holding their 48px separation), closing the kicker
+   row — the system's section-divider weight as slide furniture (a style
+   call; the rule-less decks pin the kicker alone). It spans the content
+   width on every slide that carries a kicker; the bleed and half-bleed
+   slides suppress it entirely (a rule across a photograph cuts it). */
+.kicker::after {
+  content: ""; position: absolute; left: 0; right: 0;
+  top: calc(2.5 * var(--baseline) - 1px - (1.5 * var(--baseline) - 1cap)); /* 2px rule centered on the 120 half-step, positioned relative to the kicker's own top */
+  height: 2px; background: var(--color-divider);
+}
+.kicker { right: var(--pad-x); } /* the ::after needs the kicker box to span the content width; the text inside stays a line */
+.slide-title {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: var(--type-title); line-height: calc(1.5 * var(--baseline)); letter-spacing: -0.015em; margin: 0;
+  margin-left: -0.058em; /* optical left alignment — see the note below */
+  text-box: trim-both cap alphabetic;
+}
+/* Optical left alignment — the deliberate exception to box-edge alignment
+   the reviewed decks share, re-derived for this face (the rules generalize,
+   the numbers never do — see ../../../deck-templates.md). Archivo's Black
+   cut carries heavy flat bearings and light diagonal ones: measured from
+   the 800's hmtx (cross-checked against render scans), flat stems sit at
+   0.075-0.077em, rounds at 0.045-0.049em, T at 0.024em, A/W/V at
+   0.007-0.014em, S at 0.044em. One value per class targets the population:
+   -0.058em keeps flats a hair inset (0.017em), lands rounds just past flush
+   (0.013em over — the round overhang hand-set margins allow), and lets the
+   diagonals overhang the way the reviewed compact-sans deck's -0.06em does.
+   Digits: the 800's figures are mono-width by default (uniform 0.625em
+   advances; the "1" pads its bearing to 0.101em) and the face ships no
+   proportional display forms — pnum is a no-op — so each digit class
+   compensates its own leading-glyph population (.ghost-num -0.045em for
+   the "0" ghosts, .hero-num -0.101em for the padded "1"); the 400's text
+   digits ARE proportional by default, so COLUMNS opt into "tnum" (see
+   .kicker). */
+.pin-bottom { position: absolute; left: var(--pad-x); right: var(--pad-x); bottom: var(--pad-bottom); }
+.meta { display: flex; align-items: baseline; gap: 18px; font-size: var(--type-kicker); color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+.meta span { text-box: trim-both cap alphabetic; } /* pinned at pad-bottom: baseline lands on the 20th gridline at 960 */
+
+/* PAGE FURNITURE — on by default. To remove the page numbers and footer
+   text deck-wide, add the no-page-furniture attribute to the <deck-stage>
+   tag (a one-line tweak); to change the text, edit --page-foot-note in
+   the deck's token block. The folio sits flush left on the text axis with
+   its baseline ON the 960 footer gridline — the same line the cover's
+   pinned meta row uses — at the meta row's scale and 55% ink, the number
+   tabular like every column figure. Carried by the content slides (hero,
+   quote, split and the half-bleeds included — on the half-bleeds it follows
+   the copy half, because small muted type cannot pass the
+   type-over-photography rule). The cover and close keep their meta rows
+   instead, the full bleed's photograph owns its edges, and the dividers
+   stay clean — the full-red page is this system's one poster statement,
+   and furniture would dilute it. Every slide still counts, so the printed
+   number stays truthful to position. */
+deck-stage { counter-reset: page; }
+.slide { counter-increment: page; }
+.page-foot {
+  position: absolute; left: var(--pad-x); bottom: var(--pad-bottom);
+  font-size: var(--type-kicker);
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  text-box: trim-both cap alphabetic; /* bottom edge = baseline, pinned to 960 */
+}
+.page-foot::before { content: counter(page) " · "; font-feature-settings: "tnum" 1; /* furniture digits are columns — see .kicker */ }
+.page-foot::after { content: var(--page-foot-note); }
+deck-stage[no-page-furniture] .page-foot, deck-stage[no-page-furniture] .page-head { display: none !important; }
+.half-bleed:not(.flip) .page-foot { left: calc(960px + var(--pad-x)); } /* the folio follows the copy half — type never sits on the photograph (deck-templates.md law) */
+
+/* — cover and close — */
+.cover { justify-content: center; }
+.cover .rise { display: flex; flex-direction: column; gap: 48px; }
+.display {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: var(--type-display); line-height: calc(2.5 * var(--baseline)); letter-spacing: -0.02em; margin: 0;
+  margin-left: -0.058em; /* optical left alignment — see the .slide-title note */
+}
+.cover-sub { font-size: var(--type-subtitle); line-height: var(--baseline); max-width: 40ch; margin: 0; }
+
+/* — contents — */
+/* Ruled rows at the section-divider weight — 2px in the divider token, the
+   system's "strong horizontal rules between sections" made literal (a style
+   call; the hairline deck rules its rows at 1px, the rule-less decks use
+   whitespace). Rules sit ON gridlines at a three-gridline pitch; the row
+   text centers its cap box between rule centerlines — the documented optical
+   exception ruled rows share (the 1px terms are the 2px rules' halves). */
+.toc { display: flex; flex-direction: column; max-width: 1100px;
+  font-size: var(--type-subtitle); border-top: 2px solid var(--color-divider); }
+.toc-row { display: flex; align-items: baseline; gap: 48px;
+  border-bottom: 2px solid var(--color-divider);
+  padding-block: calc(1.5 * var(--baseline) - 0.5cap - 1px); }
+.toc-row > span { text-box: trim-both cap alphabetic; }
+.toc-num { font-size: var(--type-kicker); color: var(--color-accent); font-feature-settings: "tnum" 1; }
+
+/* — section dividers — */
+/* Dividers sit on a ground of their own — the shared deck contract (see
+   ../../../deck-templates.md): the ground change is what makes sections read
+   as breaks when flipping the deck. Modernist's divider ground is the full
+   red page — the Swiss poster statement, the system's one place where the
+   accent runs as a field instead of a mark. Type reverses to the paper
+   token; contrast re-derived for the red ground (printed values are
+   per-ground): paper display type 3.8:1 (display-grade; the divider sets
+   nothing small), ghost re-pinned below. */
+.divider { justify-content: center; background: var(--color-accent); color: var(--color-bg); }
+.divider .rise { display: flex; flex-direction: column; align-items: flex-start; gap: 48px; }
+.ghost-num {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 260px; line-height: 0.9; letter-spacing: -0.02em;
+  color: var(--color-accent-700); /* ghost on the red ground: 1.7:1 — the deep step reads as
+     a shadow of the field, presence without competing with the title */
+  /* the ghosts lead with "0" (lsb 0.045em): -0.045em lands them flush. No
+     pnum here — the face has no proportional figures (see the .hero-num
+     note); the mono-width defaults are what renders. */
+  margin-left: -0.045em;
+}
+
+/* — content slides — */
+.content { padding-top: calc(5 * var(--baseline)); /* title baseline on the 5th gridline, clear of the pinned kicker row */ }
+.content > .slide-title, .content > .chart-head { margin-top: -1cap; } /* cap-trimmed: the baseline, not the cap top, sits on the gridline */
+.content > .bullets { margin-top: calc(2.5 * var(--baseline) - 1cap); } /* review round 3: the list rises to the half-step — tighter under the title */
+.content > .table { margin-top: calc(2 * var(--baseline)); } /* top edge on a gridline */
+.content > .toc { margin-top: calc(2 * var(--baseline)); } /* ruled rows: the top rule sits on the
+   gridline two below the title baseline (336); four 3-gridline bands close at 912, one
+   gridline above the 960 footer line — inside the vertical budget */
+.content > figure { margin-top: var(--baseline); }
+.content > .chart-caption { margin-top: calc(2 * var(--baseline) - 1cap); }
+.bullets { display: flex; flex-direction: column; max-width: 1220px; margin: 0; padding: 0; list-style: none; font-size: var(--type-body); }
+.bullets li { position: relative; line-height: var(--baseline); text-box: trim-both cap alphabetic; }
+.bullets li + li { margin-top: calc(1.5 * var(--baseline) - 1cap); } /* review round 3: a 72px item pitch (three half-steps, was two gridlines) — wrapped lines inside an item keep the 48px grid leading; item baselines ride the half-step lattice */
+/* the bullet mark is drawn, not type: a 10px red square — the system's
+   square, zero-radius geometry at marker scale, in the accent the way the
+   reviewed dark deck colors its rule-marks — hanging in the left margin
+   (the text never indents; one alignment axis), optically centered on the
+   first line's cap. Red squares are "small emphasis" in this system's own
+   grammar; the prose stays ink. */
+.bullets li::before { content: ""; position: absolute; left: -36px; top: calc(0.5cap - 5px); width: 10px; height: 10px; background: var(--color-accent); } /* review round 3: 10px square hung 26px clear of the axis (was 12px at 32px) — smaller, and sitting closer to its line */
+
+/* — column layouts — */
+/* Ruled columns: each column opens with a 2px rule in the divider token —
+   the header band's weight carried into the columns, the way this system
+   draws its structure (a style call; the rule-less decks organise columns
+   with whitespace alone). Rule centerlines sit ON the gridline two below
+   the title baseline (336, via the -1px term, as the toc's rules do);
+   column heads hang one gridline below the rule, bodies one more down,
+   and every baseline rides the 48px lattice. The gutter is one grid unit.
+   Heads set at body scale in the heading cut with no optical shift — the
+   deck compensates display sizes only (.slide-title and up); at 34px the
+   800's ink inset is under 3px, inside the reviewed tolerance. Measures:
+   two columns ≈50ch, three ≈32ch at the small size — both clear the 30ch
+   floor for this face. */
+.cols { display: grid; column-gap: var(--baseline); margin-top: calc(2 * var(--baseline) - 1px); }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.cols > div { border-top: 2px solid var(--color-divider); }
+.cols h3 { font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: var(--type-body); line-height: var(--baseline); margin: 0;
+  margin-top: calc(var(--baseline) - 1cap - 1px); /* head baseline one gridline below the rule's centerline */
+  text-box: trim-both cap alphabetic; }
+.cols p { font-size: var(--type-small); line-height: var(--baseline); margin: 0;
+  margin-top: calc(var(--baseline) - 1cap); /* first body baseline one gridline below the head's */
+  text-box: trim-both cap alphabetic; }
+
+/* — quadrants — */
+/* The 2x2 matrix divided by DRAWN rules — a 2px crossing in the divider
+   token, vertical through the content center (960), horizontal on the 576
+   gridline: the system's grid made literal (the whitespace decks divide
+   with the gutter alone). Geometry: matrix top on the 336 gridline, two
+   4-gridline rows with a 2-gridline row gap, so cell-head baselines land
+   on 384/672, cell lines from 432/720, and the matrix foot on
+   816. The axis pair prints one gridline lower (baseline 864), two clear
+   of the 960 folio line. Left column = lower x; the y reading (top row
+   stricter) is carried by the cell copy — a drawn y-axis pair has no
+   flush-left seat in this system, so the horizontal pair does the labeling
+   (the shared-spec minimum), and the one-liners name both states. */
+.quad { position: relative; display: grid; grid-template-columns: 1fr 1fr;
+  grid-template-rows: calc(4 * var(--baseline)) calc(4 * var(--baseline));
+  gap: calc(2 * var(--baseline)) 96px; margin-top: calc(2 * var(--baseline)); }
+.quad::before { content: ""; position: absolute; left: calc(50% - 1px); top: 0; bottom: 0; width: 2px; background: var(--color-divider); }
+.quad::after { content: ""; position: absolute; top: calc(50% - 1px); left: 0; right: 0; height: 2px; background: var(--color-divider); }
+.quad h3 { font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: var(--type-body); line-height: var(--baseline); margin: 0;
+  margin-top: calc(var(--baseline) - 1cap); /* head baseline one gridline below the cell top */
+  text-box: trim-both cap alphabetic; }
+.quad p { font-size: var(--type-small); line-height: var(--baseline); margin: 0;
+  margin-top: calc(var(--baseline) - 1cap);
+  text-box: trim-both cap alphabetic; }
+.quad-axis { display: flex; justify-content: space-between;
+  margin-top: calc(var(--baseline) - 1cap); /* label baselines one gridline below the matrix foot (864) */
+  font-size: var(--type-kicker); color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+.quad-axis span { text-box: trim-both cap alphabetic; }
+
+/* — data table (component class at projection scale) — */
+.slide .table { max-width: 1560px; font-size: 29px; font-feature-settings: "tnum" 1; }
+/* 96px row pitch (two gridlines): the component's own rules land on
+   gridlines, and — the deliberate optical exception the ruled-row decks
+   share — the cell text centers its cap box between rule centerlines. The
+   component draws a 2px header rule and 1px row rules, so the th bottom
+   term is 1px (half of 2px) and the td terms are 0.5px; the cap terms
+   cancel, so the pitch holds in any font. The rules themselves are the
+   system's .table component's: this deck adds none of its own. */
+.slide .table th, .slide .table td { text-box: trim-both cap alphabetic; }
+.slide .table th {
+  font-size: var(--type-kicker);
+  padding: calc(var(--baseline) - 0.5cap) 24px calc(var(--baseline) - 0.5cap - 1px);
+}
+.slide .table td {
+  padding: calc(var(--baseline) - 0.5cap - 0.5px) 24px calc(var(--baseline) - 0.5cap - 0.5px);
+}
+.slide .table tbody tr:hover { background: none; } /* a projected slide has no hover state */
+.slide .table th:first-child, .slide .table td:first-child { padding-left: 0; }
+.slide .table th:last-child, .slide .table td:last-child { padding-right: 0; }
+.slide .table td:first-child { width: 64px; position: relative; }
+/* Out of flow so its 40px box can't stretch the cap-trimmed row; centered on
+   the 96px row band like the row text. Square corners — the swatch keeps the
+   system's zero radius. Transform-free so exporters that read offsets stay
+   exact. */
+.slide .table .swatch { position: absolute; left: 0; top: calc(var(--baseline) - 20px); }
+.swatch { display: inline-block; width: 40px; height: 40px; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
+
+/* — hero figure — */
+.hero { justify-content: center; gap: 48px; }
+.hero-num {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 280px; line-height: 1; letter-spacing: -0.02em; margin: 0;
+  color: var(--color-accent); /* the accent as a single huge mark — red spent on one figure,
+     the way this system lets its one color carry emphasis */
+  /* this face has NO proportional figures: the 800's default digits are the
+     mono-width set (uniform 0.625em advances) and its pnum table maps only
+     .tf forms back to those defaults, so the shared pnum escape for padded
+     tabular ones is a no-op here. The hero leads with the padded "1"
+     (lsb 0.101em — contrast ratios usually do), so this class compensates
+     that glyph directly; a derived deck leading with another digit will
+     overhang by up to 0.074em (the "4" — lsb 0.027em) and should retune
+     this one value. */
+  margin-left: -0.101em;
+}
+.hero-caption { font-size: var(--type-small); line-height: var(--baseline); max-width: 46ch; margin: 0; }
+
+/* — charts (static SVG on the tokens; no script, no chart library) — */
+/* Constructed charts: flat ink geometry on the visible grid — square bar
+   tops (zero radius is the system), solid 40%-ink grid and axis hairlines
+   (data furniture, like the table's rules), the one red element per figure
+   the highlight. */
+.chart { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text {
+  font-family: var(--font-body); font-size: 24px;
+  fill: color-mix(in srgb, var(--color-text) 55%, transparent);
+  font-feature-settings: "tnum" 1; /* chart text is columns — see .kicker */
+}
+.chart .grid, .chart .axis { stroke: var(--color-divider); stroke-width: 1; }
+.chart .bar { fill: var(--color-neutral-800); }
+.chart .bar-hi { fill: var(--color-accent); }
+.chart .val { fill: color-mix(in srgb, var(--color-text) 70%, transparent); }
+.chart .ref { stroke: var(--color-accent-700); stroke-width: 1; stroke-dasharray: 8 8; }
+.chart .ref-label { fill: var(--color-accent-700); }
+.chart .hi-label { fill: var(--color-accent-700); }
+.chart .series-a, .key .series-a { stroke: var(--color-accent); stroke-width: 3; fill: none; }
+.chart .series-b, .key .series-b { stroke: var(--color-neutral-800); stroke-width: 3; fill: none; stroke-dasharray: 10 8; }
+.chart-caption { font-size: 25px; line-height: var(--baseline); max-width: 88ch; margin: 0; text-box: trim-both cap alphabetic; }
+/* Chart title row — title left, legend right, sharing one baseline. Single
+   family throughout this system, but the family is pinned anyway: the -1cap
+   margin must resolve in the heading face (the two-family decks' lesson). */
+.chart-head { display: flex; align-items: baseline; justify-content: space-between;
+  font-family: var(--font-heading); font-size: var(--type-title); }
+.chart-legend { display: flex; align-items: baseline; gap: 16px; font-family: var(--font-body); font-weight: 400; font-size: var(--type-kicker); color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+.chart-legend span { text-box: trim-both cap alphabetic; }
+.chart-legend .key { width: 60px; height: 4px; overflow: visible; position: relative; top: -7px; } /* flex sits the box bottom on the baseline; the nudge lifts the key line to the label's optical center */
+.chart-legend .key:not(:first-child) { margin-left: 24px; }
+/* Timeline (same .chart text defaults as the other SVGs). These classes
+   carry color and size only; the geometry — one left edge per column and
+   the optically-set vertical cluster — is documented where it lives, in
+   the pattern comment inside the timeline SVG. The nodes are squares — the
+   system's zero-radius geometry — with the current milestone the one red. */
+.chart .tl-line { stroke: var(--color-divider); stroke-width: 1; }
+.chart .tl-node { fill: var(--color-neutral-800); }
+.chart .tl-node-hi { fill: var(--color-accent); }
+.chart .tl-date { fill: color-mix(in srgb, var(--color-text) 55%, transparent); letter-spacing: 0.08em; }
+.chart .tl-date-hi { fill: var(--color-accent); letter-spacing: 0.08em; }
+.chart .tl-label { fill: var(--color-text); font-size: 29px; font-family: var(--font-heading); font-weight: 600; }
+
+/* — image slide — */
+.split { flex-direction: row; align-items: center; gap: 96px; }
+.split-copy { flex: none; width: 640px; display: flex; flex-direction: column; gap: 48px; }
+.split-copy .note { font-size: var(--type-small); line-height: var(--baseline); margin: 0; }
+.split-figure { min-width: 0; /* defensive: the slot host's aspect-ratio fallback can exert min-content width in a flex item (see deck-templates.md, swappable imagery) — harmless today, cheap insurance */ flex: 1; }
+.split-figure image-slot { width: 100%; aspect-ratio: 951 / 665; } /* the old img sized at the
+   bundled photograph's natural ratio (951×665); the box pins it, so a swapped
+   image cover-crops into the same frame (cover framing is the component's own) */
+
+/* — full-bleed image slide — */
+/* The photograph covers the stage (the slide clips it) through the same
+   grayscale wrapper as every image. Type sits on the photograph over a scrim
+   built from the ground token: near-opaque at the foot where the title sits,
+   gone by mid-stage so the image stays the subject; at the head the band
+   HOLDS near-opaque through the kicker row before letting go (round 5 —
+   the measured re-derivation is on the gradient below). Copy pins to the
+   bottom padding edge like the cover's meta row, so its last baseline
+   lands on the 960 gridline. */
+.bleed-figure { position: absolute; inset: 0; margin: 0; }
+.bleed-figure image-slot { width: 100%; height: 100%; } /* framing is the component's (fit=cover default) — no object-fit to carry */
+.bleed-scrim {
+  position: absolute; inset: 0; pointer-events: none; /* the slot beneath is interactive (hover controls, drops) — overlays must not eat its events (image-slot usage contract) */
+  background:
+    linear-gradient(to top,
+      color-mix(in srgb, var(--color-bg) 95%, transparent),
+      color-mix(in srgb, var(--color-bg) 60%, transparent) 32%,
+      transparent 62%),
+    /* Head band re-derived (review round 5; measured per
+       deck-templates.md, type over photography): the old 62%→0 fade
+       left the kicker's accent red at ≈2.9:1 over the photograph's
+       bright sky — the band now HOLDS ~93% of the ground token through
+       the kicker row (0–12% of the stage) before letting go by 32%,
+       measured ≥3.2:1 across the band on the reference photograph. */
+    linear-gradient(to bottom,
+      color-mix(in srgb, var(--color-bg) 93%, transparent),
+      color-mix(in srgb, var(--color-bg) 93%, transparent) 12%,
+      transparent 32%);
+}
+/* the bleed slide has no room for the header band — the rule would cut the
+   photograph; the kicker pins alone here */
+.bleed .kicker::after, .half-bleed .kicker::after { display: none; }
+.half-bleed .kicker { right: auto; }
+.bleed .kicker { right: auto; pointer-events: none; /* sits on the photograph — same usage contract as the scrim */
+  color: var(--color-accent-700); } /* over the photograph the base red measures
+     3.3:1 at the 5th percentile (stroke-scale blur, per the shared measurement
+     procedure) — the 700 step measures 5.7:1, clearing the 4.5 bar the law
+     sets below 36px */
+.bleed-copy { position: absolute; left: var(--pad-x); right: var(--pad-x); bottom: var(--pad-bottom); pointer-events: none; } /* text over the slot — must not eat its hover/drop events */
+.bleed-copy .note {
+  font-size: var(--type-small); line-height: var(--baseline); max-width: 56ch;
+  margin: calc(2 * var(--baseline) - 1cap) 0 0; /* note's first baseline two gridlines below the title's */
+  text-box: trim-both cap alphabetic; /* bottom edge = last baseline, pinned to 960 */
+  color: var(--color-text); /* bleed type takes full-opacity ink and loses its
+     text-muted (the shared photography law): the 55% mix measures 3.2:1 at the
+     5th percentile over this photograph, full ink 9.5:1 */
+}
+
+/* — half-bleed image slides — */
+/* The photograph takes half the 1920 stage and bleeds to its three edges; the
+   copy takes the other half on the standard content rhythm (kicker baseline
+   on the 72px half-step, title baseline on the 5th gridline, bullets/notes
+   below as on any content slide). Base class puts the image LEFT and the copy right, one
+   pad-x beyond the image edge; add .flip to mirror (image right, copy back at
+   the text axis). Hanging marks keep hanging left of the copy either way. */
+.half-bleed { padding-top: calc(5 * var(--baseline)); }
+.half-bleed > .slide-title { margin-top: -1cap; max-width: 680px; }
+.half-bleed .note {
+  font-size: var(--type-small); line-height: var(--baseline); max-width: 680px;
+  margin: calc(2 * var(--baseline) - 1cap) 0 0;
+  text-box: trim-both cap alphabetic; /* the margin calc presupposes the trim */
+}
+.half-bleed .bullets { margin-top: calc(2.5 * var(--baseline) - 1cap); max-width: 680px; } /* rises with the content slides' list — review round 3 */
+.half-bleed-figure { position: absolute; inset: 0 auto 0 0; width: 960px; margin: 0; }
+.half-bleed-figure image-slot { width: 100%; height: 100%; } /* framing is the component's (fit=cover default) */
+.half-bleed:not(.flip) > .slide-title { margin-left: calc(960px - 0.058em); } /* the copy column offset, preserving the optical shift */
+.half-bleed:not(.flip) .note,
+.half-bleed:not(.flip) .bullets { margin-left: 960px; }
+.half-bleed:not(.flip) .kicker { left: calc(960px + var(--pad-x)); }
+.half-bleed.flip .half-bleed-figure { inset: 0 0 0 auto; }
+
+/* — quote — */
+.quote { justify-content: center; gap: 48px; }
+.quote .rise { display: flex; flex-direction: column; gap: 48px; }
+.quote blockquote {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight); /* the quote in the
+     Black cut — a Swiss poster speaks in its display voice, not an italic (the system loads
+     no italic face, and a synthesized oblique decorates, which this system does not) */
+  font-size: 56px; line-height: calc(1.5 * var(--baseline)); letter-spacing: -0.015em;
+  max-width: 30ch; margin: 0;
+  text-indent: -0.496em; /* hang the opening “ (measured advance in the 800) */
+}
+.quote figcaption { font-size: var(--type-small); margin: 0; text-indent: -1.209em; /* hang the leading em-dash + space (measured advance in the Regular: 1.000em + 0.209em) */ }
+
+/* Review aid: the baseline grid drawn as a hairline under every --baseline
+   step. Debug-only — toggled by ?baselines or the B key; not part of the look. */
+deck-stage[data-baselines] .slide::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom,
+      color-mix(in srgb, var(--color-accent) 35%, transparent) 0 1px,
+      transparent 1px var(--baseline)),
+    repeating-linear-gradient(to bottom,
+      transparent 0 calc(var(--baseline) / 2),
+      color-mix(in srgb, var(--color-accent) 16%, transparent) calc(var(--baseline) / 2) calc(var(--baseline) / 2 + 1px),
+      transparent calc(var(--baseline) / 2 + 1px) var(--baseline));
+}
+
+/* Entrance — end-state is the base style; animate from hidden, gated on the
+   active slide and the motion preference, so print and reduced-motion are safe. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-deck-active] .rise { animation: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+}
+</style>
+</head>
+<body>
+<deck-stage width="1920" height="1080">
+
+  <section class="slide cover" data-label="Title">
+    <div class="kicker"><span>Investor overview</span></div>
+    <div class="rise">
+      <h1 class="display">Forkcast</h1>
+      <p class="cover-sub text-muted">Nutrition-aware food ordering — a personal daily budget, restaurant dishes ranked to fit it, and automatic logging the moment the kitchen accepts.</p>
+    </div>
+    <div class="pin-bottom meta"><span>Founder name</span><span>·</span><span>July 2026</span><span>·</span><span>Confidential</span></div>
+  </section>
+
+  <section class="slide content" data-label="Contents">
+    <h2 class="slide-title">Contents</h2>
+    <div class="toc rise">
+      <div class="toc-row"><span class="toc-num">01</span><span>The problem</span></div>
+      <div class="toc-row"><span class="toc-num">02</span><span>The product</span></div>
+      <div class="toc-row"><span class="toc-num">03</span><span>Business model</span></div>
+      <div class="toc-row"><span class="toc-num">04</span><span>Roadmap &amp; ask</span></div>
+    </div>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide divider" data-label="The problem">
+    <div class="rise">
+      <div class="ghost-num">01</div>
+      <h2 class="slide-title">The problem</h2>
+    </div>
+  </section>
+
+  <section class="slide content" data-label="The gap">
+    <div class="kicker"><span>01 · The problem</span></div>
+    <h2 class="slide-title">The gap</h2>
+    <div class="cols cols-2 rise">
+      <div>
+        <h3>Tracking apps</h3>
+        <p>Calorie logging is manual, after the fact, and abandoned within weeks. The data lives apart from the decision it should inform — what to eat next.</p>
+      </div>
+      <div>
+        <h3>Ordering apps</h3>
+        <p>Delivery platforms optimize for cravings and basket size. Restaurant nutrition, when shown at all, is a PDF-grade afterthought with no link to the diner’s goal.</p>
+      </div>
+    </div>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide hero" data-label="The daily budget">
+    <div class="kicker"><span>01 · The problem</span></div>
+    <p class="hero-num rise">−500</p>
+    <p class="hero-caption text-muted">kcal per day — the whole mechanism of a weight-loss goal. Every restaurant meal either respects that budget or breaks it, and today nothing at the point of ordering says which.</p>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide divider" data-label="The product">
+    <div class="rise">
+      <div class="ghost-num">02</div>
+      <h2 class="slide-title">The product</h2>
+    </div>
+  </section>
+
+  <section class="slide half-bleed" data-label="The loop">
+    <figure class="half-bleed-figure grayscale">
+      <image-slot id="deck-loop" shape="rect" src="../assets/photos/hero-verdant.png" role="img" aria-label="Overhead plate photograph, printed in black and white"></image-slot>
+    </figure>
+    <div class="kicker"><span>02 · The product</span></div>
+    <h2 class="slide-title rise">The loop</h2>
+    <ul class="bullets rise">
+      <li>A metabolic profile sets a personal daily budget — Mifflin-St Jeor, not a generic 2,000</li>
+      <li>Every dish nearby is scored against what remains of the day</li>
+      <li>Ordering is logging — the meal posts automatically when the kitchen accepts</li>
+    </ul>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide content" data-label="The Fit Score">
+    <div class="kicker"><span>02 · The product</span></div>
+    <h2 class="slide-title">The Fit Score</h2>
+    <div class="cols cols-3 rise">
+      <div>
+        <h3>Calorie fit</h3>
+        <p>A dish is scored against the diner’s remaining budget for the day, not a daily total — the same bowl scores differently at noon and at nine.</p>
+      </div>
+      <div>
+        <h3>Protein density</h3>
+        <p>Weighted by goal — cutting, maintaining or building each set their own protein target, per sports-nutrition guidance.</p>
+      </div>
+      <div>
+        <h3>Guardrails</h3>
+        <p>Sodium, sugar and fiber, plus personal allergy and condition flags. Sponsored placement can never move a score.</p>
+      </div>
+    </div>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide content" data-label="Three surfaces">
+    <div class="kicker"><span>02 · The product</span></div>
+    <h2 class="slide-title">Three surfaces, one prototype</h2>
+    <table class="table rise">
+      <thead>
+        <tr><th></th><th>Surface</th><th>Role</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="swatch" style="background: var(--color-accent)"></span></td><td>Customer app · iPhone</td><td>Onboarding to auto-logged order, one flow</td><td>Built — live demo</td></tr>
+        <tr><td><span class="swatch" style="background: var(--color-neutral-800)"></span></td><td>Partner terminal · iPad</td><td>Order intake, prep flow, corrections, payouts</td><td>Built — synced to the app</td></tr>
+        <tr><td><span class="swatch" style="background: var(--color-neutral-500)"></span></td><td>Web companion · desktop</td><td>Day dashboard, discovery, live order tracking</td><td>Built — synced to the app</td></tr>
+      </tbody>
+    </table>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide content" data-label="The restaurant side">
+    <div class="kicker"><span>02 · The product</span></div>
+    <h2 class="slide-title">The restaurant side</h2>
+    <ul class="bullets rise">
+      <li>Orders arrive on a Forkcast terminal — no POS integration project, no middleman fees</li>
+      <li>Verified menus carry provenance, confidence ranges and a versioned corrections policy</li>
+      <li>Customer allergy and diet flags reach the kitchen before prep starts</li>
+    </ul>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide divider" data-label="Business model">
+    <div class="rise">
+      <div class="ghost-num">03</div>
+      <h2 class="slide-title">Business model</h2>
+    </div>
+  </section>
+
+  <section class="slide content" data-label="Revenue">
+    <div class="kicker"><span>03 · Business model</span></div>
+    <h2 class="slide-title">Revenue</h2>
+    <div class="quad rise">
+      <div>
+        <h3>Order take rate</h3>
+        <p>A percentage of each order placed through Forkcast, with delivery brokered to courier partners.</p>
+      </div>
+      <div>
+        <h3>Forkcast Pay</h3>
+        <p>Direct settlement between diner and restaurant — processing margin replaces the POS middleman.</p>
+      </div>
+      <div>
+        <h3>Menu verification</h3>
+        <p>A partner subscription for verified nutrition: provenance, review dates and the corrections workflow.</p>
+      </div>
+      <div>
+        <h3>Partnerships</h3>
+        <p>Gyms fund member perks that route members to partner restaurants — acquisition on both sides.</p>
+      </div>
+    </div>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide content" data-label="Trust by design">
+    <div class="kicker"><span>03 · Business model</span></div>
+    <h2 class="slide-title">Trust by design</h2>
+    <ul class="bullets rise">
+      <li>Nutrition values are estimates and say so — every figure carries a source and a ± range</li>
+      <li>Allergen flags are never guaranteed; sponsored placement can never move a ranking</li>
+      <li>Pilot metrics are defined before launch — no claim ships without a recorded measurement</li>
+    </ul>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide divider" data-label="Roadmap and ask">
+    <div class="rise">
+      <div class="ghost-num">04</div>
+      <h2 class="slide-title">Roadmap &amp; ask</h2>
+    </div>
+  </section>
+
+  <section class="slide content" data-label="Milestones">
+    <div class="kicker"><span>04 · Roadmap &amp; ask</span></div>
+    <h2 class="slide-title">Milestones</h2>
+    <figure class="rise">
+      <svg class="chart" viewBox="0 0 1680 240" role="img" aria-label="Timeline of five milestones from the prototype in July 2026 to a second city in July 2027; the prototype milestone is current">
+      <line class="tl-line" x1="0" y1="96" x2="1680" y2="96"/>
+      <text class="tl-date-hi" x="0" y="62">JUL 26</text>
+      <text class="tl-date" x="360" y="62">OCT 26</text>
+      <text class="tl-date" x="720" y="62">JAN 27</text>
+      <text class="tl-date" x="1080" y="62">APR 27</text>
+      <text class="tl-date" x="1440" y="62">JUL 27</text>
+      <rect class="tl-node-hi" x="0" y="88" width="16" height="16"/>
+      <rect class="tl-node" x="360" y="88" width="16" height="16"/>
+      <rect class="tl-node" x="720" y="88" width="16" height="16"/>
+      <rect class="tl-node" x="1080" y="88" width="16" height="16"/>
+      <rect class="tl-node" x="1440" y="88" width="16" height="16"/>
+      <text class="tl-label" x="0" y="158">Prototype</text>
+      <text class="tl-label" x="360" y="158">Boston pilot</text>
+      <text class="tl-label" x="720" y="158">Launch</text>
+      <text class="tl-label" x="1080" y="158">Forkcast Pay</text>
+      <text class="tl-label" x="1440" y="158">Second city</text>
+      <text x="0" y="216">three synced surfaces</text>
+      <text x="360" y="216">first partner restaurants</text>
+      <text x="720" y="216">public app, one city</text>
+      <text x="1080" y="216">direct settlement GA</text>
+      <text x="1440" y="216">the playbook repeats</text>
+      </svg>
+    </figure>
+    <p class="chart-caption text-muted">The prototype milestone is complete — the pilot begins when the first partner restaurants sign, and every later date follows from pilot evidence.</p>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide content" data-label="The ask">
+    <div class="kicker"><span>04 · Roadmap &amp; ask</span></div>
+    <h2 class="slide-title">The ask</h2>
+    <ul class="bullets rise">
+      <li>Raising a seed round — amount and terms to be finalized with counsel</li>
+      <li>Use of funds: Boston pilot operations, partner integrations, regulatory review</li>
+      <li>Milestone for the round: recorded pilot evidence — accuracy, adherence, conversion — by January 2027</li>
+    </ul>
+    <div class="page-foot" aria-hidden="true"></div>
+  </section>
+
+  <section class="slide cover" data-label="Close">
+    <div class="kicker"><span>Investor overview</span></div>
+    <div class="rise">
+      <h2 class="display">Thank you</h2>
+      <p class="cover-sub text-muted">The prototype is live — phone, terminal and web, synced end to end. Ask for the demo.</p>
+    </div>
+    <div class="pin-bottom meta"><span>founder@forkcast.app</span></div>
+  </section>
+
+</deck-stage>
+<script src="deck-stage.js"></script>
+<script src="image-slot.js"></script>
+<script>
+// Review aid: baseline-grid overlay — add ?baselines to the URL, or press B to toggle.
+(() => {
+  const stage = document.querySelector('deck-stage');
+  if (new URLSearchParams(location.search).has('baselines')) stage.setAttribute('data-baselines', '');
+  addEventListener('keydown', (e) => {
+    const t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return; // typing guard, as in deck-stage's own keys
+    if ((e.key === 'b' || e.key === 'B') && !e.metaKey && !e.ctrlKey && !e.altKey) stage.toggleAttribute('data-baselines');
+  });
+})();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1b4f1ceffc17207',t:'MTc4NDA3ODQyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

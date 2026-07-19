@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-0e34c851-fce6-49f4-a021-94c4df541184/styles.css">
+  <script src="_ds/modernist-0e34c851-fce6-49f4-a021-94c4df541184/_ds_bundle.js"></script>
+  <style>
+    body{margin:0;background:var(--color-bg);}
+    a{color:var(--color-accent-700);} a:hover{color:var(--color-accent);}
+    .btn{border-radius:12px;} .tag{border-radius:999px;} .input{border-radius:12px;} .card{border-radius:14px;}
+  </style>
+</helmet>
+<div style="min-height:100vh;font-family:var(--font-body);color:var(--color-text);">
+  <div style="max-width:1160px;margin:0 auto;padding:0 32px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:2px solid var(--color-divider);">
+      <div style="font:800 20px var(--font-heading);letter-spacing:.03em;">FORKCAST</div>
+      <div style="font:600 12px var(--font-body);text-transform:uppercase;letter-spacing:.1em;color:var(--color-neutral-600);">Impact &amp; evidence</div>
+    </div>
+    <div style="padding:48px 0 32px;border-bottom:2px solid var(--color-divider);">
+      <div style="font:800 44px/1.1 var(--font-heading);max-width:720px;">Evidence, not claims.</div>
+      <div style="font:500 16px/1.6 var(--font-body);color:var(--color-neutral-700);max-width:640px;margin-top:14px;">Every outcome Forkcast will ever publish is predeclared here first — the metric, its definition, and how it will be measured. Until real pilot data exists, each card shows its status honestly: nothing below is a result.</div>
+    </div>
+    <div style="padding:20px 0;border-bottom:2px solid var(--color-divider);display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <span style="font:600 11px var(--font-body);text-transform:uppercase;letter-spacing:.1em;color:var(--color-neutral-600);margin-right:8px;">Status vocabulary</span>
+      <span class="tag tag-neutral">Demo data</span>
+      <span class="tag tag-outline">Pilot target — predeclared</span>
+      <span class="tag tag-outline">Modeled projection</span>
+      <span class="tag tag-accent">Partner-verified</span>
+      <span class="tag tag-accent">Achieved result</span>
+      <span style="font:500 12px var(--font-body);color:var(--color-neutral-600);">— the last two appear only with a supporting record and publication permission on file.</span>
+    </div>
+    <div style="padding:36px 0 8px;font:700 13px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">Predeclared pilot metrics — Boston</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-left:2px solid var(--color-divider);border-top:2px solid var(--color-divider);margin-bottom:48px;">
+      <sc-for list="{{ metrics }}" as="m" hint-placeholder-count="6">
+        <div style="border-right:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider);padding:22px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font:600 10px var(--font-body);text-transform:uppercase;letter-spacing:.1em;color:var(--color-accent-700);">{{ m.domain }}</div>
+          <div style="font:800 19px/1.2 var(--font-heading);">{{ m.title }}</div>
+          <div style="font:500 13px/1.55 var(--font-body);color:var(--color-neutral-700);">{{ m.definition }}</div>
+          <div style="font:500 12px/1.55 var(--font-body);color:var(--color-neutral-600);"><span style="font-weight:700;color:var(--color-neutral-700);">Protocol — </span>{{ m.protocol }}</div>
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px;align-items:flex-start;">
+            <span class="{{ m.statusCls }}">{{ m.status }}</span>
+            <span style="font:500 11px var(--font-body);color:var(--color-neutral-600);">{{ m.artifact }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:0 0 8px;font:700 13px var(--font-body);text-transform:uppercase;letter-spacing:.1em;">Source ledger — every public statistic we cite</div>
+    <div style="font:500 13px/1.5 var(--font-body);color:var(--color-neutral-700);max-width:640px;margin-bottom:16px;">Public claims are versioned: each carries its primary source, access date, and the exact wording we allow ourselves. Corrections are recorded, never silent.</div>
+    <table class="table" style="width:100%;margin-bottom:48px;">
+      <thead><tr><th style="text-align:left;">Claim as worded</th><th style="text-align:left;">Primary source</th><th style="text-align:left;">Accessed</th><th style="text-align:left;">Status</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ ledger }}" as="l" hint-placeholder-count="4">
+          <tr>
+            <td style="font:500 13px/1.5 var(--font-body);max-width:420px;">{{ l.claim }}</td>
+            <td style="font:500 13px var(--font-body);">{{ l.source }}</td>
+            <td style="font:500 13px var(--font-body);white-space:nowrap;">{{ l.accessed }}</td>
+            <td><span class="tag tag-neutral" style="white-space:nowrap;">{{ l.status }}</span></td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    <div style="background:var(--color-accent);padding:40px 32px;margin-bottom:48px;">
+      <div style="font:800 28px/1.2 var(--font-heading);color:var(--color-bg);max-width:720px;">Zero partner badges, user counts, retention numbers, or outcomes appear anywhere in Forkcast without a record in this repository — and permission to publish it.</div>
+    </div>
+    <div style="border-top:2px solid var(--color-divider);padding:20px 0 40px;font:500 12px/1.6 var(--font-body);color:var(--color-neutral-600);">This page is an evidence-development artifact, not legal, medical, or investment advice. Supporting documentation may map these artifacts to external frameworks; that mapping is likewise not legal advice. Corrections: corrections@forkcast.app.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals(){
+    const predeclared = { status:'Pilot target — predeclared', statusCls:'tag tag-outline' };
+    return {
+      metrics: [
+        { domain:'Estimate accuracy', title:'Nutrition estimate error', definition:'Median absolute percent error of Forkcast dish estimates against verified recipe-level values for the same serving.', protocol:'Blinded sample of partner dishes, compared per nutrient; error reported with confidence intervals and negative results included.', ...predeclared, artifact:'Evidence artifact: none on record yet.' },
+        { domain:'Decision quality', title:'Pre-order calorie delta', definition:'Difference in calories ordered when a user sees Fit Scores before ordering, versus matched baseline orders.', protocol:'Preregistered comparison design fixed before any outcome data is collected; analysis plan versioned in the repository.', ...predeclared, artifact:'Evidence artifact: none on record yet.' },
+        { domain:'Sustained use', title:'Twelve-week retention', definition:'Share of onboarded users still logging or ordering in week 12, without manipulative streak mechanics.', protocol:'Cohort-based measurement with definitions of "active" published in advance.', ...predeclared, artifact:'Evidence artifact: none on record yet.' },
+        { domain:'Restaurant participation', title:'Verified independent menus', definition:'Count of partner-verified independent-restaurant menus, and median staff time to digitize and review one menu.', protocol:'Signed, dated partner agreements retained; verification workload benchmarked per menu.', status:'Demo data — 5 demonstration restaurants, 0 signed partners on record', statusCls:'tag tag-neutral', artifact:'Evidence artifact: demonstration catalog only.' },
+        { domain:'Comprehension', title:'Score &amp; confidence comprehension', definition:'Share of users who correctly interpret a Fit Score and its confidence range in moderated usability sessions.', protocol:'Task-based sessions with published rubric; failures reported alongside successes.', ...predeclared, artifact:'Evidence artifact: none on record yet.' },
+        { domain:'Fairness', title:'Cuisine-parity audit', definition:'Distribution of Fit Scores across cuisine types, checking that the scoring model does not systematically penalize any cuisine.', protocol:'Periodic audit over the full catalog; methodology and results published together.', status:'Not yet run — methodology drafted', statusCls:'tag tag-outline', artifact:'Evidence artifact: none on record yet.' }
+      ],
+      ledger: [
+        { claim:'U.S. food-away-from-home spending reached 58.5% of food spending in 2023.', source:'USDA Economic Research Service', accessed:'Jul 14, 2026', status:'Cited — public source' },
+        { claim:'Federal menu labeling generally covers chains with 20 or more locations.', source:'FDA labeling requirements overview', accessed:'Jul 14, 2026', status:'Cited — public source' },
+        { claim:'Measured adult obesity prevalence was 40.3% (Aug 2021–Aug 2023).', source:'CDC / NCHS', accessed:'Jul 14, 2026', status:'Cited — public source' },
+        { claim:'At least two-thirds of surveyed fast-food diners underestimated meal calories; about one quarter by 500+ kcal.', source:'BMJ 2013;346:f2907', accessed:'Jul 14, 2026', status:'Cited — corrected attribution' },
+        { claim:'Menu labeling was associated with ~25 fewer calories purchased per transaction.', source:'JAMA Network Open (national chain study)', accessed:'Jul 14, 2026', status:'Cited — public source' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
