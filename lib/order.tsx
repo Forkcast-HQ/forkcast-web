@@ -150,16 +150,33 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(t);
   }, [hasLive]);
 
+  // One restaurant per basket. Adding from the SAME restaurant merges lines;
+  // adding from a DIFFERENT restaurant never clears silently — it opens a
+  // confirmation dialog (rendered by the provider below).
+  const [pendingAdd, setPendingAdd] = useState<{ slug: string; itemId: string } | null>(null);
+
   const addToCart = useCallback((slug: string, itemId: string) => {
     setCart((prev) => {
-      // One restaurant per basket — starting a new restaurant clears the basket.
-      const same = prev.filter((l) => l.slug === slug);
-      const ex = same.find((l) => l.itemId === itemId);
+      if (prev.length && prev[0].slug !== slug) {
+        // Conflict: ask before replacing the basket.
+        setPendingAdd({ slug, itemId });
+        return prev;
+      }
+      const ex = prev.find((l) => l.itemId === itemId);
       return ex
-        ? same.map((l) => (l.itemId === itemId ? { ...l, qty: l.qty + 1 } : l))
-        : [...same, { slug, itemId, qty: 1 }];
+        ? prev.map((l) => (l.itemId === itemId ? { ...l, qty: l.qty + 1 } : l))
+        : [...prev, { slug, itemId, qty: 1 }];
     });
   }, []);
+
+  const confirmNewBasket = useCallback(() => {
+    setPendingAdd((p) => {
+      if (p) setCart([{ slug: p.slug, itemId: p.itemId, qty: 1 }]);
+      return null;
+    });
+  }, []);
+
+  const dismissPendingAdd = useCallback(() => setPendingAdd(null), []);
 
   const changeQty = useCallback((itemId: string, delta: number) => {
     setCart((prev) =>
@@ -338,7 +355,52 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     [cart, orders, hydrated, cartRestaurantSlug, cartCount, addToCart, changeQty, setLineNote, clearCart, placeOrder, markLogged, reorder, activeOrder, cartItems, cartTotals, now],
   );
 
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+  // Basket-conflict dialog (one restaurant per basket, never cleared silently)
+  const pendingRest = pendingAdd ? getRestaurant(pendingAdd.slug) : null;
+  const currentRest = cart.length ? getRestaurant(cart[0].slug) : null;
+  const pendingDish = pendingRest?.menu.find((m) => m.id === pendingAdd?.itemId);
+
+  return (
+    <Ctx.Provider value={value}>
+      {children}
+      {pendingAdd && pendingRest && (
+        <div
+          className="fixed inset-0 z-[90] flex items-end justify-center bg-black/40 p-4 sm:items-center"
+          onClick={dismissPendingAdd}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Start a new basket?"
+        >
+          <div
+            className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="font-display text-xl font-extrabold text-ink">Start a new basket?</h2>
+            <p className="mt-2 text-sm text-ink/65">
+              Orders are one restaurant at a time. Adding{" "}
+              <strong className="text-ink">{pendingDish?.name ?? "this dish"}</strong> from{" "}
+              <strong className="text-ink">{pendingRest.name}</strong> will clear your current basket
+              {currentRest ? <> ({cartCount} item{cartCount === 1 ? "" : "s"} from <strong className="text-ink">{currentRest.name}</strong>)</> : null}.
+            </p>
+            <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+              <button
+                onClick={confirmNewBasket}
+                className="flex-1 rounded-full bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
+              >
+                Start new basket
+              </button>
+              <button
+                onClick={dismissPendingAdd}
+                className="flex-1 rounded-full border border-black/10 px-4 py-2.5 text-sm font-semibold text-ink/70 transition hover:border-black/20"
+              >
+                Keep {currentRest?.name ?? "current basket"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Ctx.Provider>
+  );
 }
 
 export function useOrder(): OrderStoreValue {
