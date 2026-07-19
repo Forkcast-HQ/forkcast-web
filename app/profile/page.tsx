@@ -233,7 +233,14 @@ export default function Profile() {
               adds the AI coach, unlimited photo AI, and calibration depth.
             </p>
             {isPremium ? (
-              cloud ? null : (
+              cloud ? (
+                <a
+                  href={`mailto:shasanov@seas.harvard.edu?subject=Forkcast%20membership%20—%20manage%20or%20cancel&body=Account%20email%3A%20${encodeURIComponent(user?.email ?? "")}`}
+                  className="inline-flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/20"
+                >
+                  Manage or cancel membership
+                </a>
+              ) : (
                 <button onClick={cancelDemo} className="inline-flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/20">
                   Cancel Premium (demo)
                 </button>
