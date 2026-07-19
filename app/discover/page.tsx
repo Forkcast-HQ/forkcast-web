@@ -256,9 +256,7 @@ export default function Discover() {
       <div className="mt-3 flex items-start gap-2 rounded-xl px-1 text-xs leading-relaxed text-ink/50">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-600" />
         <p>
-          Catalog mixes demo listings, restaurant-published nutrition (quoted from public disclosures), and labeled
-          engine estimates. Prices, ratings, and delivery times are placeholders — always verify details, especially
-          allergens, with the restaurant.
+          Every dish shows its nutrition source (verified · published · estimated). Always confirm allergens with the restaurant.
         </p>
       </div>
 

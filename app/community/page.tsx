@@ -77,7 +77,6 @@ export default function CommunityPage() {
 
       <p className="mt-8 text-xs text-ink/45">
         Interested in hearing when events go live? Create an account — members will be invited first.
-        Looking for the investor overview instead? It lives at <Link href="/business" className="font-semibold text-brand-700 underline">the opportunity</Link>.
       </p>
     </div>
   );

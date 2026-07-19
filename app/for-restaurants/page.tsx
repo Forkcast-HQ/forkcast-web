@@ -64,17 +64,17 @@ export default function ForRestaurants() {
           <Benefit
             icon={<Users className="h-6 w-6" />}
             title="Higher-intent customers"
-            body="Forkcast users are deciding where to eat around a goal. When your dish fits, you're the recommendation — not one of fifty thumbnails. Health-minded diners also visit more often and are more loyal."
+            body="Our diners are choosing around a goal — when your dish fits, you're the recommendation, not one of fifty thumbnails."
           />
           <Benefit
             icon={<Utensils className="h-6 w-6" />}
             title="Free menu nutrition"
-            body="We compute per-dish calories and macros for your whole menu — chain-exact where data exists, estimated where it doesn't. The compliance-grade transparency big chains have, without the lab bill."
+            body="We compute per-dish calories and macros for your whole menu — the transparency big chains have, without the lab bill."
           />
           <Benefit
             icon={<LineChart className="h-6 w-6" />}
             title="Insight you can use"
-            body="See which dishes win on Fit Score, what health-minded diners search for nearby, and where a lighter option would capture demand you're missing today."
+            body="See which dishes win, what diners near you search for, and where a lighter option would capture missed demand."
           />
         </div>
       </section>
