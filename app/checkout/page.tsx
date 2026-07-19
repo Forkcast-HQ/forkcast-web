@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Store, Bike, Info, ShieldAlert, CreditCard } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 import { useOrder, DELIVERY_FEE, MA_MEALS_TAX } from "@/lib/order";
 import { getRestaurant } from "@/data/restaurants";
 import { money, cls } from "@/lib/format";
@@ -24,12 +25,13 @@ const OPTIONS: { key: Fulfillment; label: string; desc: string; icon: React.Reac
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { user, hydrated: authHydrated } = useAuth();
   const { hydrated, cartItems, cartTotals, cartRestaurantSlug, placeOrder } = useOrder();
   const [fulfill, setFulfill] = useState<Fulfillment>("pickup");
   const [payMethod, setPayMethod] = useState<"Forkcast Pay" | "Card">("Forkcast Pay");
   const [placed, setPlaced] = useState(false);
 
-  if (!hydrated) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
+  if (!hydrated || !authHydrated) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
 
   const items = cartItems();
   const rest = cartRestaurantSlug ? getRestaurant(cartRestaurantSlug) : null;
@@ -47,6 +49,35 @@ export default function CheckoutPage() {
           <Link href="/discover" className="mt-6 inline-flex items-center rounded-full bg-brand-600 px-5 py-2.5 font-semibold text-white hover:bg-brand-700">
             Discover restaurants
           </Link>
+        </div>
+      </Shell>
+    );
+  }
+
+  // Placing an order requires an account: the order confirms into a daily
+  // log, carries the customer's allergy flags to the kitchen, and keeps an
+  // evidence trail — none of which exists for an anonymous visitor. The
+  // basket survives signup (guest baskets are adopted on sign-in).
+  if (!user) {
+    return (
+      <Shell>
+        <div className="mx-auto max-w-md py-16 text-center">
+          <h1 className="font-display text-2xl font-extrabold text-ink">Almost there — sign in to place your order</h1>
+          <p className="mt-3 text-sm text-ink/60">
+            Your basket is saved. An account lets your order carry your allergy flags to the
+            restaurant and log the meal to your day once it&apos;s confirmed.
+          </p>
+          <div className="mt-7 space-y-3">
+            <Link href="/signup" className="flex w-full items-center justify-center rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-brand-700">
+              Create a free account
+            </Link>
+            <Link href="/login" className="flex w-full items-center justify-center rounded-full border border-black/10 px-6 py-3.5 text-base font-semibold text-ink/70 transition hover:border-black/25">
+              Log in
+            </Link>
+            <Link href="/basket" className="block text-sm font-medium text-ink/50 hover:text-ink">
+              Back to basket
+            </Link>
+          </div>
         </div>
       </Shell>
     );

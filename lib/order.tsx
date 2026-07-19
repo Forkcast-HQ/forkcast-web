@@ -103,14 +103,28 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     try {
       const raw = localStorage.getItem(ordersKey(storeId));
       const p: PersistShape | null = raw ? JSON.parse(raw) : null;
-      setCart(p?.cart ?? []);
+      let cartNext = p?.cart ?? [];
+      // A guest who filled a basket and then signed in keeps that basket:
+      // adopt the guest cart into the account (once), so the funnel never
+      // dumps someone back to an empty basket after signup.
+      if (userId && cartNext.length === 0) {
+        try {
+          const guestRaw = localStorage.getItem(ordersKey("guest"));
+          const guest: PersistShape | null = guestRaw ? JSON.parse(guestRaw) : null;
+          if (guest?.cart?.length) {
+            cartNext = guest.cart;
+            localStorage.setItem(ordersKey("guest"), JSON.stringify({ ...guest, cart: [] }));
+          }
+        } catch { /* ignore */ }
+      }
+      setCart(cartNext);
       setOrders(p?.orders ?? []);
     } catch {
       setCart([]);
       setOrders([]);
     }
     setLoadedFor(storeId);
-  }, [storeId, authHydrated]);
+  }, [storeId, userId, authHydrated]);
 
   // Cloud sync: signed-in users pull their cross-device order history.
   // Cloud wins when present; a device-only history is seeded up once.

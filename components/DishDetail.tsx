@@ -12,6 +12,7 @@ import { ArrowLeft, BadgeCheck, Check, Flame, ShieldAlert, ShoppingBag } from "l
 import { getRestaurant } from "@/data/restaurants";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
+import { useAuth } from "@/lib/auth";
 import { conditionWarnings, fitScore } from "@/lib/nutrition";
 import { correctionsFor } from "@/lib/bus";
 import { flyToBasket } from "@/lib/fly";
@@ -32,7 +33,9 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
   const item = restaurant?.menu.find((m) => m.id === id);
   const { profile, targets, consumedToday, hydrated } = useUser();
   const { addToCart } = useOrder();
+  const { user } = useAuth();
   const [inCart, setInCart] = useState(false);
+  const [guestNudge, setGuestNudge] = useState(false);
   const [portion, setPortion] = useState(1); // live preview multiplier
   const [corrections, setCorrections] = useState<MenuCorrection[]>([]);
 
@@ -65,6 +68,7 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
     flyToBasket(e.currentTarget);
     setInCart(true);
     setTimeout(() => setInCart(false), 2200);
+    if (!user) setGuestNudge(true); // guests get a clear next step, not silence
   };
 
   return (
@@ -152,6 +156,32 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
             <p className="mt-2 text-center text-xs text-ink/45">
               Logged to your day once the meal is confirmed — with portion edits and the order reference attached.
             </p>
+
+            {/* Guest nudge: adding works without an account, but the next step
+                is explicit — never a silent add for signed-out visitors. */}
+            {guestNudge && !user && (
+              <div className="mt-3 rounded-2xl border border-brand-200 bg-brand-50 p-4">
+                <p className="text-sm font-semibold text-ink">
+                  <Check className="mr-1 inline h-4 w-4 text-brand-600" />
+                  Added to your basket.
+                </p>
+                <p className="mt-1 text-sm text-ink/65">
+                  Create a free account to see your personal Fit Score on every dish and log this
+                  meal to your day automatically when the order&apos;s confirmed.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Link href="/signup" className="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+                    Get started — it&apos;s free
+                  </Link>
+                  <Link href="/login" className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/25">
+                    Log in
+                  </Link>
+                  <Link href="/basket" className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/25">
+                    View basket
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
