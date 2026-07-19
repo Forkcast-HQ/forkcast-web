@@ -78,7 +78,7 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
         <div>
           <div className="relative overflow-hidden rounded-2xl">
             <SmartImage
-              src={categoryImg(item.category, 0)}
+              src={item.photoUrl ?? categoryImg(item.category, 0)}
               alt={item.name}
               label={item.name}
               className="h-72 w-full object-cover sm:h-80"

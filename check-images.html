@@ -1,0 +1,11 @@
+<!doctype html><meta charset="utf-8"><title>Forkcast image check</title>
+<style>body{font-family:sans-serif;background:#f3f2f2;margin:20px} .g{display:grid;grid-template-columns:repeat(6,1fr);gap:10px} figure{margin:0;background:#fff;border-radius:10px;padding:6px} img{width:100%;height:110px;object-fit:cover;border-radius:6px;background:#fdd} figcaption{font-size:11px;padding:4px 2px}</style>
+<h3>Dish categories</h3><div class="g" id="cats"></div>
+<h3>Restaurants</h3><div class="g" id="rests"></div>
+<script>
+const U=(id)=>`https://images.unsplash.com/photo-${id}?w=400&h=280&fit=crop&auto=format&q=60`;
+const CATS={"grain-bowl":["1512621776951-a57141f2eefd","1546069901-ba9599a7e63c","1540189549336-e6e99c3679fe"],salad:["1512621776951-a57141f2eefd","1540189549336-e6e99c3679fe"],poke:["1553621042-f6e147245754","1546069901-ba9599a7e63c"],wrap:["1626700051175-6818013e1d4f"],smoothie:["1490474418585-ba9bad8fd0ea","1511690743698-d9d85f2fbf38"],soup:["1547592180-85f173990554"],"chicken-plate":["1532550907401-a500c9a57435","1504674900247-0877df9cc836"],"salmon-plate":["1467003909585-2f8a72700288","1519708227418-c8fd9a32b7a2"],mediterranean:["1505576399279-565b52d4ac71"],taco:["1613514785940-daed07799d9b","1551504734-5ee1c4a1479b"],curry:["1601050690597-df0568f70950","1585032226651-759b368d7246"],sandwich:["1528735602780-2552fd46c7af","1482049016688-2d3e1b311543"],pasta:["1473093295043-cdd812d0e601"],breakfast:["1482049016688-2d3e1b311543","1484723091739-30a097e8f929"],dessert:["1565958011703-44f9829ba187","1488477181946-6428a0291777"],burger:["1568901346375-23c9450c58cd","1571091718767-18b5b1457add"],steak:["1544025162-d76694265947"],juice:["1610970881699-44a5587cabec"]};
+const RESTS={cafe:["1554118811-1e0d58224f24"],"asian-resto":["1585032226651-759b368d7246"]};
+function fill(el,map){for(const[k,ids]of Object.entries(map))ids.forEach((id,i)=>{el.insertAdjacentHTML("beforeend",`<figure><img src="${U(id)}" onerror="this.style.background='#f00';this.alt='FAILED'"><figcaption>${k} #${i}</figcaption></figure>`)})}
+fill(document.getElementById("cats"),CATS);fill(document.getElementById("rests"),RESTS);
+</script>

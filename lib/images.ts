@@ -1,55 +1,73 @@
-// Real-photo image helper. We use LoremFlickr (real Flickr photos by keyword,
-// deterministic via the `lock` seed) so the demo shows actual food photography
-// rather than illustrations. A gradient fallback (see SmartImage) covers any
-// network hiccups so the UI always looks intentional.
+// Real-photo image helper with a reliability cascade:
+//   1. Curated Unsplash photos (their CDN is fast and stable; the Unsplash
+//      license permits commercial use without attribution) — hand-matched to
+//      each dish category and restaurant type.
+//   2. LoremFlickr keyword photo as automatic fallback (encoded in the URL
+//      fragment; SmartImage swaps to it on error).
+//   3. Brand gradient tile as the final fallback (SmartImage).
+//
+// LICENSING RULE (do not break): only freely-licensed or partner-provided
+// photography ships in the app. Restaurant-owned marketing photos may be used
+// ONLY once the partner grants a license (photo clause in the partner
+// agreement). The catalog supports per-restaurant `photoUrl` for exactly that.
+
+const U = (id: string, w: number, h: number) =>
+  `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&fit=crop&auto=format&q=70`;
 
 export function foodImg(keywords: string, seed: number, w = 800, h = 600): string {
   const kw = encodeURIComponent(keywords.replace(/\s+/g, ","));
   return `https://loremflickr.com/${w}/${h}/${kw}?lock=${seed}`;
 }
 
-// Stable category -> (keywords, seed) map. Menu items reference a category so
-// related dishes share a coherent look, the way real ordering apps do.
-const CATEGORY_IMG: Record<string, [string, number]> = {
-  "grain-bowl": ["grain,bowl,quinoa,healthy", 21],
-  salad: ["salad,greens,fresh", 32],
-  poke: ["poke,bowl,salmon,rice", 44],
-  wrap: ["wrap,burrito,healthy", 53],
-  "smoothie": ["smoothie,bowl,acai,berries", 61],
-  soup: ["soup,bowl,vegetable", 72],
-  "chicken-plate": ["grilled,chicken,plate,vegetables", 83],
-  "salmon-plate": ["salmon,grilled,plate", 94],
-  mediterranean: ["mediterranean,hummus,falafel,plate", 105],
-  "taco": ["tacos,mexican,fresh", 116],
-  curry: ["curry,bowl,rice", 127],
-  sandwich: ["sandwich,healthy,wholegrain", 138],
-  pasta: ["pasta,wholegrain,vegetables", 149],
-  breakfast: ["breakfast,eggs,avocado,toast", 160],
-  dessert: ["yogurt,parfait,berries", 171],
-  burger: ["burger,turkey,lettuce", 182],
-  steak: ["steak,lean,plate,vegetables", 193],
-  juice: ["juice,green,fresh", 204],
+// Primary URL + fallback packed into the hash so existing call sites (which
+// expect a single string) keep working. SmartImage reads `#fb=` on error.
+function cascade(ids: string[], keywords: string, seed: number, w: number, h: number): string {
+  const id = ids[Math.abs(seed) % ids.length];
+  return `${U(id, w, h)}#fb=${encodeURIComponent(foodImg(keywords, seed, w, h))}`;
+}
+
+// Curated, hand-matched Unsplash photo IDs per dish category. Multiple IDs
+// where dishes commonly repeat, so a menu doesn't show one photo five times.
+const CATEGORY_IMG: Record<string, { ids: string[]; kw: string; seed: number }> = {
+  "grain-bowl": { ids: ["1512621776951-a57141f2eefd", "1546069901-ba9599a7e63c", "1540189549336-e6e99c3679fe"], kw: "grain,bowl,quinoa,healthy", seed: 21 },
+  salad: { ids: ["1512621776951-a57141f2eefd", "1540189549336-e6e99c3679fe"], kw: "salad,greens,fresh", seed: 32 },
+  poke: { ids: ["1553621042-f6e147245754", "1546069901-ba9599a7e63c"], kw: "poke,bowl,salmon,rice", seed: 44 },
+  wrap: { ids: ["1626700051175-6818013e1d4f", "1512621776951-a57141f2eefd"], kw: "wrap,burrito,healthy", seed: 53 },
+  smoothie: { ids: ["1490474418585-ba9bad8fd0ea", "1511690743698-d9d85f2fbf38"], kw: "smoothie,bowl,acai,berries", seed: 61 },
+  soup: { ids: ["1547592180-85f173990554"], kw: "soup,bowl,vegetable", seed: 72 },
+  "chicken-plate": { ids: ["1532550907401-a500c9a57435", "1504674900247-0877df9cc836"], kw: "grilled,chicken,plate,vegetables", seed: 83 },
+  "salmon-plate": { ids: ["1467003909585-2f8a72700288", "1519708227418-c8fd9a32b7a2"], kw: "salmon,grilled,plate", seed: 94 },
+  mediterranean: { ids: ["1505576399279-565b52d4ac71", "1540189549336-e6e99c3679fe"], kw: "mediterranean,hummus,falafel,plate", seed: 105 },
+  taco: { ids: ["1613514785940-daed07799d9b", "1551504734-5ee1c4a1479b"], kw: "tacos,mexican,fresh", seed: 116 },
+  curry: { ids: ["1601050690597-df0568f70950", "1585032226651-759b368d7246"], kw: "curry,bowl,rice", seed: 127 },
+  sandwich: { ids: ["1528735602780-2552fd46c7af", "1482049016688-2d3e1b311543"], kw: "sandwich,healthy,wholegrain", seed: 138 },
+  pasta: { ids: ["1473093295043-cdd812d0e601"], kw: "pasta,wholegrain,vegetables", seed: 149 },
+  breakfast: { ids: ["1482049016688-2d3e1b311543", "1484723091739-30a097e8f929"], kw: "breakfast,eggs,avocado,toast", seed: 160 },
+  dessert: { ids: ["1565958011703-44f9829ba187", "1488477181946-6428a0291777"], kw: "yogurt,parfait,berries", seed: 171 },
+  burger: { ids: ["1568901346375-23c9450c58cd", "1571091718767-18b5b1457add"], kw: "burger,turkey,lettuce", seed: 182 },
+  steak: { ids: ["1544025162-d76694265947", "1504674900247-0877df9cc836"], kw: "steak,lean,plate,vegetables", seed: 193 },
+  juice: { ids: ["1610970881699-44a5587cabec", "1490474418585-ba9bad8fd0ea"], kw: "juice,green,fresh", seed: 204 },
 };
 
-const RESTAURANT_IMG: Record<string, [string, number]> = {
-  "salad-bar": ["salad,restaurant,counter,fresh", 211],
-  "poke-shop": ["poke,restaurant,bowl", 222],
-  "mediterranean-resto": ["mediterranean,restaurant,mezze", 233],
-  "mexican-resto": ["mexican,restaurant,fresh,tacos", 244],
-  "cafe": ["cafe,healthy,bowls,interior", 255],
-  "asian-resto": ["asian,bowl,restaurant,noodles", 266],
-  "grill": ["grill,chicken,restaurant", 277],
-  "juice-bar": ["juice,bar,smoothie,fresh", 288],
+const RESTAURANT_IMG: Record<string, { ids: string[]; kw: string; seed: number }> = {
+  "salad-bar": { ids: ["1512621776951-a57141f2eefd"], kw: "salad,restaurant,counter,fresh", seed: 211 },
+  "poke-shop": { ids: ["1553621042-f6e147245754"], kw: "poke,restaurant,bowl", seed: 222 },
+  "mediterranean-resto": { ids: ["1505576399279-565b52d4ac71"], kw: "mediterranean,restaurant,mezze", seed: 233 },
+  "mexican-resto": { ids: ["1613514785940-daed07799d9b"], kw: "mexican,restaurant,fresh,tacos", seed: 244 },
+  cafe: { ids: ["1554118811-1e0d58224f24"], kw: "cafe,healthy,bowls,interior", seed: 255 },
+  "asian-resto": { ids: ["1585032226651-759b368d7246"], kw: "asian,bowl,restaurant,noodles", seed: 266 },
+  grill: { ids: ["1544025162-d76694265947"], kw: "grill,chicken,restaurant", seed: 277 },
+  "juice-bar": { ids: ["1610970881699-44a5587cabec"], kw: "juice,bar,smoothie,fresh", seed: 288 },
 };
 
 export function categoryImg(category: string, seed = 0, w = 800, h = 600): string {
   const entry = CATEGORY_IMG[category];
-  if (entry) return foodImg(entry[0], entry[1] + seed, w, h);
+  if (entry) return cascade(entry.ids, entry.kw, entry.seed + seed, w, h);
   return foodImg("healthy,food," + category, 300 + seed, w, h);
 }
 
 export function restaurantImg(category: string, w = 1200, h = 800): string {
   const entry = RESTAURANT_IMG[category];
-  if (entry) return foodImg(entry[0], entry[1], w, h);
+  if (entry) return cascade(entry.ids, entry.kw, entry.seed, w, h);
   return foodImg("restaurant,healthy,food", 400, w, h);
 }

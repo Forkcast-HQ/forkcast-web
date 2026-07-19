@@ -53,7 +53,7 @@ export function RestaurantDetail({ slug }: { slug: string }) {
       {/* Hero */}
       <div className="relative h-72 w-full sm:h-96">
         <SmartImage
-          src={restaurantImg(restaurant.category)}
+          src={restaurant.photoUrl ?? restaurantImg(restaurant.category)}
           alt={restaurant.name}
           label={restaurant.name}
           className="h-full w-full object-cover"

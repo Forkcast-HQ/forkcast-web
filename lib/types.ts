@@ -48,6 +48,9 @@ export interface MenuItem {
   sugar: number; // g
   category: string; // image + grouping key
   tags: string[]; // dietary + attribute tags
+  // Partner-provided dish photo (licensed via the partner agreement).
+  // When present it overrides the stock category photo.
+  photoUrl?: string;
 }
 
 export interface Restaurant {
@@ -71,6 +74,8 @@ export interface Restaurant {
   dataSource?: "published" | "estimated";
   sourceNote?: string; // what was published, what was estimated, retrieval date
   blurb: string;
+  // Partner-provided hero photo (licensed via the partner agreement).
+  photoUrl?: string;
   category: string; // hero image key
   tags: string[];
   menu: MenuItem[];

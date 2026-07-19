@@ -70,7 +70,7 @@ export function MenuItemCard({
         aria-label={`${item.name} — details`}
       >
         <SmartImage
-          src={categoryImg(item.category, seed)}
+          src={item.photoUrl ?? categoryImg(item.category, seed)}
           alt={item.name}
           label={item.name}
           className="h-full w-full object-cover"
