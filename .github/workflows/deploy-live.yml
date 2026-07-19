@@ -36,6 +36,12 @@ jobs:
         run: rm -rf app/api
 
       - name: Build static export
+        env:
+          # Supabase (optional): add both as repo secrets to enable real
+          # accounts + cloud sync on the live site. Absent secrets = demo mode.
+          # The anon key is public-by-design; data is protected by RLS.
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         run: STATIC_EXPORT=true PAGES_BASE_PATH=/forkcast-live NEXT_PUBLIC_BASE_PATH=/forkcast-live NEXT_PUBLIC_USE_REAL_AI=false npx next build
 
       - name: Publish to forkcast-live
