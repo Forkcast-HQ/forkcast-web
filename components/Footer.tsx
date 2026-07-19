@@ -35,6 +35,7 @@ export function Footer() {
           <FooterCol
             title="Built on real data"
             links={[
+              ["Source of Data & AI", "/data-and-ai"],
               ["CDC obesity facts", "https://www.cdc.gov/obesity/adult-obesity-facts/index.html"],
               ["USDA ERS food spending", "https://www.ers.usda.gov/data-products/food-expenditure-series/"],
               ["USDA FoodData Central", "https://fdc.nal.usda.gov/"],
@@ -42,7 +43,11 @@ export function Footer() {
           />
         </div>
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-black/5 pt-6 text-xs text-ink/50 sm:flex-row sm:items-center">
-          <p>© {2026} Forkcast — demonstration prototype. Nutrition values are realistic estimates.</p>
+          <p>
+            © {2026} Forkcast — demonstration prototype. Nutrition values are realistic estimates. ·{" "}
+            <Link href="/privacy" className="hover:text-brand-700">Privacy</Link> ·{" "}
+            <Link href="/terms" className="hover:text-brand-700">Terms</Link>
+          </p>
           <p>Boston, MA · Built for the Forkcast pitch.</p>
         </div>
       </div>
