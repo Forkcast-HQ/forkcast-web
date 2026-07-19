@@ -32,7 +32,7 @@ export function CoachChat() {
   const pathname = usePathname();
   const { user, hydrated: authHydrated } = useAuth();
   const { profile, targets, calibration, consumedToday, hydrated } = useUser();
-  const { isPremium, trialActive, trialDaysLeft, hasAccess, messagesLeftToday, consumeMessage, upgradeDemo } = usePremium();
+  const { isPremium, trialActive, trialDaysLeft, hasAccess, messagesLeftToday, consumeMessage, upgradeDemo, cloud } = usePremium();
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -145,9 +145,9 @@ export function CoachChat() {
                   onClick={upgradeDemo}
                   className="mt-3 w-full rounded-full bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
                 >
-                  Activate Premium (demo — no payment)
+                  {cloud ? "Request Premium access (pilot)" : "Activate Premium (demo — no payment)"}
                 </button>
-                <p className="mt-1.5 text-center text-[10px] text-ink/45">Demo prototype: this flips a local flag so the flow can be evaluated. Production uses real billing.</p>
+                <p className="mt-1.5 text-center text-[10px] text-ink/45">{cloud ? "Pilot phase: purchases open at launch — pilot members are granted Premium by the team." : "Demo prototype: this flips a local flag so the flow can be evaluated. Production uses real billing."}</p>
               </div>
             )}
             {hasAccess && msgs.length === 0 && (

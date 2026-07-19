@@ -30,6 +30,21 @@ pushed up once automatically.
    contents of [`supabase/migrations/0001_init.sql`](../supabase/migrations/0001_init.sql)
    → Run. You should see "Success". This creates the 4 tables **with
    row-level security** — each user can only read/write their own rows.
+   Then run [`supabase/migrations/0002_entitlements.sql`](../supabase/migrations/0002_entitlements.sql)
+   the same way — it adds server-side Premium entitlements (`plan`,
+   `premium_until`), protected by a trigger so users cannot grant themselves
+   Premium.
+
+   **To comp a pilot tester** (give free Premium):
+
+   ```sql
+   update public.profiles set plan = 'pilot_comp'
+   where user_id = (select id from auth.users where email = 'tester@email.com');
+   ```
+
+   Set `plan = 'free'` to revoke. Real billing (RevenueCat on mobile, Stripe
+   on web if needed) later writes `plan = 'premium'` + `premium_until` via
+   webhooks — same columns, no app changes.
 
 3. **Decide on email confirmation.** Dashboard → Authentication → Sign In / Up
    → Email. For the pilot, turning **Confirm email OFF** gives the smoothest

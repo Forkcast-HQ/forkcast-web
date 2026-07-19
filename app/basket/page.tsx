@@ -10,6 +10,8 @@ import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
 import { getRestaurant } from "@/data/restaurants";
 import { money, cls, pct } from "@/lib/format";
+import { SmartImage } from "@/components/SmartImage";
+import { dishImg } from "@/lib/images";
 
 export default function BasketPage() {
   const router = useRouter();
@@ -69,13 +71,34 @@ export default function BasketPage() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-3">
-          {items.map((it) => (
+          {items.map((it) => {
+            const menuItem = rest.menu.find((m) => m.id === it.itemId);
+            return (
             <div key={it.itemId} className="rounded-2xl border border-black/5 bg-white p-4">
               <div className="flex items-center gap-4">
+                <Link
+                  href={`/restaurant/${rest.slug}/dish/${it.itemId}`}
+                  className="block h-16 w-16 shrink-0 overflow-hidden rounded-xl sm:h-20 sm:w-20"
+                  aria-label={`${it.name} — details`}
+                >
+                  <SmartImage
+                    src={menuItem?.photoUrl ?? dishImg(rest.slug, it.itemId, menuItem?.category ?? "grain-bowl")}
+                    alt={it.name}
+                    label={it.name}
+                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </Link>
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-ink">{it.name}</p>
+                  <Link href={`/restaurant/${rest.slug}/dish/${it.itemId}`} className="font-semibold text-ink hover:text-brand-700">
+                    {it.name}
+                  </Link>
                   <p className="mt-0.5 text-xs text-ink/50">
                     {it.calories} cal · {it.protein}g P · {it.carbs}g C · {it.fat}g F
+                    {it.qty > 1 && (
+                      <span className="ml-1 font-semibold text-ink/70">
+                        · ×{it.qty} = {Math.round(it.calories * it.qty)} cal
+                      </span>
+                    )}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -98,7 +121,15 @@ export default function BasketPage() {
                 </p>
               )}
             </div>
-          ))}
+            );
+          })}
+
+          <Link
+            href={`/restaurant/${rest.slug}`}
+            className="inline-flex items-center gap-1.5 px-1 pt-1 text-sm font-semibold text-brand-700 hover:text-brand-800"
+          >
+            <Plus className="h-4 w-4" /> Add more from {rest.name}
+          </Link>
 
           <p className="px-1 pt-2 text-xs text-ink/40">
             One restaurant per order. Nutrition values are {rest.partner ? "partner-verified" : "estimates"} — allergen and

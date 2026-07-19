@@ -37,7 +37,7 @@ function resizeImage(file: File, maxEdge = 1024, quality = 0.82): Promise<string
 
 export function PhotoLogger() {
   const { logMeal } = useUser();
-  const { isPremium, trialActive, trialDaysLeft, hasAccess, upgradeDemo } = usePremium();
+  const { isPremium, trialActive, trialDaysLeft, hasAccess, upgradeDemo, cloud } = usePremium();
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [preview, setPreview] = useState<string | null>(null);
@@ -157,7 +157,7 @@ export function PhotoLogger() {
               ordering and confirmed logging stay free forever.
             </p>
             <button onClick={upgradeDemo} className="mt-4 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700">
-              Activate Premium (demo — no payment)
+              {cloud ? "Request Premium access (pilot)" : "Activate Premium (demo — no payment)"}
             </button>
           </div>
         )}
