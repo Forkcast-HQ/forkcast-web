@@ -17,6 +17,16 @@ import type {
 import { calibrateTdee, computeTargets, type CalibrationResult } from "./nutrition";
 import { todayKey, uid } from "./format";
 import { useAuth } from "./auth";
+import { cloudEnabled } from "./supabase";
+import {
+  pullAll,
+  pushProfile as cloudPushProfile,
+  pushMeal as cloudPushMeal,
+  deleteMeal as cloudDeleteMeal,
+  pushWeight as cloudPushWeight,
+  pushMealsBulk,
+  pushWeightsBulk,
+} from "./cloud";
 
 const dataKey = (id: string) => `forkcast.data.${id}`;
 
@@ -87,6 +97,40 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setLoadedFor(userId);
   }, [userId, authHydrated]);
 
+  // Cloud sync (Supabase configured): after the local copy loads, pull the
+  // cross-device truth. Cloud data wins when present; a device-only history
+  // (account predating the backend) is pushed up once instead.
+  useEffect(() => {
+    if (!userId || loadedFor !== userId || !cloudEnabled()) return;
+    let cancelled = false;
+    pullAll(userId).then((remote) => {
+      if (!remote || cancelled) return;
+      const hasRemote = remote.profile || remote.meals.length || remote.weights.length;
+      if (hasRemote) {
+        if (remote.profile) setProfileState(remote.profile);
+        if (remote.meals.length) setMeals(remote.meals);
+        if (remote.weights.length) setWeights(remote.weights);
+      } else {
+        // First cloud sign-in from this device: seed the backend.
+        setProfileState((p) => {
+          if (p) cloudPushProfile(userId, p);
+          return p;
+        });
+        setMeals((m) => {
+          if (m.length) pushMealsBulk(userId, m);
+          return m;
+        });
+        setWeights((w) => {
+          if (w.length) pushWeightsBulk(userId, w);
+          return w;
+        });
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, loadedFor]);
+
   // Persist on change (only once this user's data is loaded).
   useEffect(() => {
     if (!authHydrated || !userId || loadedFor !== userId) return;
@@ -97,34 +141,51 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, [profile, meals, weights, userId, authHydrated, loadedFor]);
 
-  const setProfile = useCallback((p: HealthProfile) => {
-    setProfileState(p);
-    setWeights((w) => {
-      const key = todayKey();
-      const next = w.filter((e) => e.date !== key);
-      return [...next, { date: key, weightKg: p.weightKg }].sort((a, b) => a.date.localeCompare(b.date));
-    });
-  }, []);
+  const setProfile = useCallback(
+    (p: HealthProfile) => {
+      setProfileState(p);
+      const entry = { date: todayKey(), weightKg: p.weightKg };
+      setWeights((w) => {
+        const next = w.filter((e) => e.date !== entry.date);
+        return [...next, entry].sort((a, b) => a.date.localeCompare(b.date));
+      });
+      if (userId) {
+        cloudPushProfile(userId, p);
+        cloudPushWeight(userId, entry);
+      }
+    },
+    [userId],
+  );
 
   const logMeal = useCallback(
     (m: Omit<LoggedMeal, "id" | "loggedAt"> & { loggedAt?: number }) => {
-      setMeals((prev) => [...prev, { ...m, id: uid(), loggedAt: m.loggedAt ?? Date.now() }]);
+      const meal: LoggedMeal = { ...m, id: uid(), loggedAt: m.loggedAt ?? Date.now() };
+      setMeals((prev) => [...prev, meal]);
+      if (userId) cloudPushMeal(userId, meal);
     },
-    [],
+    [userId],
   );
 
-  const removeMeal = useCallback((id: string) => {
-    setMeals((prev) => prev.filter((m) => m.id !== id));
-  }, []);
+  const removeMeal = useCallback(
+    (id: string) => {
+      setMeals((prev) => prev.filter((m) => m.id !== id));
+      if (userId) cloudDeleteMeal(userId, id);
+    },
+    [userId],
+  );
 
-  const addWeight = useCallback((kg: number) => {
-    setWeights((w) => {
-      const key = todayKey();
-      const next = w.filter((e) => e.date !== key);
-      return [...next, { date: key, weightKg: kg }].sort((a, b) => a.date.localeCompare(b.date));
-    });
-    setProfileState((p) => (p ? { ...p, weightKg: kg } : p));
-  }, []);
+  const addWeight = useCallback(
+    (kg: number) => {
+      const entry = { date: todayKey(), weightKg: kg };
+      setWeights((w) => {
+        const next = w.filter((e) => e.date !== entry.date);
+        return [...next, entry].sort((a, b) => a.date.localeCompare(b.date));
+      });
+      setProfileState((p) => (p ? { ...p, weightKg: kg } : p));
+      if (userId) cloudPushWeight(userId, entry);
+    },
+    [userId],
+  );
 
   const resetAll = useCallback(() => {
     setProfileState(null);

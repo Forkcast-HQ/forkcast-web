@@ -19,9 +19,9 @@ export default function LogIn() {
     if (hydrated && user) router.replace(user.role === "restaurant" ? "/partner" : "/dashboard");
   }, [hydrated, user, router]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = logIn({ email, password });
+    const res = await logIn({ email, password });
     if (!res.ok) {
       setError(res.error ?? "Something went wrong.");
       return;

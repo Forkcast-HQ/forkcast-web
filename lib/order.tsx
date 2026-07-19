@@ -25,6 +25,8 @@ import { uid } from "./format";
 import { useAuth } from "./auth";
 import { useUser } from "./store";
 import { readBus, writeBus } from "./bus";
+import { cloudEnabled } from "./supabase";
+import { pullOrders, pushOrder as cloudPushOrder, pushOrdersBulk } from "./cloud";
 
 export const DELIVERY_FEE = 5.99;
 export const MA_MEALS_TAX = 0.07; // Massachusetts meals tax
@@ -109,6 +111,25 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     }
     setLoadedFor(storeId);
   }, [storeId, authHydrated]);
+
+  // Cloud sync: signed-in users pull their cross-device order history.
+  // Cloud wins when present; a device-only history is seeded up once.
+  useEffect(() => {
+    if (!userId || loadedFor !== userId || !cloudEnabled()) return;
+    let cancelled = false;
+    pullOrders(userId).then((remote) => {
+      if (!remote || cancelled) return;
+      if (remote.length) setOrders(remote);
+      else
+        setOrders((local) => {
+          if (local.length) pushOrdersBulk(userId, local);
+          return local;
+        });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, loadedFor]);
 
   useEffect(() => {
     if (!authHydrated || loadedFor !== storeId) return;
@@ -224,6 +245,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       setOrders((prev) => [...prev, order]);
       setCart([]);
       setNow(Date.now());
+      if (userId) cloudPushOrder(userId, order);
 
       // Publish to the sync bus so a partner terminal can claim it.
       // Kitchen flags: profile allergens / dietary preferences vs item text.
@@ -263,13 +285,19 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     [cart, cartItems, profile, user],
   );
 
-  const markLogged = useCallback((orderId: string, dismissed = false) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === orderId ? { ...o, logged: !dismissed, dismissedLog: dismissed } : o,
-      ),
-    );
-  }, []);
+  const markLogged = useCallback(
+    (orderId: string, dismissed = false) => {
+      setOrders((prev) =>
+        prev.map((o) => {
+          if (o.id !== orderId) return o;
+          const next = { ...o, logged: !dismissed, dismissedLog: dismissed };
+          if (userId) cloudPushOrder(userId, next);
+          return next;
+        }),
+      );
+    },
+    [userId],
+  );
 
   const reorder = useCallback((orderId: string) => {
     setOrders((prev) => {

@@ -20,14 +20,14 @@ export default function ForgotPassword() {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (password !== confirm) {
       setError("Passwords don't match.");
       return;
     }
-    const res = resetPassword({ email, newPassword: password });
+    const res = await resetPassword({ email, newPassword: password });
     if (!res.ok) {
       setError(res.error ?? "Something went wrong.");
       return;

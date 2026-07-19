@@ -55,7 +55,7 @@ export default function SignUp() {
     setStep("verify");
   };
 
-  const verify = (e: React.FormEvent) => {
+  const verify = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (codeInput.trim() !== sentCode) {
@@ -63,11 +63,17 @@ export default function SignUp() {
       return;
     }
     setBusy(true);
-    const res = signUp({ name, email, password, role });
+    const res = await signUp({ name, email, password, role });
     if (!res.ok) {
       setError(res.error ?? "Something went wrong.");
       setBusy(false);
       setStep("form");
+      return;
+    }
+    if (res.info) {
+      // Cloud mode with email confirmation on — account created, no session yet.
+      setError(res.info);
+      setBusy(false);
       return;
     }
     router.push(role === "restaurant" ? "/partner" : "/onboarding");
