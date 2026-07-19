@@ -5,7 +5,20 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { AuthShell, AuthField } from "@/components/AuthShell";
+import { AuthShell, AuthField, type AuthPanelContent } from "@/components/AuthShell";
+
+const RESTAURANT_PANEL: AuthPanelContent = {
+  kicker: "Forkcast for restaurants",
+  headline: "Your order terminal and menu tools.",
+  bullets: [
+    "Live orders with customer allergy flags",
+    "Review & correct your menu's nutrition — versioned",
+    "Sponsored placement never changes Fit Scores",
+  ],
+  factBold: "2 in 3",
+  fact: "diners underestimate restaurant-meal calories. Verified menus turn that trust gap into your advantage.",
+  factCite: "Peer-reviewed, BMJ/JAMA",
+};
 
 export default function LogIn() {
   const router = useRouter();
@@ -14,6 +27,13 @@ export default function LogIn() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [asRestaurant, setAsRestaurant] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (new URLSearchParams(window.location.search).get("as") === "restaurant") setAsRestaurant(true);
+    } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
     if (hydrated && user) router.replace(user.role === "restaurant" ? "/partner" : "/dashboard");
@@ -31,7 +51,11 @@ export default function LogIn() {
   };
 
   return (
-    <AuthShell title="Welcome back" subtitle="Log in to pick up your plan.">
+    <AuthShell
+      title={asRestaurant ? "Restaurant sign in" : "Welcome back"}
+      subtitle={asRestaurant ? "Log in to open your order terminal." : "Log in to pick up your plan."}
+      panel={asRestaurant ? RESTAURANT_PANEL : undefined}
+    >
       <form onSubmit={submit} className="space-y-4">
         <AuthField label="Email">
           <input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" autoComplete="email" required />
@@ -70,8 +94,8 @@ export default function LogIn() {
 
       <p className="mt-6 text-center text-sm text-ink/60">
         New here?{" "}
-        <Link href="/signup" className="font-semibold text-brand-700 hover:underline">
-          Create an account
+        <Link href={asRestaurant ? "/signup?role=restaurant" : "/signup"} className="font-semibold text-brand-700 hover:underline">
+          {asRestaurant ? "Register your restaurant" : "Create an account"}
         </Link>
       </p>
     </AuthShell>

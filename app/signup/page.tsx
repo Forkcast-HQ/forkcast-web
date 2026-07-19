@@ -23,15 +23,19 @@ const RESTAURANT_PANEL: AuthPanelContent = {
 
 export default function SignUp() {
   const router = useRouter();
-  const { signUp, user, hydrated } = useAuth();
+  const { signUp, user, hydrated, logOut } = useAuth();
   const [role, setRole] = useState<AccountRole>("customer");
 
   // Deep link from /for-restaurants: /signup?role=restaurant preselects the
   // restaurant account type. window.location (not useSearchParams) keeps the
   // static export Suspense-free.
+  const [wantsRestaurant, setWantsRestaurant] = useState(false);
   useEffect(() => {
     try {
-      if (new URLSearchParams(window.location.search).get("role") === "restaurant") setRole("restaurant");
+      if (new URLSearchParams(window.location.search).get("role") === "restaurant") {
+        setRole("restaurant");
+        setWantsRestaurant(true);
+      }
     } catch { /* ignore */ }
   }, []);
   const [name, setName] = useState("");
@@ -47,8 +51,38 @@ export default function SignUp() {
   const [codeInput, setCodeInput] = useState("");
 
   useEffect(() => {
-    if (hydrated && user) router.replace(user.role === "restaurant" ? "/partner" : "/dashboard");
-  }, [hydrated, user, router]);
+    if (!hydrated || !user) return;
+    if (user.role === "restaurant") { router.replace("/partner"); return; }
+    // Diner arriving via "Become a partner": show the switch screen instead
+    // of bouncing to the dashboard.
+    if (!wantsRestaurant) router.replace("/dashboard");
+  }, [hydrated, user, router, wantsRestaurant]);
+
+  // Signed-in diner who clicked "Become a partner"
+  if (hydrated && user && user.role !== "restaurant" && wantsRestaurant) {
+    return (
+      <AuthShell
+        title="Restaurant accounts are separate"
+        subtitle={`You're signed in as ${user.name || user.email} (diner). Create a dedicated restaurant account to get the order terminal and menu tools.`}
+        panel={RESTAURANT_PANEL}
+      >
+        <div className="space-y-3">
+          <button
+            onClick={() => { logOut(); }}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700"
+          >
+            Log out &amp; create a restaurant account <ArrowRight className="h-5 w-5" />
+          </button>
+          <Link
+            href="/dashboard"
+            className="flex w-full items-center justify-center rounded-full border border-black/10 px-6 py-3.5 text-base font-semibold text-ink/70 transition hover:border-black/25"
+          >
+            Never mind — back to my dashboard
+          </Link>
+        </div>
+      </AuthShell>
+    );
+  }
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();

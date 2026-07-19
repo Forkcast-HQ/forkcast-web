@@ -24,6 +24,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { RESTAURANTS, getRestaurant } from "@/data/restaurants";
+import { useAuth } from "@/lib/auth";
 import { readBus, writeBus, clearBus, correctionsFor, addCorrection } from "@/lib/bus";
 import type { LiveOrderBus, MenuCorrection } from "@/lib/types";
 import { MA_MEALS_TAX } from "@/lib/order";
@@ -32,6 +33,7 @@ import { cls, money } from "@/lib/format";
 const FIELDS: MenuCorrection["field"][] = ["calories", "protein", "carbs", "fat", "fiber", "sodium", "sugar"];
 
 export default function PartnerTerminal() {
+  const { user, hydrated, logOut } = useAuth();
   const [bus, setBus] = useState<LiveOrderBus | null>(null);
   const [slug, setSlug] = useState(RESTAURANTS.find((r) => r.partner)?.slug ?? RESTAURANTS[0].slug);
   const [corrections, setCorrections] = useState<MenuCorrection[]>([]);
@@ -47,6 +49,44 @@ export default function PartnerTerminal() {
     const t = setInterval(refresh, 1000);
     return () => clearInterval(t);
   }, [refresh]);
+
+  // ---- Role gate: the terminal is for restaurant accounts ----
+  if (!hydrated) {
+    return <div className="py-24 text-center text-ink/40">Loading…</div>;
+  }
+  if (!user) {
+    return (
+      <GateShell
+        title="Restaurant partner terminal"
+        body="Sign in with your restaurant account to open the live order queue and menu tools."
+      >
+        <Link href="/login?as=restaurant" className="flex w-full items-center justify-center rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-brand-700">
+          Restaurant sign in
+        </Link>
+        <Link href="/signup?role=restaurant" className="flex w-full items-center justify-center rounded-full border border-black/10 px-6 py-3.5 text-base font-semibold text-ink/70 transition hover:border-black/25">
+          Become a partner — register your restaurant
+        </Link>
+      </GateShell>
+    );
+  }
+  if (user.role !== "restaurant") {
+    return (
+      <GateShell
+        title="This area is for restaurant accounts"
+        body={`You're signed in as ${user.name || user.email} (diner). Restaurant tools live on a separate account type.`}
+      >
+        <button
+          onClick={() => logOut()}
+          className="flex w-full items-center justify-center rounded-full bg-brand-600 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-brand-700"
+        >
+          Log out &amp; switch to a restaurant account
+        </button>
+        <Link href="/dashboard" className="flex w-full items-center justify-center rounded-full border border-black/10 px-6 py-3.5 text-base font-semibold text-ink/70 transition hover:border-black/25">
+          Back to my dashboard
+        </Link>
+      </GateShell>
+    );
+  }
 
   const restaurant = getRestaurant(slug);
   // The queue shows the live order if it belongs to any restaurant (a real
@@ -264,6 +304,19 @@ export default function PartnerTerminal() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function GateShell({ title, body, children }: { title: string; body: string; children: React.ReactNode }) {
+  return (
+    <div className="mx-auto max-w-md px-4 py-20 text-center sm:px-6">
+      <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-50 text-brand-600">
+        <MonitorSmartphone className="h-7 w-7" />
+      </span>
+      <h1 className="mt-5 font-display text-2xl font-extrabold text-ink">{title}</h1>
+      <p className="mt-2 text-sm text-ink/60">{body}</p>
+      <div className="mt-7 space-y-3">{children}</div>
     </div>
   );
 }
