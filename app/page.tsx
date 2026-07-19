@@ -118,9 +118,10 @@ export default function Home() {
                   label="Eating out"
                   className="aspect-[4/3] w-full object-cover"
                 />
-                {/* On-image caption with scrim */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent px-6 pb-5 pt-20">
-                  <p className="font-display text-xl font-extrabold leading-snug text-white">
+                {/* On-image caption with scrim — right-aligned so the floating
+                    stat card (bottom-left) never overlaps it */}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent px-6 pb-5 pt-20 sm:text-right">
+                  <p className="font-display text-xl font-extrabold leading-snug text-white sm:ml-auto sm:max-w-[24ch]">
                     A third of America&apos;s calories are now eaten out.
                   </p>
                   <p className="mt-1 text-sm font-medium text-white/70">
@@ -138,7 +139,9 @@ export default function Home() {
                 className="aspect-[4/5] w-full object-cover"
               />
             </div>
-            <div className="absolute -bottom-5 -left-5 max-w-[220px] rounded-2xl border border-black/5 bg-white p-4 card-shadow">
+            {/* Stat card: flows below the image on mobile, floats over the
+                bottom-left corner on larger screens (caption is right-aligned) */}
+            <div className="mt-4 max-w-[220px] rounded-2xl border border-black/5 bg-white p-4 card-shadow sm:absolute sm:-bottom-5 sm:-left-5 sm:mt-0">
               <p className="font-display text-3xl font-extrabold text-brand-600">~24 cal</p>
               <p className="mt-1 text-sm text-ink/60">
                 Average intake change from menu calorie labels alone.
