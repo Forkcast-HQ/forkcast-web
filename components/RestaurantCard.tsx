@@ -8,7 +8,7 @@ import { fitScore } from "@/lib/nutrition";
 import { SmartImage } from "./SmartImage";
 import { FitPill } from "./FitBadge";
 import { TiltCard } from "./TiltCard";
-import { restaurantImg } from "@/lib/images";
+import { restaurantHeroImg } from "@/lib/images";
 import { priceLevelLabel } from "@/lib/format";
 
 export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
@@ -36,7 +36,7 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
     >
       <div className="relative aspect-[16/10] overflow-hidden">
         <SmartImage
-          src={restaurant.photoUrl ?? restaurantImg(restaurant.category)}
+          src={restaurant.photoUrl ?? restaurantHeroImg(restaurant.slug, restaurant.category)}
           alt={restaurant.name}
           label={restaurant.name}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

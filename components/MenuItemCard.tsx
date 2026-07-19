@@ -11,7 +11,7 @@ import { getRestaurant } from "@/data/restaurants";
 import { flyToBasket } from "@/lib/fly";
 import { SmartImage } from "./SmartImage";
 import { FitBadge } from "./FitBadge";
-import { categoryImg } from "@/lib/images";
+import { dishImg } from "@/lib/images";
 import { cls, money } from "@/lib/format";
 
 const TAG_LABEL: Record<string, string> = {
@@ -70,7 +70,7 @@ export function MenuItemCard({
         aria-label={`${item.name} — details`}
       >
         <SmartImage
-          src={item.photoUrl ?? categoryImg(item.category, seed)}
+          src={item.photoUrl ?? dishImg(restaurantSlug, item.id, item.category, seed)}
           alt={item.name}
           label={item.name}
           className="h-full w-full object-cover"

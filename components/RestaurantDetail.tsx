@@ -8,7 +8,7 @@ import { useUser } from "@/lib/store";
 import { fitScore, deriveTags } from "@/lib/nutrition";
 import { SmartImage } from "@/components/SmartImage";
 import { MenuItemCard } from "@/components/MenuItemCard";
-import { restaurantImg } from "@/lib/images";
+import { restaurantHeroImg } from "@/lib/images";
 import { cls, priceLevelLabel } from "@/lib/format";
 
 const FILTERS = [
@@ -53,7 +53,7 @@ export function RestaurantDetail({ slug }: { slug: string }) {
       {/* Hero */}
       <div className="relative h-72 w-full sm:h-96">
         <SmartImage
-          src={restaurant.photoUrl ?? restaurantImg(restaurant.category)}
+          src={restaurant.photoUrl ?? restaurantHeroImg(restaurant.slug, restaurant.category)}
           alt={restaurant.name}
           label={restaurant.name}
           className="h-full w-full object-cover"

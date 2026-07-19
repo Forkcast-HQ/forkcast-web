@@ -27,7 +27,7 @@ trap restore_api EXIT
 
 echo "Building static export..."
 rm -rf "$ROOT/.next" "$OUT"
-STATIC_EXPORT=true PAGES_BASE_PATH="$BASE" NEXT_PUBLIC_USE_REAL_AI=false "$ROOT/node_modules/.bin/next" build "$ROOT"
+STATIC_EXPORT=true PAGES_BASE_PATH="$BASE" NEXT_PUBLIC_BASE_PATH="$BASE" NEXT_PUBLIC_USE_REAL_AI=false "$ROOT/node_modules/.bin/next" build "$ROOT"
 touch "$OUT/.nojekyll"
 
 echo "Publishing compiled app to $PAGES_REPO ..."

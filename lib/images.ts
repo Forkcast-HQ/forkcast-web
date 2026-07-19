@@ -60,6 +60,23 @@ const RESTAURANT_IMG: Record<string, { ids: string[]; kw: string; seed: number }
   "juice-bar": { ids: ["1610970881699-44a5587cabec"], kw: "juice,bar,smoothie,fresh", seed: 288 },
 };
 
+// ---- Local-first resolution for generated/owned photography ---------------
+// Drop files into public/img/food/dishes/<slug>__<itemId>.jpg and
+// public/img/food/restaurants/<slug>.jpg (see docs/PHOTO_BRIEF.md) and they
+// are picked up automatically: the local file is tried first, and if it
+// doesn't exist the stock cascade takes over. No code changes needed.
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+export function dishImg(slug: string, itemId: string, category: string, seed = 0, w = 800, h = 600): string {
+  const local = `${BASE}/img/food/dishes/${slug}__${itemId}.jpg`;
+  return `${local}#fb=${encodeURIComponent(categoryImg(category, seed, w, h))}`;
+}
+
+export function restaurantHeroImg(slug: string, category: string, w = 1200, h = 800): string {
+  const local = `${BASE}/img/food/restaurants/${slug}.jpg`;
+  return `${local}#fb=${encodeURIComponent(restaurantImg(category, w, h))}`;
+}
+
 export function categoryImg(category: string, seed = 0, w = 800, h = 600): string {
   const entry = CATEGORY_IMG[category];
   if (entry) return cascade(entry.ids, entry.kw, entry.seed + seed, w, h);

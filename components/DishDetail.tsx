@@ -18,7 +18,7 @@ import { flyToBasket } from "@/lib/fly";
 import type { MenuCorrection } from "@/lib/types";
 import { FitBadge } from "@/components/FitBadge";
 import { SmartImage } from "@/components/SmartImage";
-import { categoryImg } from "@/lib/images";
+import { dishImg } from "@/lib/images";
 import { cls, money, pct } from "@/lib/format";
 
 // Estimate uncertainty by source (labeled, never presented as measurement):
@@ -78,7 +78,7 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
         <div>
           <div className="relative overflow-hidden rounded-2xl">
             <SmartImage
-              src={item.photoUrl ?? categoryImg(item.category, 0)}
+              src={item.photoUrl ?? dishImg(slug, item.id, item.category, 0)}
               alt={item.name}
               label={item.name}
               className="h-72 w-full object-cover sm:h-80"
