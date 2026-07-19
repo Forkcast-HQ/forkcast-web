@@ -430,7 +430,7 @@ export default function Discover() {
                 {geoState === "asking" ? "Locating…" : geoState === "denied" ? "Location unavailable — distances from downtown Boston" : "Use my location for real distances"}
               </button>
             )}
-            <p className="hidden text-xs text-ink/40 sm:block">Boston pilot catalog · demo + published + estimated tiers</p>
+            <p className="hidden text-xs text-ink/40 sm:block">Boston catalog · demo + published + estimated tiers</p>
           </div>
         </div>
 

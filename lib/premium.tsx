@@ -39,9 +39,11 @@ export interface PremiumState {
   trialDaysLeft: number;
   /** Premium OR inside the 7-day trial */
   hasAccess: boolean;
+  /** Cloud mode: a pilot access request is pending founder approval */
+  premiumRequested: boolean;
   messagesLeftToday: number; // Infinity when premium
   consumeMessage: () => void;
-  /** Demo mode: flips the demo flag. Cloud mode: opens a pilot comp-request email. */
+  /** Demo mode: flips the demo flag. Cloud mode: files an in-app access request. */
   upgradeDemo: () => void;
   cancelDemo: () => void;
 }
@@ -53,6 +55,7 @@ export function usePremium(): PremiumState {
   const [plan, setPlan] = useState<PremiumState["plan"]>("free");
   const [premiumUntil, setPremiumUntil] = useState<string | null>(null);
   const [demoFlag, setDemoFlag] = useState(false);
+  const [requested, setRequested] = useState(false);
   const [used, setUsed] = useState(0);
 
   const refresh = useCallback(() => {
@@ -81,6 +84,13 @@ export function usePremium(): PremiumState {
             setPremiumUntil(data.premium_until ?? null);
           }
         });
+      s.from("premium_requests")
+        .select("status")
+        .eq("user_id", id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+        .then(({ data }) => setRequested(data?.status === "pending"));
     }
   }, [id]);
 
@@ -113,11 +123,20 @@ export function usePremium(): PremiumState {
 
   const upgradeDemo = useCallback(() => {
     if (!id) return;
-    if (cloud) {
-      // Pilot: purchases open at launch; testers are comped by the founders.
-      window.location.href =
-        "mailto:shasanov@seas.harvard.edu?subject=Forkcast%20Premium%20(pilot)&body=Hi%20—%20I%27d%20like%20Premium%20access%20during%20the%20pilot.%20My%20account%20email%3A%20" +
-        encodeURIComponent(user?.email ?? "");
+    const s = supa();
+    if (cloud && s) {
+      // Pilot: purchases open at launch. File an in-app access request the
+      // founders approve from the dashboard — no email client involved.
+      setRequested(true); // optimistic; UI flips immediately
+      s.from("premium_requests")
+        .insert({ user_id: id, email: user?.email ?? "" })
+        .then(({ error }) => {
+          if (error) {
+            console.warn("[premium] request failed:", error.message);
+            setRequested(false);
+          }
+          window.dispatchEvent(new Event("forkcast-premium-change"));
+        });
       return;
     }
     try {
@@ -146,6 +165,7 @@ export function usePremium(): PremiumState {
     trialActive,
     trialDaysLeft,
     hasAccess: isPremium || trialActive,
+    premiumRequested: cloud && requested && !isPremium,
     messagesLeftToday: isPremium ? Infinity : Math.max(0, FREE_DAILY_MESSAGES - used),
     consumeMessage,
     upgradeDemo,

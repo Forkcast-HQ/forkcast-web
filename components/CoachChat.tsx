@@ -32,7 +32,7 @@ export function CoachChat() {
   const pathname = usePathname();
   const { user, hydrated: authHydrated } = useAuth();
   const { profile, targets, calibration, consumedToday, hydrated } = useUser();
-  const { isPremium, trialActive, trialDaysLeft, hasAccess, messagesLeftToday, consumeMessage, upgradeDemo, cloud } = usePremium();
+  const { isPremium, trialActive, trialDaysLeft, hasAccess, messagesLeftToday, consumeMessage, upgradeDemo, cloud, premiumRequested } = usePremium();
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -141,13 +141,17 @@ export function CoachChat() {
                   The coach, unlimited photo AI, and metabolic calibration are part of <strong>Forkcast Premium</strong> ({PRICE_LINE}).
                   Everything core stays free forever: Fit Scores, discovery, ordering, and confirmed meal logging.
                 </p>
-                <button
-                  onClick={upgradeDemo}
-                  className="mt-3 w-full rounded-full bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
-                >
-                  {cloud ? "Request Premium access (pilot)" : "Activate Premium (demo — no payment)"}
-                </button>
-                <p className="mt-1.5 text-center text-[10px] text-ink/45">{cloud ? "Pilot phase: purchases open at launch — pilot members are granted Premium by the team." : "Demo prototype: this flips a local flag so the flow can be evaluated. Production uses real billing."}</p>
+                {premiumRequested ? (
+                  <p className="mt-3 rounded-full bg-brand-100 px-4 py-2.5 text-center text-sm font-bold text-brand-800">Request sent — Premium will be enabled on your account shortly.</p>
+                ) : (
+                  <button
+                    onClick={upgradeDemo}
+                    className="mt-3 w-full rounded-full bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
+                  >
+                    {cloud ? "Request Premium access" : "Activate Premium (demo — no payment)"}
+                  </button>
+                )}
+                <p className="mt-1.5 text-center text-[10px] text-ink/45">{cloud ? "Purchases open soon — until then, access is granted on request." : "Demo prototype: this flips a local flag so the flow can be evaluated. Production uses real billing."}</p>
               </div>
             )}
             {hasAccess && msgs.length === 0 && (

@@ -32,7 +32,7 @@ export default function Home() {
           <div className="animate-rise">
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/70 px-3 py-1 text-sm font-medium text-brand-700">
               <Sparkles className="h-4 w-4" />
-              Live demo · Boston pilot catalog
+              Live demo · Boston catalog
             </span>
             <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-6xl text-balance">
               Know what you&apos;ll eat{" "}
@@ -62,7 +62,7 @@ export default function Home() {
             </div>
 
             <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-ink/55" aria-label="Product highlights">
-              {['A Fit Score on every dish', 'Every number shows its source', 'Free during the pilot'].map((item) => (
+              {['A Fit Score on every dish', 'Every number shows its source', 'Free to start'].map((item) => (
                 <li key={item} className="inline-flex items-center gap-1.5">
                   <span className="grid h-4 w-4 place-items-center rounded-full bg-sage-100 text-[10px] font-black text-sage-700" aria-hidden="true">✓</span>
                   {item}
@@ -233,7 +233,7 @@ export default function Home() {
           <div>
             <SectionTag>The catalog</SectionTag>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-              Explore the Boston pilot
+              Explore Boston
             </h2>
             <p className="mt-2 max-w-2xl text-sm text-ink/55">A representative catalog — this is how discovery will feel as real restaurants come aboard.</p>
           </div>

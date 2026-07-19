@@ -34,10 +34,10 @@ const PLANNED = [
 export default function CommunityPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <p className="kicker text-brand-700">Boston pilot</p>
+      <p className="kicker text-brand-700">Boston</p>
       <h1 className="mt-1 font-display text-3xl font-extrabold text-ink sm:text-4xl">Community</h1>
       <p className="mt-3 max-w-2xl text-lg text-ink/65">
-        Eating well is easier together. Alongside the app, the Boston pilot will run free, health-focused community
+        Eating well is easier together. Alongside the app, Forkcast will run free, health-focused community
         events with our partner restaurants.
       </p>
 
@@ -45,8 +45,8 @@ export default function CommunityPage() {
       <div className="mt-6 flex items-start gap-3 rounded-2xl border-2 border-ink/40 bg-white p-5">
         <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
         <p className="text-sm text-ink/70">
-          <strong className="text-ink">No events are scheduled yet.</strong> The calendar opens when the Boston pilot
-          launches with its first verified partner restaurants. What follows is the plan — not a promise of dates.
+          <strong className="text-ink">No events are scheduled yet.</strong> The calendar opens when Forkcast launches in Boston
+          with its first verified partner restaurants. What follows is the plan — not a promise of dates.
         </p>
       </div>
 
@@ -76,7 +76,7 @@ export default function CommunityPage() {
       </div>
 
       <p className="mt-8 text-xs text-ink/45">
-        Interested in hearing when events go live? Create an account — pilot participants will be invited first.
+        Interested in hearing when events go live? Create an account — members will be invited first.
         Looking for the investor overview instead? It lives at <Link href="/business" className="font-semibold text-brand-700 underline">the opportunity</Link>.
       </p>
     </div>

@@ -61,7 +61,7 @@ export function Navbar() {
             <Logo />
           </Link>
           <span className="hidden rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-700 lg:inline-flex">
-            Boston pilot
+            Boston
           </span>
         </div>
 

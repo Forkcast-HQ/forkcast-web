@@ -125,7 +125,7 @@ export default function ForRestaurants() {
           />
         </div>
         <p className="mt-6 text-center text-sm text-ink/50">
-          Pilot terms, subject to partner agreements. Sponsored placement is always labeled —
+          Early-partner terms, subject to partner agreements. Sponsored placement is always labeled —
           recommendation integrity is the product.
         </p>
         <div className="mt-8 text-center">

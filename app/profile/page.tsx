@@ -35,7 +35,7 @@ export default function Profile() {
   const router = useRouter();
   const { user, hydrated, logOut, updateName } = useAuth();
   const { profile, hydrated: storeHydrated, setProfile, resetAll } = useUser();
-  const { isPremium, trialActive, trialDaysLeft, upgradeDemo, cancelDemo, cloud, plan } = usePremium();
+  const { isPremium, trialActive, trialDaysLeft, upgradeDemo, cancelDemo, cloud, plan, premiumRequested } = usePremium();
 
   const [name, setName] = useState("");
   const [sex, setSex] = useState<Sex>("male");
@@ -223,7 +223,7 @@ export default function Profile() {
           <Card title="Membership">
             <p className="text-sm text-ink/65">
               {isPremium ? (
-                <><strong className="text-brand-700">{cloud ? (plan === "pilot_comp" ? "Premium (pilot access)" : "Premium") : "Premium (demo)"}</strong> — unlimited coach chat and photo AI. </>
+                <><strong className="text-brand-700">{cloud ? (plan === "pilot_comp" ? "Premium (complimentary)" : "Premium") : "Premium (demo)"}</strong> — unlimited coach chat and photo AI. </>
               ) : trialActive ? (
                 <><strong className="text-ink">Free trial</strong> — {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} left of your {TRIAL_DAYS}-day full-access trial. </>
               ) : (
@@ -245,14 +245,18 @@ export default function Profile() {
                   Cancel Premium (demo)
                 </button>
               )
+            ) : premiumRequested ? (
+              <p className="inline-flex items-center gap-2 rounded-full bg-brand-100 px-4 py-2 text-sm font-bold text-brand-800">
+                Request sent — Premium will be enabled on your account shortly.
+              </p>
             ) : (
               <button onClick={upgradeDemo} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
-                {cloud ? "Request Premium access (pilot)" : "Activate Premium (demo — no payment)"}
+                {cloud ? "Request Premium access" : "Activate Premium (demo — no payment)"}
               </button>
             )}
             <p className="text-xs text-ink/40">
               {cloud
-                ? "Pilot phase: purchases open at launch (mobile app-store billing). Premium is granted server-side — the button emails the team."
+                ? "Purchases open soon. Until then, Premium access is granted on request — no payment needed."
                 : "Demo prototype: no billing exists; this toggles a local flag so the gating flow can be evaluated."}
             </p>
           </Card>

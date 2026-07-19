@@ -70,7 +70,7 @@ export function RestaurantDetail({ slug }: { slug: string }) {
         <div className="absolute bottom-0 mx-auto w-full max-w-7xl px-4 pb-6 text-white sm:px-6 lg:px-8">
           {restaurant.partner && (
             <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-brand-700">
-              <BadgeCheck className="h-3.5 w-3.5" /> Sample pilot listing
+              <BadgeCheck className="h-3.5 w-3.5" /> Sample listing
             </span>
           )}
           <h1 className="font-display text-3xl font-extrabold drop-shadow sm:text-4xl">{restaurant.name}</h1>
@@ -123,7 +123,7 @@ export function RestaurantDetail({ slug }: { slug: string }) {
         <p className="mt-5 max-w-3xl text-lg leading-relaxed text-ink/65">{restaurant.blurb}</p>
         <div className="mt-3 flex max-w-3xl items-start gap-2 text-xs leading-relaxed text-ink/45">
           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-600" />
-          <p>This pilot listing uses demonstration menu and nutrition data. Confirm current ingredients, allergens, pricing, and availability with the restaurant.</p>
+          <p>This listing uses demonstration menu and nutrition data. Confirm current ingredients, allergens, pricing, and availability with the restaurant.</p>
         </div>
 
         {!profile && (
@@ -190,7 +190,7 @@ export function RestaurantDetail({ slug }: { slug: string }) {
           {/* sidebar */}
           <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
             <div className="rounded-2xl border border-black/5 bg-white p-5">
-              <h3 className="font-semibold text-ink">Pilot listing details</h3>
+              <h3 className="font-semibold text-ink">Listing details</h3>
               <dl className="mt-4 space-y-3 text-sm">
                 <InfoRow label="Address" value={restaurant.address} />
                 <InfoRow label="Cuisine" value={restaurant.cuisine} />
