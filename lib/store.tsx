@@ -27,6 +27,7 @@ import {
   pushMealsBulk,
   pushWeightsBulk,
 } from "./cloud";
+import { syncMealToGoogleHealth } from "./health";
 
 const dataKey = (id: string) => `forkcast.data.${id}`;
 
@@ -161,7 +162,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     (m: Omit<LoggedMeal, "id" | "loggedAt"> & { loggedAt?: number }) => {
       const meal: LoggedMeal = { ...m, id: uid(), loggedAt: m.loggedAt ?? Date.now() };
       setMeals((prev) => [...prev, meal]);
-      if (userId) cloudPushMeal(userId, meal);
+      if (userId) {
+        cloudPushMeal(userId, meal);
+        syncMealToGoogleHealth(meal); // no-op unless Fitbit/Google Health is connected + auto-sync is on
+      }
     },
     [userId],
   );

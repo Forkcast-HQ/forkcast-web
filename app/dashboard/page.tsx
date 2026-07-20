@@ -16,13 +16,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowRight, Sparkles, Trash2, Camera, Utensils, PencilLine, Flame, Trophy, Target, ShoppingBag, MapPin, Clock, Info } from "lucide-react";
+import { ArrowRight, Sparkles, Trash2, Camera, Utensils, PencilLine, Flame, Trophy, Target, ShoppingBag, MapPin, Clock, Info, Footprints } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useUser } from "@/lib/store";
 import { GOAL_LABELS, bmiInfo, kgToLb, lbToKg, fitScore, personalAdjust } from "@/lib/nutrition";
 import { allMenuItems } from "@/data/restaurants";
 import { coachTip } from "@/lib/ai";
 import { usePremium } from "@/lib/premium";
+import { getDailyActivity, type DailyActivity } from "@/lib/health";
 import { MacroRing, MacroBar } from "@/components/MacroRing";
 import { PhotoLogger } from "@/components/PhotoLogger";
 import { MenuItemCard } from "@/components/MenuItemCard";
@@ -86,6 +87,15 @@ export default function Dashboard() {
       .catch(() => { /* heuristic tip stays */ });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, hydrated, hasAccess, Boolean(profile), Boolean(targets)]);
+
+  // Steps / active-calories-burned from a connected Fitbit (Google Health
+  // API) — tiles only render once this comes back connected, so nothing
+  // changes for users who haven't connected a device.
+  const [activity, setActivity] = useState<DailyActivity>({ connected: false });
+  useEffect(() => {
+    if (!user || !hydrated) return;
+    getDailyActivity().then(setActivity);
+  }, [user?.id, hydrated]);
 
   useEffect(() => {
     if (authHydrated && !user) router.replace("/login");
@@ -322,6 +332,12 @@ export default function Dashboard() {
         <Tile icon={<Target className="h-5 w-5" />} label="Protein to go" value={<><CountUp value={proteinLeft} />g</>} />
         <Tile icon={<Trophy className="h-5 w-5" />} label="Logging streak" value={<><CountUp value={days} /> {days === 1 ? "day" : "days"}</>} />
         <Tile icon={<Utensils className="h-5 w-5" />} label="Meals today" value={<CountUp value={today.length} />} />
+        {activity.connected && (
+          <>
+            <Tile icon={<Footprints className="h-5 w-5" />} label="Steps today" value={<CountUp value={activity.steps ?? 0} />} />
+            <Tile icon={<Flame className="h-5 w-5" />} label="Active calories burned" value={<CountUp value={activity.activeCaloriesBurned ?? 0} />} />
+          </>
+        )}
       </div>
 
       {/* Row 3: Next best meals — full-width swipeable rail */}

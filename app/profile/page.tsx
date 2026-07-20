@@ -3,9 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Check, LogOut, Save, Trash2, User } from "lucide-react";
+import { ArrowRight, Check, LogOut, Save, Trash2, User, Watch, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useUser } from "@/lib/store";
+import { cloudEnabled } from "@/lib/supabase";
+import {
+  getHealthStatus,
+  connectGoogleHealth,
+  disconnectGoogleHealth,
+  setAutoSyncMeals,
+  type HealthStatus,
+} from "@/lib/health";
 import {
   ACTIVITY_LABELS,
   BMI_SCREENING_NOTE,
@@ -36,6 +44,56 @@ export default function Profile() {
   const { user, hydrated, logOut, updateName } = useAuth();
   const { profile, hydrated: storeHydrated, setProfile, resetAll } = useUser();
   const { isPremium, trialActive, trialDaysLeft, upgradeDemo, cancelDemo, cloud, plan, premiumRequested } = usePremium();
+
+  // Connected apps — Fitbit / Google Health (cloud accounts only; there's
+  // nowhere durable to store a token in device-only demo mode).
+  const [health, setHealth] = useState<HealthStatus>({ connected: false });
+  const [healthLoading, setHealthLoading] = useState(false);
+  const [healthNotice, setHealthNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!cloudEnabled() || !user) return;
+    getHealthStatus().then(setHealth);
+    // window.location (not useSearchParams) keeps the static export
+    // Suspense-free — same convention as app/signup/page.tsx.
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const result = params.get("health");
+      if (result === "connected") {
+        setHealthNotice("Fitbit / Google Health connected.");
+        router.replace("/profile");
+      } else if (result === "error") {
+        const reason = params.get("reason");
+        setHealthNotice(`Couldn't connect Fitbit / Google Health${reason ? ` (${reason.replace(/_/g, " ")})` : ""} — try again.`);
+        router.replace("/profile");
+      }
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  const handleConnectHealth = async () => {
+    setHealthLoading(true);
+    const err = await connectGoogleHealth();
+    if (err) {
+      setHealthNotice(err);
+      setHealthLoading(false);
+    }
+    // On success the browser navigates away to Google's consent screen.
+  };
+
+  const handleDisconnectHealth = async () => {
+    if (!confirm("Disconnect Fitbit / Google Health? Forkcast will stop syncing meals and steps/calories won't show on your dashboard.")) return;
+    setHealthLoading(true);
+    const ok = await disconnectGoogleHealth();
+    setHealth(ok ? { connected: false } : health);
+    setHealthNotice(ok ? "Disconnected." : "Couldn't disconnect — try again.");
+    setHealthLoading(false);
+  };
+
+  const handleToggleAutoSync = async (enabled: boolean) => {
+    setHealth((h) => ({ ...h, autoSyncMeals: enabled }));
+    await setAutoSyncMeals(enabled);
+  };
 
   const [name, setName] = useState("");
   const [sex, setSex] = useState<Sex>("male");
@@ -235,6 +293,52 @@ export default function Profile() {
               {saved ? <><Check className="h-4 w-4" /> Saved</> : <><Save className="h-4 w-4" /> Save changes</>}
             </button>
           </Card>
+
+          {cloud && (
+            <Card icon={<Watch className="h-5 w-5" />} title="Connected apps">
+              {healthNotice && (
+                <p className="rounded-lg bg-black/[0.03] px-3 py-2 text-xs text-ink/60">{healthNotice}</p>
+              )}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-ink">Fitbit &amp; Google Health</p>
+                  <p className="mt-0.5 text-sm text-ink/60">
+                    {health.connected
+                      ? "Connected — logged meals sync to your Fitbit nutrition log, and steps / active calories show on your dashboard."
+                      : "Sync logged meals to your Fitbit food log and pull steps / calories burned into your dashboard."}
+                  </p>
+                </div>
+                {health.connected ? (
+                  <button
+                    onClick={handleDisconnectHealth}
+                    disabled={healthLoading}
+                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/20 disabled:opacity-50"
+                  >
+                    {healthLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Disconnect
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleConnectHealth}
+                    disabled={healthLoading}
+                    className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+                  >
+                    {healthLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Connect Fitbit
+                  </button>
+                )}
+              </div>
+              {health.connected && (
+                <label className="flex items-center gap-2.5 text-sm text-ink/70">
+                  <input
+                    type="checkbox"
+                    checked={health.autoSyncMeals ?? true}
+                    onChange={(e) => handleToggleAutoSync(e.target.checked)}
+                    className="h-4 w-4 rounded border-black/20 text-brand-600 focus:ring-brand-500"
+                  />
+                  Auto-sync every logged meal to Fitbit
+                </label>
+              )}
+            </Card>
+          )}
 
           <Card title="Membership">
             <p className="text-sm text-ink/65">
