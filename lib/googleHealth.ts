@@ -6,17 +6,28 @@
 //
 // Docs: https://developers.google.com/health · Base URL: health.googleapis.com/v4
 //
-// ⚠️ ON EXACT PAYLOAD SHAPES: Google's public docs (as published mid-2026)
-// fully confirm the OAuth/token/identity endpoints and the envelope for
-// interval-style data points (Active Energy Burned's REST example is quoted
-// directly below), but do NOT yet publish a field-level schema for the
-// `nutritionLog` sample body specifically. `NUTRITION_PAYLOAD` below is our
-// best-informed first attempt, built by analogy to the confirmed `bodyFat`
-// Sample shape (`{ sampleTime: {...}, <value fields> }`) and Google Fit's
-// prior nutrient-enum conventions. If a push comes back with a 400, Google's
-// error names the actual expected field — that's why every call here
-// surfaces the raw response body in the thrown Error instead of a generic
-// message. Treat the first real sync as the way you confirm/patch this.
+// ⚠️ ON EXACT PAYLOAD SHAPES: Google's HTML docs (as published mid-2026)
+// don't publish a field-level schema for `nutritionLog`, but the machine-
+// readable API discovery document (health.googleapis.com/$discovery/rest?
+// version=v4) does, and it's authoritative — it's what Google's own client
+// libraries are generated from. Per that doc's `NutritionLog` schema,
+// carbs/fat/energy are NOT expressed via a generic nutrient enum — they're
+// dedicated, fully-typed fields: `totalCarbohydrate` / `totalFat`
+// (`WeightQuantity: { grams }`) and `energy` (`EnergyQuantity: { kcal }`).
+// The time field is `interval` (`SessionTimeInterval`:
+// startTime/endTime/startUtcOffset/endUtcOffset), not `sampleTime`. The
+// dish-name field is `foodDisplayName`, not `name`.
+//
+// The discovery doc's own `NutrientQuantity`/`Nutrient` types are dangling
+// references (referenced but never defined in the doc — likely incomplete
+// since this API is brand new), so protein/fiber/sodium/sugar — which DO
+// go through the generic `nutrients` array — are confirmed correct by two
+// live 400 responses instead: `PROTEIN`, `DIETARY_FIBER`, `SODIUM`, and
+// `SUGAR` were sent and never flagged as invalid, while `TOTAL_CARBOHYDRATE`
+// /`CARBOHYDRATE` and `TOTAL_FAT`/`FAT` were rejected both times — consistent
+// with carbs/fat belonging in the dedicated fields above instead. If a push
+// still 400s after this, every call here surfaces Google's raw response in
+// the thrown Error, so the exact next problem will be visible immediately.
 
 const BASE = "https://health.googleapis.com/v4";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -139,27 +150,28 @@ export async function pushNutritionLog(accessToken: string, meal: MealForSync): 
   const dataPointId = nutritionDataPointId(meal.id);
   const name = `users/me/dataTypes/nutrition-log/dataPoints/${dataPointId}`;
 
-  // Round 2, informed by a real 400 from Google (2026-07-20): `sampleTime`,
-  // `name`, and `calories` are NOT fields on `nutrition_log` (unlike the
-  // `bodyFat` sample shape docs imply by analogy) — all three came back as
-  // "Unknown name ... Cannot find field." `nutrients` itself, and the
-  // `{ nutrient, quantity: { grams } }` shape, were accepted without
-  // complaint. Of the six nutrient enum values sent, only two were
-  // rejected — TOTAL_CARBOHYDRATE and TOTAL_FAT — while PROTEIN,
-  // DIETARY_FIBER, SODIUM, and SUGAR were NOT flagged, so those four are
-  // confirmed-correct enum names. Renamed carbs/fat to the plain form
-  // (matching the pattern of the other four) and folded calories in as its
-  // own nutrient entry instead of a separate field — still a guess, so if
-  // this round also 400s, the error will again name exactly what's wrong.
+  // Round 3 — built directly from the official v4 discovery document's
+  // NutritionLog schema (see file header). `interval` needs a start/end
+  // pair; a single logged instant is expressed as a zero-length window
+  // (start === end), same pattern the confirmed `steps`/`active-energy-
+  // burned` interval types use elsewhere in this API.
+  const loggedIso = new Date(meal.loggedAt).toISOString();
   const body = {
     name,
     dataSource: { recordingMethod: "ACTIVELY_MEASURED" },
     nutritionLog: {
+      interval: {
+        startTime: loggedIso,
+        endTime: loggedIso,
+        startUtcOffset: "0s",
+        endUtcOffset: "0s",
+      },
+      foodDisplayName: meal.name,
+      energy: { kcal: meal.calories },
+      totalCarbohydrate: { grams: meal.carbs },
+      totalFat: { grams: meal.fat },
       nutrients: [
-        { nutrient: "CALORIES", quantity: { kcal: meal.calories } },
         { nutrient: "PROTEIN", quantity: { grams: meal.protein } },
-        { nutrient: "CARBOHYDRATE", quantity: { grams: meal.carbs } },
-        { nutrient: "FAT", quantity: { grams: meal.fat } },
         { nutrient: "DIETARY_FIBER", quantity: { grams: meal.fiber } },
         { nutrient: "SODIUM", quantity: { grams: meal.sodium / 1000 } },
         { nutrient: "SUGAR", quantity: { grams: meal.sugar } },
