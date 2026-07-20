@@ -46,6 +46,7 @@ export function Footer() {
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-black/5 pt-6 text-xs text-ink/50 sm:flex-row sm:items-center">
           <p>
             © {2026} Forkcast — demonstration prototype. Nutrition values are realistic estimates. ·{" "}
+            <Link href="/pricing" className="hover:text-brand-700">Pricing</Link> ·{" "}
             <Link href="/privacy" className="hover:text-brand-700">Privacy</Link> ·{" "}
             <Link href="/terms" className="hover:text-brand-700">Terms</Link>
           </p>
