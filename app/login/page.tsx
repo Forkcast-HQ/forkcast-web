@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Eye, EyeOff } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Store, User } from "lucide-react";
 import { useAuth, lastEmail } from "@/lib/auth";
 import { AuthShell, AuthField, type AuthPanelContent } from "@/components/AuthShell";
+import { cls } from "@/lib/format";
 
 const RESTAURANT_PANEL: AuthPanelContent = {
   kicker: "Forkcast for restaurants",
@@ -61,6 +62,28 @@ export default function LogIn() {
       panel={asRestaurant ? RESTAURANT_PANEL : undefined}
     >
       <form onSubmit={submit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-2">
+          {(
+            [
+              { key: false, label: "I'm a diner", icon: <User className="h-4 w-4" /> },
+              { key: true, label: "I'm a restaurant", icon: <Store className="h-4 w-4" /> },
+            ] as const
+          ).map((o) => (
+            <button
+              key={String(o.key)}
+              type="button"
+              onClick={() => setAsRestaurant(o.key)}
+              aria-pressed={asRestaurant === o.key}
+              className={cls(
+                "flex items-center justify-center gap-1.5 rounded-xl border-2 p-2.5 text-sm font-bold text-ink transition",
+                asRestaurant === o.key ? "border-ink bg-black/[0.03]" : "border-black/10 hover:border-black/25",
+              )}
+            >
+              {o.icon} {o.label}
+            </button>
+          ))}
+        </div>
+
         <AuthField label="Email">
           <input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" autoComplete="email" required />
           {email && email === lastEmail() && (
