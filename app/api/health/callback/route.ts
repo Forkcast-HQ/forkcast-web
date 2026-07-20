@@ -56,18 +56,24 @@ export async function GET(req: Request) {
     });
     const tokenExpiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
 
-    const { error } = await admin.from("device_connections").upsert({
-      user_id: stateRow.user_id as string,
-      provider: "google_health",
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      token_expires_at: tokenExpiresAt,
-      scope: tokens.scope,
-      health_user_id: (identity as { healthUserId?: string }).healthUserId ?? null,
-      legacy_user_id: (identity as { legacyUserId?: string }).legacyUserId ?? null,
-      connected_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
+    const { error } = await admin.from("device_connections").upsert(
+      {
+        user_id: stateRow.user_id as string,
+        provider: "google_health",
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        token_expires_at: tokenExpiresAt,
+        scope: tokens.scope,
+        health_user_id: (identity as { healthUserId?: string }).healthUserId ?? null,
+        legacy_user_id: (identity as { legacyUserId?: string }).legacyUserId ?? null,
+        connected_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      // Since migration 0005, the primary key is a surrogate `id` (to allow
+      // a user to hold both a google_health and a whoop row at once), so the
+      // conflict target must be named explicitly — it's no longer the PK.
+      { onConflict: "user_id,provider" },
+    );
     if (error) throw error;
   } catch (e) {
     console.error("[health/callback] failed:", e);

@@ -1,15 +1,11 @@
 import { NextResponse } from "next/server";
 import { getUserIdFromRequest } from "@/lib/apiAuth";
 import { supaAdmin } from "@/lib/supabase-admin";
-import { revokeToken } from "@/lib/googleHealth";
+import { revokeToken } from "@/lib/whoop";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Disconnects the Fitbit/Google Health device only. Kept at this path
-// (unchanged) so the existing, already-tested Fitbit disconnect flow isn't
-// touched; WHOOP has its own parallel route at
-// app/api/health/whoop/disconnect since it revokes via a different API.
 export async function POST(req: Request) {
   const userId = await getUserIdFromRequest(req);
   if (!userId) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
@@ -19,18 +15,21 @@ export async function POST(req: Request) {
 
   const { data } = await admin
     .from("device_connections")
-    .select("refresh_token")
+    .select("access_token")
     .eq("user_id", userId)
-    .eq("provider", "google_health")
+    .eq("provider", "whoop")
     .maybeSingle();
 
-  if (data?.refresh_token) await revokeToken(data.refresh_token as string);
+  // WHOOP's revoke endpoint takes the access token (not the refresh token,
+  // unlike Google's revoke) — see developer.whoop.com/docs "Revoking an
+  // Access Token."
+  if (data?.access_token) await revokeToken(data.access_token as string);
 
   const { error } = await admin
     .from("device_connections")
     .delete()
     .eq("user_id", userId)
-    .eq("provider", "google_health");
+    .eq("provider", "whoop");
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ ok: true });

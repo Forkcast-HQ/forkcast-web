@@ -11,6 +11,8 @@ import {
   getHealthStatus,
   connectGoogleHealth,
   disconnectGoogleHealth,
+  connectWhoop,
+  disconnectWhoop,
   setAutoSyncMeals,
   type HealthStatus,
 } from "@/lib/health";
@@ -45,11 +47,24 @@ export default function Profile() {
   const { profile, hydrated: storeHydrated, setProfile, resetAll } = useUser();
   const { isPremium, trialActive, trialDaysLeft, upgradeDemo, cancelDemo, cloud, plan, premiumRequested } = usePremium();
 
-  // Connected apps — Fitbit / Google Health (cloud accounts only; there's
-  // nowhere durable to store a token in device-only demo mode).
-  const [health, setHealth] = useState<HealthStatus>({ connected: false });
-  const [healthLoading, setHealthLoading] = useState(false);
+  // Connected apps — Fitbit/Google Health and WHOOP (cloud accounts only;
+  // there's nowhere durable to store a token in device-only demo mode).
+  // Apple Watch and Samsung Health are listed in the picker but not wired
+  // up: HealthKit and the Samsung Health SDK are on-device only, so they'll
+  // need the not-yet-built native mobile app rather than a cloud OAuth flow
+  // like Fitbit/WHOOP.
+  const DISCONNECTED_STATUS = { connected: false } as const;
+  const [health, setHealth] = useState<HealthStatus>({ googleHealth: DISCONNECTED_STATUS, whoop: DISCONNECTED_STATUS });
+  const [healthLoading, setHealthLoading] = useState<string | null>(null); // provider key currently in-flight
   const [healthNotice, setHealthNotice] = useState<string | null>(null);
+  const [devicePick, setDevicePick] = useState("whoop");
+
+  const PROVIDER_LABEL: Record<string, string> = {
+    google_health: "Fitbit / Google Health",
+    whoop: "WHOOP",
+    apple_watch: "Apple Watch",
+    samsung_health: "Samsung Health",
+  };
 
   useEffect(() => {
     if (!cloudEnabled() || !user) return;
@@ -59,12 +74,14 @@ export default function Profile() {
     try {
       const params = new URLSearchParams(window.location.search);
       const result = params.get("health");
+      const provider = params.get("provider") ?? "google_health";
+      const label = PROVIDER_LABEL[provider] ?? provider;
       if (result === "connected") {
-        setHealthNotice("Fitbit / Google Health connected.");
+        setHealthNotice(`${label} connected.`);
         router.replace("/profile");
       } else if (result === "error") {
         const reason = params.get("reason");
-        setHealthNotice(`Couldn't connect Fitbit / Google Health${reason ? ` (${reason.replace(/_/g, " ")})` : ""} — try again.`);
+        setHealthNotice(`Couldn't connect ${label}${reason ? ` (${reason.replace(/_/g, " ")})` : ""} — try again.`);
         router.replace("/profile");
       }
     } catch { /* ignore */ }
@@ -72,26 +89,45 @@ export default function Profile() {
   }, [user?.id]);
 
   const handleConnectHealth = async () => {
-    setHealthLoading(true);
+    setHealthLoading("google_health");
     const err = await connectGoogleHealth();
     if (err) {
       setHealthNotice(err);
-      setHealthLoading(false);
+      setHealthLoading(null);
     }
     // On success the browser navigates away to Google's consent screen.
   };
 
   const handleDisconnectHealth = async () => {
     if (!confirm("Disconnect Fitbit / Google Health? Forkcast will stop syncing meals and steps/calories won't show on your dashboard.")) return;
-    setHealthLoading(true);
+    setHealthLoading("google_health");
     const ok = await disconnectGoogleHealth();
-    setHealth(ok ? { connected: false } : health);
+    setHealth((h) => (ok ? { ...h, googleHealth: { connected: false } } : h));
     setHealthNotice(ok ? "Disconnected." : "Couldn't disconnect — try again.");
-    setHealthLoading(false);
+    setHealthLoading(null);
+  };
+
+  const handleConnectWhoop = async () => {
+    setHealthLoading("whoop");
+    const err = await connectWhoop();
+    if (err) {
+      setHealthNotice(err);
+      setHealthLoading(null);
+    }
+    // On success the browser navigates away to WHOOP's consent screen.
+  };
+
+  const handleDisconnectWhoop = async () => {
+    if (!confirm("Disconnect WHOOP? Recovery, strain, and sleep won't show on your dashboard.")) return;
+    setHealthLoading("whoop");
+    const ok = await disconnectWhoop();
+    setHealth((h) => (ok ? { ...h, whoop: { connected: false } } : h));
+    setHealthNotice(ok ? "Disconnected." : "Couldn't disconnect — try again.");
+    setHealthLoading(null);
   };
 
   const handleToggleAutoSync = async (enabled: boolean) => {
-    setHealth((h) => ({ ...h, autoSyncMeals: enabled }));
+    setHealth((h) => ({ ...h, googleHealth: { ...h.googleHealth, autoSyncMeals: enabled } }));
     await setAutoSyncMeals(enabled);
   };
 
@@ -299,43 +335,78 @@ export default function Profile() {
               {healthNotice && (
                 <p className="rounded-lg bg-black/[0.03] px-3 py-2 text-xs text-ink/60">{healthNotice}</p>
               )}
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-ink">Fitbit &amp; Google Health</p>
-                  <p className="mt-0.5 text-sm text-ink/60">
-                    {health.connected
-                      ? "Connected — logged meals sync to your Fitbit nutrition log, and steps / active calories show on your dashboard."
-                      : "Sync logged meals to your Fitbit food log and pull steps / calories burned into your dashboard."}
-                  </p>
-                </div>
-                {health.connected ? (
+
+              {health.googleHealth.connected && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-black/[0.06] p-3">
+                  <div>
+                    <p className="text-sm font-semibold text-ink">Fitbit / Google Health</p>
+                    <p className="mt-0.5 text-sm text-ink/60">
+                      Connected — logged meals sync to your Fitbit nutrition log, and steps / active calories show on your dashboard.
+                    </p>
+                    <label className="mt-2 flex items-center gap-2.5 text-sm text-ink/70">
+                      <input
+                        type="checkbox"
+                        checked={health.googleHealth.autoSyncMeals ?? true}
+                        onChange={(e) => handleToggleAutoSync(e.target.checked)}
+                        className="h-4 w-4 rounded border-black/20 text-brand-600 focus:ring-brand-500"
+                      />
+                      Auto-sync every logged meal to Fitbit
+                    </label>
+                  </div>
                   <button
                     onClick={handleDisconnectHealth}
-                    disabled={healthLoading}
+                    disabled={healthLoading === "google_health"}
                     className="inline-flex shrink-0 items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/20 disabled:opacity-50"
                   >
-                    {healthLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Disconnect
+                    {healthLoading === "google_health" ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Disconnect
                   </button>
-                ) : (
+                </div>
+              )}
+
+              {health.whoop.connected && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-black/[0.06] p-3">
+                  <div>
+                    <p className="text-sm font-semibold text-ink">WHOOP</p>
+                    <p className="mt-0.5 text-sm text-ink/60">
+                      Connected — recovery score, day strain, and sleep performance show on your dashboard. (WHOOP has no food log, so meal sync stays Fitbit-only.)
+                    </p>
+                  </div>
                   <button
-                    onClick={handleConnectHealth}
-                    disabled={healthLoading}
-                    className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+                    onClick={handleDisconnectWhoop}
+                    disabled={healthLoading === "whoop"}
+                    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/20 disabled:opacity-50"
                   >
-                    {healthLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Connect Fitbit
+                    {healthLoading === "whoop" ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Disconnect
                   </button>
-                )}
-              </div>
-              {health.connected && (
-                <label className="flex items-center gap-2.5 text-sm text-ink/70">
-                  <input
-                    type="checkbox"
-                    checked={health.autoSyncMeals ?? true}
-                    onChange={(e) => handleToggleAutoSync(e.target.checked)}
-                    className="h-4 w-4 rounded border-black/20 text-brand-600 focus:ring-brand-500"
-                  />
-                  Auto-sync every logged meal to Fitbit
-                </label>
+                </div>
+              )}
+
+              {(!health.googleHealth.connected || !health.whoop.connected) && (
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <select
+                    value={devicePick}
+                    onChange={(e) => setDevicePick(e.target.value)}
+                    className="rounded-full border border-black/10 bg-white px-3.5 py-2 text-sm text-ink focus:border-brand-400 focus:outline-none"
+                  >
+                    {!health.whoop.connected && <option value="whoop">WHOOP</option>}
+                    {!health.googleHealth.connected && <option value="google_health">Fitbit / Google Health</option>}
+                    <option value="apple_watch">Apple Watch (coming soon)</option>
+                    <option value="samsung_health">Samsung Health (coming soon)</option>
+                  </select>
+                  {devicePick === "apple_watch" || devicePick === "samsung_health" ? (
+                    <p className="text-xs text-ink/45">
+                      Needs Forkcast's mobile app — {devicePick === "apple_watch" ? "Apple Health" : "Samsung Health"} data lives on-device, not in a cloud API like Fitbit/WHOOP.
+                    </p>
+                  ) : (
+                    <button
+                      onClick={devicePick === "whoop" ? handleConnectWhoop : handleConnectHealth}
+                      disabled={healthLoading !== null}
+                      className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+                    >
+                      {healthLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Connect
+                    </button>
+                  )}
+                </div>
               )}
             </Card>
           )}

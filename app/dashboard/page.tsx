@@ -16,14 +16,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowRight, Sparkles, Trash2, Camera, Utensils, PencilLine, Flame, Trophy, Target, ShoppingBag, MapPin, Clock, Info, Footprints } from "lucide-react";
+import { ArrowRight, Sparkles, Trash2, Camera, Utensils, PencilLine, Flame, Trophy, Target, ShoppingBag, MapPin, Clock, Info, Footprints, HeartPulse, Zap, Moon } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useUser } from "@/lib/store";
 import { GOAL_LABELS, bmiInfo, kgToLb, lbToKg, fitScore, personalAdjust } from "@/lib/nutrition";
 import { allMenuItems } from "@/data/restaurants";
 import { coachTip } from "@/lib/ai";
 import { usePremium } from "@/lib/premium";
-import { getDailyActivity, type DailyActivity } from "@/lib/health";
+import { getDailyActivity, getWhoopDaily, type DailyActivity, type WhoopDaily } from "@/lib/health";
 import { MacroRing, MacroBar } from "@/components/MacroRing";
 import { PhotoLogger } from "@/components/PhotoLogger";
 import { MenuItemCard } from "@/components/MenuItemCard";
@@ -95,6 +95,14 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user || !hydrated) return;
     getDailyActivity().then(setActivity);
+  }, [user?.id, hydrated]);
+
+  // Recovery / strain / sleep from a connected WHOOP — same "only render if
+  // connected" pattern as the Fitbit tiles above.
+  const [whoop, setWhoop] = useState<WhoopDaily>({ connected: false });
+  useEffect(() => {
+    if (!user || !hydrated) return;
+    getWhoopDaily().then(setWhoop);
   }, [user?.id, hydrated]);
 
   useEffect(() => {
@@ -336,6 +344,19 @@ export default function Dashboard() {
           <>
             <Tile icon={<Footprints className="h-5 w-5" />} label="Steps today" value={<CountUp value={activity.steps ?? 0} />} />
             <Tile icon={<Flame className="h-5 w-5" />} label="Active calories burned" value={<CountUp value={activity.activeCaloriesBurned ?? 0} />} />
+          </>
+        )}
+        {whoop.connected && (
+          <>
+            {whoop.recoveryScore != null && (
+              <Tile icon={<HeartPulse className="h-5 w-5" />} label="WHOOP recovery" value={<><CountUp value={whoop.recoveryScore} />%</>} />
+            )}
+            {whoop.strain != null && (
+              <Tile icon={<Zap className="h-5 w-5" />} label="WHOOP day strain" value={whoop.strain.toFixed(1)} />
+            )}
+            {whoop.sleepPerformancePct != null && (
+              <Tile icon={<Moon className="h-5 w-5" />} label="WHOOP sleep performance" value={<><CountUp value={whoop.sleepPerformancePct} />%</>} />
+            )}
           </>
         )}
       </div>

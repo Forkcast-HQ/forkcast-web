@@ -1,8 +1,9 @@
-// Client-side helpers for the Google Health (Fitbit) integration. Every
-// function attaches the current Supabase session's access token as a bearer
-// header — see lib/apiAuth.ts for how the server verifies it. Requires cloud
-// mode (Supabase configured): there's no meaningful "connect Fitbit" in
-// device-only demo mode since there'd be nowhere durable to store the token.
+// Client-side helpers for wearable/device integrations (Fitbit via Google
+// Health, WHOOP). Every function attaches the current Supabase session's
+// access token as a bearer header — see lib/apiAuth.ts for how the server
+// verifies it. Requires cloud mode (Supabase configured): there's no
+// meaningful "connect a device" in device-only demo mode since there'd be
+// nowhere durable to store the token.
 
 import { supa, cloudEnabled } from "./supabase";
 import type { LoggedMeal } from "./types";
@@ -15,28 +16,42 @@ async function authHeaders(): Promise<Record<string, string> | null> {
   return token ? { Authorization: `Bearer ${token}` } : null;
 }
 
-export interface HealthStatus {
+export interface ProviderStatus {
   connected: boolean;
-  provider?: string;
   connectedAt?: string;
   autoSyncMeals?: boolean;
 }
 
+export interface HealthStatus {
+  googleHealth: ProviderStatus;
+  whoop: ProviderStatus;
+}
+
+const DISCONNECTED: ProviderStatus = { connected: false };
+
+/** Fetches connection status for every provider (Fitbit/Google Health,
+ * WHOOP) in one round trip — a user can have both connected at once. */
 export async function getHealthStatus(): Promise<HealthStatus> {
-  if (!cloudEnabled()) return { connected: false };
+  if (!cloudEnabled()) return { googleHealth: DISCONNECTED, whoop: DISCONNECTED };
   const headers = await authHeaders();
-  if (!headers) return { connected: false };
+  if (!headers) return { googleHealth: DISCONNECTED, whoop: DISCONNECTED };
   try {
     const res = await fetch("/api/health/status", { headers });
-    if (!res.ok) return { connected: false };
-    return await res.json();
+    if (!res.ok) return { googleHealth: DISCONNECTED, whoop: DISCONNECTED };
+    const body: { providers?: Record<string, ProviderStatus> } = await res.json();
+    const providers = body.providers ?? {};
+    return {
+      googleHealth: providers.google_health ?? DISCONNECTED,
+      whoop: providers.whoop ?? DISCONNECTED,
+    };
   } catch {
-    return { connected: false };
+    return { googleHealth: DISCONNECTED, whoop: DISCONNECTED };
   }
 }
 
-/** Kicks off the OAuth flow: fetches a consent URL, then navigates the
- * browser to it. Returns an error string on failure (shown inline). */
+/** Kicks off the Google Health (Fitbit) OAuth flow: fetches a consent URL,
+ * then navigates the browser to it. Returns an error string on failure
+ * (shown inline). */
 export async function connectGoogleHealth(): Promise<string | null> {
   const headers = await authHeaders();
   if (!headers) return "Sign in again and retry.";
@@ -62,6 +77,32 @@ export async function disconnectGoogleHealth(): Promise<boolean> {
   }
 }
 
+/** Kicks off the WHOOP OAuth flow — same shape as connectGoogleHealth. */
+export async function connectWhoop(): Promise<string | null> {
+  const headers = await authHeaders();
+  if (!headers) return "Sign in again and retry.";
+  try {
+    const res = await fetch("/api/health/whoop/connect", { method: "POST", headers });
+    const body = await res.json();
+    if (!res.ok || !body.url) return body.error ?? "Couldn't start the connection.";
+    window.location.href = body.url;
+    return null;
+  } catch {
+    return "Network error — try again.";
+  }
+}
+
+export async function disconnectWhoop(): Promise<boolean> {
+  const headers = await authHeaders();
+  if (!headers) return false;
+  try {
+    const res = await fetch("/api/health/whoop/disconnect", { method: "POST", headers });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function setAutoSyncMeals(enabled: boolean): Promise<void> {
   const headers = await authHeaders();
   if (!headers) return;
@@ -76,7 +117,8 @@ export async function setAutoSyncMeals(enabled: boolean): Promise<void> {
  * caller, mirrors cloudPushMeal's resilience in lib/cloud.ts. Logs the
  * actual response body (not just network-level failures) so a failed push
  * is debuggable from the browser console — open DevTools, log a meal, and
- * look for "[health] sync-meal ...". */
+ * look for "[health] sync-meal ...". Fitbit/Google Health only: WHOOP has no
+ * nutrition-log endpoint. */
 export function syncMealToGoogleHealth(meal: LoggedMeal): void {
   if (!cloudEnabled()) return;
   authHeaders().then((headers) => {
@@ -111,6 +153,31 @@ export async function getDailyActivity(date?: string): Promise<DailyActivity> {
   try {
     const qs = date ? `?date=${encodeURIComponent(date)}` : "";
     const res = await fetch(`/api/health/daily${qs}`, { headers });
+    if (!res.ok) return { connected: false };
+    return await res.json();
+  } catch {
+    return { connected: false };
+  }
+}
+
+export interface WhoopDaily {
+  connected: boolean;
+  recoveryScore?: number | null;
+  strain?: number | null;
+  sleepPerformancePct?: number | null;
+  restingHeartRate?: number | null;
+  hrvMilli?: number | null;
+}
+
+/** Latest recovery score / day strain / sleep performance from WHOOP — no
+ * date param, since WHOOP has no per-calendar-day rollup (see
+ * lib/whoop.ts getLatestSummary). */
+export async function getWhoopDaily(): Promise<WhoopDaily> {
+  if (!cloudEnabled()) return { connected: false };
+  const headers = await authHeaders();
+  if (!headers) return { connected: false };
+  try {
+    const res = await fetch("/api/health/whoop/daily", { headers });
     if (!res.ok) return { connected: false };
     return await res.json();
   } catch {

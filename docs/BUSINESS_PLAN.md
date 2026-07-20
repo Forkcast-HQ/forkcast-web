@@ -2,7 +2,7 @@
 
 **The trust layer for restaurant nutrition decisions.** Forkcast tells diners what to order *before* they order — scored against their own body and goals — then closes the loop: order, confirm, log, measure. It is the only product connecting pre-order decision support, verified independent-restaurant nutrition data, and post-order confirmed logging.
 
-*Version 2.0 — July 2026. Prepared for pre-seed conversations and as part of the founders' evidence record. All market figures are sourced (CDC, USDA ERS, AHRQ, peer-reviewed literature, company filings/press; see `RESEARCH.md`); competitive claims from live site captures dated July 15, 2026 (see `COMPETITIVE_SCAN_2026-07.md`). Nothing in this document claims users, partners, revenue, or outcomes that do not exist.*
+*Version 2.1 — July 2026. Prepared for pre-seed conversations and as part of the founders' evidence record. All market figures are sourced (CDC, USDA ERS, AHRQ, peer-reviewed literature, company filings/press; see `RESEARCH.md`); competitive claims from live site captures dated July 15, 2026 (see `COMPETITIVE_SCAN_2026-07.md`). Nothing in this document claims users, partners, revenue, or outcomes that do not exist.*
 
 ---
 
@@ -51,6 +51,9 @@ Forkcast turns a health profile (Mifflin-St Jeor BMR → activity-scaled TDEE �
 | Adaptive metabolic calibration | **Live** | Target TDEE back-calculated from the user's own logged intake + weight change (energy balance), confidence-blended — the state-of-the-art approach, attached to restaurant decisions no adaptive app has |
 | Evidence system | **Live** | Exportable meal log with source/portion/confidence per entry; `/impact` page with six pre-registered pilot metrics and a public source ledger |
 | Role-based accounts (diner / restaurant), web-first with shareable dish pages | **Live** | Two-sided from day one; the app-only competitors have no web surface at all |
+| Wearable sync (Google Health / Fitbit) | **Live** | Every order-confirmed meal auto-syncs calories and macros into the user's existing Fitbit/Google Health record; steps and active-calories-burned sync back into the Forkcast dashboard |
+
+**Wearable integration — the logging loop extended into the ecosystem users already check.** As of July 2026, Forkcast operates a production Google Health API integration (Google's cloud successor to the Fitbit Web API, which Google is retiring in September 2026): every order-confirmed meal syncs its calories and macros directly into the user's existing Fitbit / Google Health record, no separate entry required, while the user's steps and active-calories-burned sync back into the Forkcast dashboard. This closes a gap the incumbents haven't: MyFitnessPal syncs wearable *activity* into its own app but still requires the user to manually diary each meal, while Forkcast's restaurant meals arrive already logged from the order itself and now surface automatically in the fitness app the user already opens daily — a zero-effort touchpoint no logging competitor's restaurant data can reach.
 
 **What is deliberately *not* built:** payment processing, live delivery dispatch, and partner handoff links — all shown as clearly-labeled integration states, never simulated as real. Kitchen status is simulated and labeled until a terminal claims the order.
 
@@ -68,7 +71,7 @@ Forkcast turns a health profile (Mifflin-St Jeor BMR → activity-scaled TDEE �
 | Player | Owns | Structurally absent |
 |---|---|---|
 | **MenuFit / PlateMate / Nuuro** | "Know what to order" positioning; AI menu scoring; influencer GTM | Sources, error ranges, corrections, restaurant participation, ordering/logging loop, web presence; guilt-based fitness framing excludes the health-condition market |
-| **MyFitnessPal** | Retrospective logging at scale | Acts after eating; restaurant data is its weakest (same dish 400–1,200 kcal); 70–80% two-week churn; first revenue decline (−5.7%, 2025) |
+| **MyFitnessPal** | Retrospective logging at scale; wearable activity sync | Acts after eating; restaurant data is its weakest (same dish 400–1,200 kcal); wearable sync covers activity, not meals — manual diary still required; 70–80% two-week churn; first revenue decline (−5.7%, 2025) |
 | **DoorDash / Uber Eats** | Ordering logistics, merchant graph, $1B+ ads | Zero personal-nutrition intelligence; sponsored placement *is* the product |
 | **Sweetgreen / CAVA** | Excellent single-brand transparency | Can't be brand-agnostic |
 | **Foodsmart / Nourish** | Payer-funded dietitian care (2.2M members / $1B+ valuation) | Care delivery, not the moment of ordering |
@@ -131,7 +134,7 @@ Full assumptions, five-year build, unit economics, and scenarios: `FINANCIAL_MOD
 | Risk | Mitigation |
 |---|---|
 | **Estimation accuracy is physics-bound** (~16–25% photo floor) | Lead with menu text (models match nutritionists there); RAG-ground in USDA FNDDS (grounding cuts error 63–83%); surface ± ranges; user correction built into every surface; never marketed as clinical |
-| **Retention kills this category** | Plan-ahead is a decision habit, not a logging chore; order-confirmed logging removes the diary; calibration gives a compounding reason to stay; annual plans ~halve churn |
+| **Retention kills this category** | Plan-ahead is a decision habit, not a logging chore; order-confirmed logging removes the diary; calibration gives a compounding reason to stay; wearable sync (Google Health/Fitbit) extends the habit into an ecosystem the user already checks daily, without a second app to open; annual plans ~halve churn |
 | **Two-sided cold start** | Published-disclosure seeding gives day-one chain coverage free; density beats breadth; the terminal gives independents value (orders + flags) before any fee |
 | **GLP-1 substitution** | Position as the eating-out companion *for* GLP-1 users — the angle funding the category |
 | **Incumbent consolidation** (MFP × Cal AI) | Moat is the verified-data + correction + ground-truth graph, not the model |
