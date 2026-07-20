@@ -150,19 +150,22 @@ export async function pushNutritionLog(accessToken: string, meal: MealForSync): 
   const dataPointId = nutritionDataPointId(meal.id);
   const name = `users/me/dataTypes/nutrition-log/dataPoints/${dataPointId}`;
 
-  // Round 3 — built directly from the official v4 discovery document's
-  // NutritionLog schema (see file header). `interval` needs a start/end
-  // pair; a single logged instant is expressed as a zero-length window
-  // (start === end), same pattern the confirmed `steps`/`active-energy-
-  // burned` interval types use elsewhere in this API.
-  const loggedIso = new Date(meal.loggedAt).toISOString();
+  // Round 4 — Google rejected round 3's zero-length interval with
+  // "Data point start time must be strictly earlier than end time"
+  // (reason: INVALID_TIME_RANGE). Unlike the Interval record type used by
+  // steps/active-energy-burned (which tolerates start === end),
+  // NutritionLog's `interval` is a Session type and requires a genuinely
+  // non-zero window. A minute is an arbitrary but reasonable stand-in for
+  // "roughly when this meal was eaten."
+  const startMs = meal.loggedAt;
+  const endMs = meal.loggedAt + 60_000;
   const body = {
     name,
     dataSource: { recordingMethod: "ACTIVELY_MEASURED" },
     nutritionLog: {
       interval: {
-        startTime: loggedIso,
-        endTime: loggedIso,
+        startTime: new Date(startMs).toISOString(),
+        endTime: new Date(endMs).toISOString(),
         startUtcOffset: "0s",
         endUtcOffset: "0s",
       },
