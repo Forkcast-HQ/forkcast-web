@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -22,6 +22,7 @@ import { useUser } from "@/lib/store";
 import { GOAL_LABELS, bmiInfo, kgToLb, lbToKg, fitScore, personalAdjust } from "@/lib/nutrition";
 import { allMenuItems } from "@/data/restaurants";
 import { coachTip } from "@/lib/ai";
+import { usePremium } from "@/lib/premium";
 import { MacroRing, MacroBar } from "@/components/MacroRing";
 import { PhotoLogger } from "@/components/PhotoLogger";
 import { MenuItemCard } from "@/components/MenuItemCard";
@@ -43,6 +44,48 @@ export default function Dashboard() {
   const { profile, targets, calibration, hydrated, meals, weights, consumedToday, todaysMeals, removeMeal, streak, addWeight } = useUser();
   const [weighIn, setWeighIn] = useState("");
   const [weighSaved, setWeighSaved] = useState(false);
+
+  // Real AI coach tip for the banner — generated once per day and cached, so
+  // the dashboard costs at most one model call daily. The heuristic tip
+  // renders instantly and remains the fallback when the AI isn't reachable.
+  const { hasAccess } = usePremium();
+  const [aiTip, setAiTip] = useState<string | null>(null);
+  const tipFetched = useRef(false);
+  useEffect(() => {
+    if (!user || !profile || !targets || !hydrated || !hasAccess || tipFetched.current) return;
+    const key = `forkcast.aitip.${user.id}.${todayKey()}`;
+    try {
+      const cached = localStorage.getItem(key);
+      if (cached) { setAiTip(cached); tipFetched.current = true; return; }
+    } catch { /* ignore */ }
+    tipFetched.current = true;
+    const consumedNow = consumedToday();
+    fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: "In one or two short sentences (no markdown, no greeting), give me the single most useful coaching nudge for the rest of my day based on my context." }],
+        context: {
+          goal: profile.goal,
+          dailyTargets: targets,
+          consumedToday: consumedNow,
+          remainingCalories: Math.max(0, targets.calories - consumedNow.calories),
+          currentWeightKg: profile.weightKg,
+          goalWeightKg: profile.goalWeightKg,
+        },
+      }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((b) => {
+        if (b?.reply) {
+          const text = String(b.reply).slice(0, 240);
+          setAiTip(text);
+          try { localStorage.setItem(key, text); } catch { /* ignore */ }
+        }
+      })
+      .catch(() => { /* heuristic tip stays */ });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, hydrated, hasAccess, Boolean(profile), Boolean(targets)]);
 
   useEffect(() => {
     if (authHydrated && !user) router.replace("/login");
@@ -214,7 +257,7 @@ export default function Dashboard() {
   const proteinLeft = Math.max(0, targets.protein - consumed!.protein);
   const bmi = bmiInfo(profile.weightKg, profile.heightCm);
   const days = streak();
-  const tip = coachTip({ goal: profile.goal, name: profile.name?.split(" ")[0], calLeft: targets.calories - consumed!.calories, proteinLeft });
+  const tip = aiTip ?? coachTip({ goal: profile.goal, name: profile.name?.split(" ")[0], calLeft: targets.calories - consumed!.calories, proteinLeft });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
