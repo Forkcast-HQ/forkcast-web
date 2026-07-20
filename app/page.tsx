@@ -5,7 +5,6 @@ import {
   HeartPulse,
   MapPin,
   Sparkles,
-  Store,
   TrendingDown,
   Utensils,
 } from "lucide-react";
@@ -14,7 +13,7 @@ import { HeroDemo } from "@/components/HeroDemo";
 import { HeroSearch } from "@/components/HeroSearch";
 import { DishMarquee } from "@/components/DishMarquee";
 import { ShowcaseCarousel } from "@/components/ShowcaseCarousel";
-import { restaurantImg, categoryImg, editorialImg } from "@/lib/images";
+import { categoryImg, editorialImg } from "@/lib/images";
 import { RESTAURANTS } from "@/data/restaurants";
 
 export default function Home() {
@@ -250,43 +249,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------------- FOR RESTAURANTS ---------------- */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-3xl bg-ink text-white">
-          <div className="grid items-center gap-8 p-8 sm:p-12 lg:grid-cols-2">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white/80">
-                <Store className="h-4 w-4" /> For restaurants
-              </span>
-              <h2 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl text-balance">
-                Get discovered by diners who came to eat well.
-              </h2>
-              <p className="mt-4 text-lg text-white/70">
-                We turn your menu into per-dish nutrition you can review and
-                correct, then surface your best dishes to people actively trying
-                to hit their goals — higher-intent diners who come back.
-              </p>
-              <Link
-                href="/for-restaurants"
-                className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand-500 px-6 py-3 text-base font-semibold text-white transition hover:bg-brand-400"
-              >
-                Partner with Forkcast <ArrowRight className="h-5 w-5" />
-              </Link>
-            </div>
-            <div className="overflow-hidden rounded-2xl">
-              <SmartImage
-                src={restaurantImg("salad-bar")}
-                alt="Restaurant partner"
-                label="Partner restaurant"
-                className="aspect-[4/3] w-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ---------------- FINAL CTA ---------------- */}
-      <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 pb-2 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl">
           <SmartImage
             src={editorialImg("restaurant-spread", 1600, 640)}
