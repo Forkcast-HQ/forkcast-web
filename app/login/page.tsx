@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "@/lib/auth";
+import { useAuth, lastEmail } from "@/lib/auth";
 import { AuthShell, AuthField, type AuthPanelContent } from "@/components/AuthShell";
 
 const RESTAURANT_PANEL: AuthPanelContent = {
@@ -33,6 +33,10 @@ export default function LogIn() {
     try {
       if (new URLSearchParams(window.location.search).get("as") === "restaurant") setAsRestaurant(true);
     } catch { /* ignore */ }
+    // Prefill the last-used email (never the password — that's the browser's
+    // password manager's job, which the autocomplete attributes trigger).
+    const remembered = lastEmail();
+    if (remembered) setEmail(remembered);
   }, []);
 
   useEffect(() => {
@@ -59,6 +63,14 @@ export default function LogIn() {
       <form onSubmit={submit} className="space-y-4">
         <AuthField label="Email">
           <input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" autoComplete="email" required />
+          {email && email === lastEmail() && (
+            <p className="mt-1 text-xs text-ink/45">
+              Welcome back.{" "}
+              <button type="button" onClick={() => setEmail("")} className="font-semibold text-brand-700 hover:underline">
+                Not you?
+              </button>
+            </p>
+          )}
         </AuthField>
         <AuthField label="Password">
           <div className="relative mb-0">

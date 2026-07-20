@@ -44,6 +44,10 @@ interface AuthValue {
   resetPassword: (input: { email: string; newPassword: string }) => Promise<AuthResult>;
 }
 
+const LAST_EMAIL_KEY = "forkcast.lastEmail";
+const rememberEmail = (e: string) => { try { localStorage.setItem(LAST_EMAIL_KEY, e); } catch { /* ignore */ } };
+export const lastEmail = (): string => { try { return localStorage.getItem(LAST_EMAIL_KEY) ?? ""; } catch { return ""; } };
+
 const ACCOUNTS_KEY = "forkcast.accounts";
 const SESSION_KEY = "forkcast.session";
 
@@ -144,6 +148,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const u = data.user;
         if (!u) return { ok: false, error: "Sign-up failed. Try again." };
         persistAccounts(mirrorCloudAccount(accounts, u.id, e, name.trim(), role ?? "customer"));
+        rememberEmail(e);
         if (!data.session) {
           // Email confirmation is enabled on the project — no session yet.
           return { ok: true, info: "Check your email to confirm your account, then log in." };
@@ -156,6 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (accounts.some((a) => a.email === e)) return { ok: false, error: "An account with that email already exists." };
       const acc: Account = { id: uid(), name: name.trim(), email: e, passwordHash: pwHash(password), role: role ?? "customer", createdAt: Date.now() };
       persistAccounts([...accounts, acc]);
+      rememberEmail(e);
       setSession(acc.id);
       return { ok: true };
     },
@@ -174,12 +180,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!u) return { ok: false, error: "Log-in failed. Try again." };
         const meta = (u.user_metadata ?? {}) as { name?: string; role?: AccountRole };
         persistAccounts(mirrorCloudAccount(accounts, u.id, e, meta.name ?? "", meta.role ?? "customer"));
+        rememberEmail(e);
         setSession(u.id);
         return { ok: true };
       }
 
       const acc = accounts.find((a) => a.email === e);
       if (!acc || acc.passwordHash !== pwHash(password)) return { ok: false, error: "Wrong email or password." };
+      rememberEmail(e);
       setSession(acc.id);
       return { ok: true };
     },
