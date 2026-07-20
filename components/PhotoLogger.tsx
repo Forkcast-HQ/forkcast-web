@@ -271,8 +271,8 @@ export function PhotoLogger() {
         )}
 
         {status !== "idle" && (
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <div className={cls("relative h-48 w-full shrink-0 overflow-hidden rounded-xl bg-neutral-900/90 sm:w-48", !preview && status === "review" && "hidden")}>
+          <div className="flex flex-col gap-4">
+            <div className={cls("relative h-52 w-full shrink-0 overflow-hidden rounded-xl bg-neutral-900/90", !preview && status === "review" && "hidden")}>
               {preview && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={preview} alt="Meal" className="h-full w-full object-contain" />
