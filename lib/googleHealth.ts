@@ -138,20 +138,28 @@ function nutritionDataPointId(mealId: string): string {
 export async function pushNutritionLog(accessToken: string, meal: MealForSync): Promise<void> {
   const dataPointId = nutritionDataPointId(meal.id);
   const name = `users/me/dataTypes/nutrition-log/dataPoints/${dataPointId}`;
-  const physicalTime = new Date(meal.loggedAt).toISOString();
 
-  // Best-informed first attempt — see the file header note.
+  // Round 2, informed by a real 400 from Google (2026-07-20): `sampleTime`,
+  // `name`, and `calories` are NOT fields on `nutrition_log` (unlike the
+  // `bodyFat` sample shape docs imply by analogy) — all three came back as
+  // "Unknown name ... Cannot find field." `nutrients` itself, and the
+  // `{ nutrient, quantity: { grams } }` shape, were accepted without
+  // complaint. Of the six nutrient enum values sent, only two were
+  // rejected — TOTAL_CARBOHYDRATE and TOTAL_FAT — while PROTEIN,
+  // DIETARY_FIBER, SODIUM, and SUGAR were NOT flagged, so those four are
+  // confirmed-correct enum names. Renamed carbs/fat to the plain form
+  // (matching the pattern of the other four) and folded calories in as its
+  // own nutrient entry instead of a separate field — still a guess, so if
+  // this round also 400s, the error will again name exactly what's wrong.
   const body = {
     name,
     dataSource: { recordingMethod: "ACTIVELY_MEASURED" },
     nutritionLog: {
-      sampleTime: { physicalTime },
-      name: meal.name,
-      calories: { kcal: meal.calories },
       nutrients: [
+        { nutrient: "CALORIES", quantity: { kcal: meal.calories } },
         { nutrient: "PROTEIN", quantity: { grams: meal.protein } },
-        { nutrient: "TOTAL_CARBOHYDRATE", quantity: { grams: meal.carbs } },
-        { nutrient: "TOTAL_FAT", quantity: { grams: meal.fat } },
+        { nutrient: "CARBOHYDRATE", quantity: { grams: meal.carbs } },
+        { nutrient: "FAT", quantity: { grams: meal.fat } },
         { nutrient: "DIETARY_FIBER", quantity: { grams: meal.fiber } },
         { nutrient: "SODIUM", quantity: { grams: meal.sodium / 1000 } },
         { nutrient: "SUGAR", quantity: { grams: meal.sugar } },
