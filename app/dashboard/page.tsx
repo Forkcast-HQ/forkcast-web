@@ -292,8 +292,10 @@ export default function Dashboard() {
         <p className="text-sm text-ink/80"><span className="font-semibold text-brand-700">Coach:</span> {tip}</p>
       </div>
 
-      {/* Row 1: Today + Photo */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      {/* Row 1: Today + Photo — items-start so neither card stretches to the
+          other's height (a tall photo review was leaving Today's nutrition
+          mostly empty white space) */}
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-3">
         <div className="rounded-3xl border border-black/5 bg-white p-6 lg:col-span-2">
           <h2 className="font-display text-xl font-bold text-ink">Today&apos;s nutrition</h2>
           <div className="mt-6 flex flex-col items-center gap-8 sm:flex-row">
