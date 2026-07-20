@@ -89,7 +89,7 @@ export function CoachChat() {
           role: "assistant",
           content: res.ok && body.reply
             ? body.reply
-            : "I can't reach the AI service on this deployment — the coach runs where the server AI key is configured (local dev or the SSR site). Everything else in Forkcast still works.",
+            : `The coach can't answer right now${body?.error ? ` (${body.error})` : ""}. Everything else in Forkcast still works.`,
         },
       ]);
     } catch {

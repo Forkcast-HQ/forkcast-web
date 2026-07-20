@@ -272,10 +272,10 @@ export function PhotoLogger() {
 
         {status !== "idle" && (
           <div className="flex flex-col gap-4 sm:flex-row">
-            <div className={cls("relative h-40 w-full shrink-0 overflow-hidden rounded-xl bg-black/5 sm:w-40", !preview && status === "review" && "hidden")}>
+            <div className={cls("relative h-48 w-full shrink-0 overflow-hidden rounded-xl bg-neutral-900/90 sm:w-48", !preview && status === "review" && "hidden")}>
               {preview && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={preview} alt="Meal" className="h-full w-full object-cover" />
+                <img src={preview} alt="Meal" className="h-full w-full object-contain" />
               )}
               {status === "analyzing" && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/55 text-white">
@@ -395,18 +395,17 @@ export function PhotoLogger() {
 
 function EditStat({ label, value, unit, onChange }: { label: string; value: string; unit?: string; onChange: (v: string) => void }) {
   return (
-    <label className="block cursor-text rounded-lg bg-black/[0.03] py-2 transition focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-600/40">
-      <span className="relative inline-flex items-baseline justify-center">
-        <input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          inputMode="numeric"
-          className="w-14 bg-transparent text-center font-display text-lg font-bold text-ink focus:outline-none"
-          aria-label={`${label} — editable`}
-        />
-        {unit && <span className="text-xs text-ink/40">{unit}</span>}
+    <label className="block min-w-0 cursor-text rounded-lg bg-black/[0.03] px-1 py-2 transition focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-600/40">
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        inputMode="numeric"
+        className="w-full min-w-0 bg-transparent text-center font-display text-lg font-bold text-ink focus:outline-none"
+        aria-label={`${label}${unit ? ` in ${unit}` : ""} — editable`}
+      />
+      <span className="block truncate text-center text-[10px] uppercase tracking-wide text-ink/45">
+        {label}{unit ? ` · ${unit}` : ""}
       </span>
-      <span className="block text-[11px] uppercase tracking-wide text-ink/45">{label}</span>
     </label>
   );
 }

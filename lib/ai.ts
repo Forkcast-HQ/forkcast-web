@@ -1,10 +1,10 @@
 // ---------------------------------------------------------------------------
 // Forkcast AI layer (swappable).
 //
-// REAL AI: when NEXT_PUBLIC_USE_REAL_AI=true, analyzeMealPhoto POSTs the photo
-// to /api/analyze, which calls a vision model (Groq Llama-4 today) server-side
-// and returns calories + macros. Requires a server (next dev, Netlify, Vercel)
-// — not the static GitHub Pages build, which falls back to the mock below.
+// REAL AI: analyzeMeal always POSTs to /api/analyze, which calls a vision
+// model server-side. On deployments without the API (static export) or
+// without keys, the request fails and the caller falls back to the clearly
+// labeled sample below — no build flag involved.
 //
 // MOCK: deterministic, realistic estimates so the demo works with no key.
 // ---------------------------------------------------------------------------
@@ -23,7 +23,6 @@ export interface MealEstimate {
   source?: "ai" | "mock";
 }
 
-export const USE_REAL_AI = process.env.NEXT_PUBLIC_USE_REAL_AI === "true";
 
 // Curated, realistic estimates the mock can return.
 const LIBRARY: MealEstimate[] = [
@@ -90,8 +89,6 @@ export interface AnalyzeOpts {
 // Real analysis via the server route. Works photo-only, description-only, or
 // both. Throws with a readable message on failure so the UI can surface it.
 export async function analyzeMeal({ image, note, prior }: AnalyzeOpts): Promise<MealEstimate> {
-  if (!USE_REAL_AI) return mockEstimate(image ?? note ?? "", note);
-
   const res = await fetch("/api/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
