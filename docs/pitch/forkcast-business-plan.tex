@@ -364,6 +364,20 @@ SBIR Phase I · Seed raised & Mo 9--18 & ---\\
 \bottomrule
 \end{tabularx}
 
+\subsection*{Five-year plan \normalfont\small\color{muted}(projection; reconciles to the financial model)}
+
+\begin{tabularx}{\textwidth}{@{}l r r r r r@{}}
+\toprule
+ & \textbf{Y1} & \textbf{Y2} & \textbf{Y3} & \textbf{Y4} & \textbf{Y5}\\
+\midrule
+Metros & Boston & 3 & 8 & 15 & 25\\
+Paying subscribers (yr-end) & $\sim$3k & $\sim$25k & $\sim$90k & $\sim$220k & $\sim$450k\\
+Verified Partner restaurants & $\sim$20 & $\sim$400 & $\sim$1{,}500 & $\sim$4{,}000 & $\sim$9{,}000\\
+Team (yr-end) & 5 & 12 & 24 & 40 & 62\\
+Revenue & \$0.15M & \$1.47M & \$5.86M & \$16.44M & \$37.35M\\
+\bottomrule
+\end{tabularx}
+
 % ================= 10 RISKS =================
 \section{Risks \& mitigations}
 
@@ -382,21 +396,95 @@ Policy risk on B2B2C & Anchor on commercial MNT; Medicaid expansion as optionali
 \end{tabularx}
 
 % ================= 11 NATIONAL INTEREST =================
-\section{National-interest alignment}
+\section{National impact}
 
-{\small\color{muted}This section states the founders' case factually; it draws no legal conclusions.}
+{\small\color{muted}This section states the founders' case factually; it draws no legal conclusions. Forward figures are projections.}
 
 \begin{itemize}[leftmargin=1.4em,itemsep=3pt]
-\item \textbf{Substantial merit.} Restaurant-nutrition transparency for the independent majority federal labeling does not reach; pre-order decision support where labels demonstrably fail ($\sim$24 kcal/order); health literacy through explained, sourced, correctable numbers; small-restaurant menu digitization at documented cost.
-\item \textbf{National importance.} A reproducible protocol --- collection standard, provenance tiers, correction governance, pre-registered measurement --- designed to scale across U.S. markets; addressed at a diet-disease burden of $\sim$\$334B/yr.
-\item \textbf{Well positioned.} Working product with dated commit history; live-captured published-data integrations; documented methods; financial and competitive analyses; a pilot designed for verifiable evidence (restaurant letters, correction logs, exportable provenance-carrying data).
-\item \textbf{Evidence integrity.} No fabricated users, restaurants, partners, outcomes, revenue, ratings, or health claims --- enforced in the product itself (prototype stamps, simulation labels, demo-payment disclosures, confidence tiers).
+\item \textbf{Contributions to the economy.} Diet-related disease costs $\sim$\$334B/yr in direct medical spending; the away-from-home channel (58.5\% of U.S. food spending) is where those diets are decided, yet the only federal instrument there shifts intake by $\sim$24 kcal/order. Forkcast contributes infrastructure: trustworthy per-dish nutrition for any menu, chain or independent, at the moment of decision.
+\item \textbf{Job creation.} Direct: 5 $\to$ 62 U.S. employees projected over five years (engineering, nutrition data operations, market-launch teams --- Boston first, then the CDC's highest-prevalence regions). Indirect: $\sim$9{,}000 projected partner restaurants by Y5, overwhelmingly independent small businesses, each keeping 94\% of Forkcast-originated order revenue.
+\item \textbf{Support for small businesses.} Federal labeling covers only chains (20+ locations); lab nutrition panels cost $\sim$\$500--1{,}000/dish. Forkcast gives independents menu digitization, per-dish nutrition, verification tools, and a corrections ledger free --- charging 6\% only on orders it originates, vs.\ 15--30\% at delivery marketplaces.
+\item \textbf{Future impact.} Expansion sequenced toward the regions federal surveillance identifies as most affected (2024 BRFSS: Midwest 35.9\%, South 34.5\%; 19 states $\geq$35\%). Beyond Y5: covered-benefit nutrition programs, research access to provenance-carrying real-world data, and a correction-governed standard others can adopt.
+\item \textbf{Evidence integrity.} No fabricated users, restaurants, partners, outcomes, revenue, ratings, or health claims --- enforced in the product itself.
 \end{itemize}
 
-% ================= 12 TEAM =================
-\section{Team}
+% ================= 12 ORGANIZATION =================
+\section{Organization \& people}
 
-Founding team --- two co-founders: one leading product and engineering (builder of the product to date), one leading strategy, market validation, and regulatory-economic analysis. Founder credentials are shared with investors directly. Pre-seed hires: a registered dietitian / nutrition-science advisor (credibility + B2B2C), an ML engineer (estimation engine), and a local GTM lead (restaurant density). Advisory targets: a fast-casual operator and a digital-health payer-contracting advisor.
+\textbf{Structure.} Flat by design through Y2, then three functional pods reporting to the co-founders. Every pod owns a number: Engineering owns activation and estimate-correction rate, Data owns provenance coverage, Market owns partner density and CAC. G\&A stays fractional until Y3.
+
+\begin{center}
+\begin{tikzpicture}[
+  box/.style={draw=ink!30, rounded corners=3pt, fill=ground, align=center, font=\small\bfseries, inner sep=6pt, minimum width=3.4cm},
+  lbl/.style={font=\footnotesize\color{muted}, align=center},
+  line/.style={draw=ink!40, thick}
+]
+\node[box, fill=accent!12] (founders) at (0,0) {Co-founders\\ \footnotesize\normalfont Product \& Eng $\cdot$ Strategy \& Partnerships};
+\node[box] (eng) at (-4.6,-1.9) {Product \& Eng};
+\node[lbl, below=1pt of eng] {web $\cdot$ mobile $\cdot$ ML};
+\node[box] (data) at (0,-1.9) {Data \& Nutrition};
+\node[lbl, below=1pt of data] {nutrition ops $\cdot$ RD};
+\node[box] (mkt) at (4.6,-1.9) {Market \& Partnerships};
+\node[lbl, below=1pt of mkt] {city launch $\cdot$ support};
+\draw[line] (founders.south) -- ++(0,-0.35) -| (eng.north);
+\draw[line] (founders.south) -- (data.north);
+\draw[line] (founders.south) -- ++(0,-0.35) -| (mkt.north);
+\end{tikzpicture}
+\end{center}
+
+\textbf{Management.} Two co-founders: one leading product and engineering (builder of the product to date), one leading strategy, market validation, and regulatory-economic analysis; credentials shared with investors directly. Advisory targets: a registered dietitian, a fast-casual operator, and a digital-health payer-contracting advisor.
+
+\subsection*{Personnel plan by year \normalfont\small\color{muted}(projection; year-end headcount)}
+
+\begin{tabularx}{\textwidth}{@{}L r r r r r@{}}
+\toprule
+\textbf{Function} & \textbf{Y1} & \textbf{Y2} & \textbf{Y3} & \textbf{Y4} & \textbf{Y5}\\
+\midrule
+Founders / management & 2 & 2 & 3 & 4 & 5\\
+Engineering (web, mobile, ML, data) & 1 & 5 & 9 & 14 & 20\\
+Nutrition data ops + RD & 1 & 2 & 4 & 7 & 11\\
+Market launch \& partner success & 1 & 2 & 6 & 11 & 18\\
+Support \& community & --- & 1 & 1 & 3 & 5\\
+G\&A & --- & --- & 1 & 1 & 3\\
+\midrule
+\textbf{Total} & \textbf{5} & \textbf{12} & \textbf{24} & \textbf{40} & \textbf{62}\\
+\bottomrule
+\end{tabularx}
+
+\subsection*{Salary table \normalfont\small\color{muted}(Boston-market base; fully loaded $\approx$ base $\times$ 1.25)}
+
+\begin{tabularx}{\textwidth}{@{}L r@{}}
+\toprule
+\textbf{Role} & \textbf{Base}\\
+\midrule
+Co-founder (Y1--Y2, below market) & \$90{,}000\\
+Senior ML engineer & \$165{,}000\\
+Full-stack / mobile engineer & \$150{,}000\\
+Product designer & \$120{,}000\\
+Registered dietitian (part-time $\to$ full) & \$60{,}000--95{,}000\\
+Nutrition data operations & \$70{,}000\\
+City GTM lead & \$110{,}000 + incentive\\
+Partner success rep & \$85{,}000\\
+Support specialist & \$55{,}000\\
+\bottomrule
+\end{tabularx}
+
+\subsection*{Personnel spend by year \normalfont\small\color{muted}(projection; reconciles to the P\&L ``Team'' line)}
+
+\begin{tabularx}{\textwidth}{@{}L r r r r r@{}}
+\toprule
+ & \textbf{Y1} & \textbf{Y2} & \textbf{Y3} & \textbf{Y4} & \textbf{Y5}\\
+\midrule
+Headcount (average) & 4 & 9 & 18 & 32 & 51\\
+Salaries + load & \$0.7M & \$1.9M & \$3.7M & \$6.2M & \$9.8M\\
+Contractors (mobile launch, design) & \$0.2M & \$0.3M & \$0.5M & \$0.8M & \$1.2M\\
+\midrule
+\textbf{Total team cost} & \textbf{\$0.9M} & \textbf{\$2.2M} & \textbf{\$4.2M} & \textbf{\$7.0M} & \textbf{\$11.0M}\\
+\bottomrule
+\end{tabularx}
+
+\vspace{4pt}
+Hiring is sequenced behind revenue proof: the Y2 step-up follows pilot conversion data; Y3+ market-launch hiring follows the seed round and the second-metro playbook. Non-dilutive SBIR offsets part of Y1--Y2 engineering.
 
 \vspace{14pt}
 {\color{ground}\hrule height 2pt}

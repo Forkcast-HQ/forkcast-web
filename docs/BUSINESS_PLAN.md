@@ -115,6 +115,17 @@ Full assumptions, five-year build, unit economics, and scenarios: `FINANCIAL_MOD
 | SBIR Phase I submitted/awarded | Month 9–12 | — |
 | Seed raised | Month 12–18 | — |
 
+### Five-year plan (projection; reconciles to `FINANCIAL_MODEL.md`)
+
+| | Y1 | Y2 | Y3 | Y4 | Y5 |
+|---|---:|---:|---:|---:|---:|
+| Metros | Boston | 3 | 8 | 15 | 25 |
+| Paying subscribers (yr-end) | ~3k | ~25k | ~90k | ~220k | ~450k |
+| Verified Partner restaurants | ~20 | ~400 | ~1,500 | ~4,000 | ~9,000 |
+| Team (yr-end) | 5 | 12 | 24 | 40 | 62 |
+| Revenue | $0.15M | $1.47M | $5.86M | $16.44M | $37.35M |
+| Milestone | Pilot evidence | Playbook ×3 | B2B2C first contracts | Approaching breakeven | Profitable, 25-metro standard |
+
 ## 10. Risks & mitigations
 
 | Risk | Mitigation |
@@ -127,18 +138,76 @@ Full assumptions, five-year build, unit economics, and scenarios: `FINANCIAL_MOD
 | **Trust/integrity failure would be fatal** | Governance is product: sponsored-scoring separation is categorical; corrections versioned and public; simulated states labeled; the `/impact` no-unrecorded-claims commitment |
 | **Policy risk on B2B2C** | Anchor on commercial MNT; Medicaid expansion as optionality |
 
-## 11. National-interest alignment
+## 11. National impact
 
-*This section states the founders' case factually; it draws no legal conclusions.*
+*This section states the founders' case factually; it draws no legal conclusions. All forward figures are projections from the planning model, labeled as such.*
 
-- **Substantial merit.** Restaurant-nutrition transparency for the independent majority that federal labeling does not reach; pre-order decision support where labels demonstrably fail (~24 kcal/transaction); health literacy through explained, sourced, correctable numbers; small-restaurant menu digitization at documented cost.
-- **National importance.** A reproducible protocol — collection standard, provenance tiers, correction governance, pre-registered measurement — designed to scale across U.S. markets rather than serve one city; addressed at a diet-disease burden of ~$334B/yr.
-- **Well positioned.** Working product with dated commit history; live-captured published-data integrations; documented methods (`MENU_COLLECTION.md`, `/impact`, `SYSTEM_ARCHITECTURE.md`); financial and competitive analyses; a pilot designed for verifiable evidence (restaurant letters, correction logs, exportable provenance-carrying data).
-- **Evidence integrity.** No fabricated users, restaurants, partners, outcomes, revenue, ratings, or health claims — enforced in the product itself (prototype stamps, simulation labels, demo-payment disclosures, confidence tiers).
+**11.1 Contributions to the economy.** Diet-related disease costs the U.S. ~$334B/yr in direct medical spending (CDC-cited); the away-from-home channel — 58.5% of food spending (USDA ERS) — is where those diets are decided, yet the only federal instrument there (chain calorie labeling) shifts intake by ~24 kcal/order (peer-reviewed). Forkcast's contribution is infrastructure: turning any menu, chain or independent, into trustworthy per-dish nutrition at the moment of decision. Each point of improvement in restaurant-meal choices compounds across ~$1.5T of annual away-from-home spending.
 
-## 12. Team
+**11.2 Job creation.** Direct: the personnel plan below projects **5 → 62 U.S. employees across five years** (engineering, nutrition data operations, market launch teams — Boston first, then the CDC's highest-prevalence regions). Indirect: every Verified Partner restaurant gains a free digital storefront, order channel, and menu-data capability; the model projects ~9,000 partner restaurants by Y5, overwhelmingly independent small businesses, each keeping 94% of Forkcast-originated order revenue.
 
-Founding team — two co-founders: one leading product and engineering (builder of the product to date), one leading strategy, market validation, and regulatory-economic analysis. Founder credentials are shared with investors directly. Pre-seed hires: registered dietitian/nutrition-science advisor (credibility + B2B2C), ML engineer (estimation engine), local GTM lead (restaurant density). Advisory targets: a fast-casual operator and a digital-health payer-contracting advisor.
+**11.3 Support for small businesses.** Federal labeling rules cover chains with 20+ locations; the independent majority is priced out of nutrition analysis (lab panels run ~$500–1,000/dish). Forkcast gives independents that capability free — menu digitization, per-dish nutrition, verification tools, a corrections ledger — and charges only a 6% fee on orders it originates, versus the 15–30% delivery marketplaces charge. The pilot's partner agreements and correction logs are designed to evidence this support, restaurant by restaurant.
+
+**11.4 Future impact.** The expansion sequence deliberately targets the regions federal surveillance identifies as most affected (2024 BRFSS: Midwest 35.9% adult obesity, South 34.5%; 19 states ≥35%). Beyond five years, the same provenance-carrying dataset supports covered-benefit nutrition programs (B2B2C leg), research access to real-world restaurant-eating data, and a correction-governed standard other platforms can adopt. The endeavor is job-creating rather than job-taking, and its methods — collection protocol, provenance tiers, pre-registered metrics — are publishable infrastructure.
+
+**Evidence integrity.** No fabricated users, restaurants, partners, outcomes, revenue, ratings, or health claims — enforced in the product itself (prototype stamps, simulation labels, demo-payment disclosures, confidence tiers).
+
+## 12. Organization & people
+
+**12.1 Organizational structure.** Flat by design through Y2, then three functional pods reporting to the co-founders:
+
+```
+                    Co-founders
+        (Product & Engineering | Strategy & Partnerships)
+                         │
+      ┌──────────────────┼──────────────────────┐
+ Product & Eng      Data & Nutrition       Market & Partnerships
+ web · mobile · ML  nutrition ops · RD     city launch · partner success
+                    corrections QA          support · co-marketing
+```
+
+G&A (finance, people ops) stays fractional/outsourced until Y3. Every pod owns a number: Eng owns activation and estimate-correction rate, Data owns provenance coverage, Market owns partner density and CAC.
+
+**12.2 Management team.** Two co-founders: one leading product and engineering (builder of the product to date), one leading strategy, market validation, and regulatory-economic analysis. Founder credentials are shared with investors directly. Advisory targets: a registered dietitian (clinical credibility + B2B2C), a fast-casual operator, and a digital-health payer-contracting advisor.
+
+**12.3 Personnel plan by year** *(projection; headcount at year end)*
+
+| Function | Y1 | Y2 | Y3 | Y4 | Y5 |
+|---|---:|---:|---:|---:|---:|
+| Founders / management | 2 | 2 | 3 | 4 | 5 |
+| Engineering (web, mobile, ML, data) | 1 | 5 | 9 | 14 | 20 |
+| Nutrition data ops + RD | 1 | 2 | 4 | 7 | 11 |
+| Market launch & partner success | 1 | 2 | 6 | 11 | 18 |
+| Support & community | – | 1 | 1 | 3 | 5 |
+| G&A (finance, people) | – | – | 1 | 1 | 3 |
+| **Total** | **5** | **12** | **24** | **40** | **62** |
+
+**12.4 Salary table** *(Boston-market base, projection)*
+
+| Role | Base salary |
+|---|---:|
+| Co-founder (Y1–Y2, below market) | $90,000 |
+| Senior ML engineer | $165,000 |
+| Full-stack / mobile engineer | $150,000 |
+| Product designer | $120,000 |
+| Registered dietitian (part-time → full) | $60,000–95,000 |
+| Nutrition data operations | $70,000 |
+| City GTM lead | $110,000 + incentive |
+| Partner success rep | $85,000 |
+| Support specialist | $55,000 |
+
+Fully-loaded cost ≈ base × 1.25 (payroll taxes, benefits, tools).
+
+**12.5 Personnel spend by year** *(projection; reconciles to the "Team" line in the P&L, `FINANCIAL_MODEL.md` §5)*
+
+| | Y1 | Y2 | Y3 | Y4 | Y5 |
+|---|---:|---:|---:|---:|---:|
+| Headcount (avg) | 4 | 9 | 18 | 32 | 51 |
+| Salaries + load | $0.7M | $1.9M | $3.7M | $6.2M | $9.8M |
+| Contractors (mobile launch, design) | $0.2M | $0.3M | $0.5M | $0.8M | $1.2M |
+| **Total team cost** | **$0.9M** | **$2.2M** | **$4.2M** | **$7.0M** | **$11.0M** |
+
+Hiring is sequenced behind revenue proof: the Y2 step-up follows pilot conversion data; Y3+ market-launch hiring follows the seed round and the second-metro playbook. Non-dilutive SBIR offsets part of Y1–Y2 engineering.
 
 ---
 
