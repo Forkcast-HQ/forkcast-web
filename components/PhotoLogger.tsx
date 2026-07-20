@@ -283,6 +283,30 @@ export function PhotoLogger() {
                   <span className="text-xs font-medium">Analyzing…</span>
                 </div>
               )}
+              {/* On-image header: name + badge + confidence on a scrim */}
+              {status === "review" && preview && estimate && edit && (
+                <>
+                  <button onClick={reset} aria-label="Discard" className="absolute right-2 top-2 rounded-full bg-black/45 p-1.5 text-white/85 transition hover:bg-black/65">
+                    <X className="h-4 w-4" />
+                  </button>
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-4 pb-3 pt-14">
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={edit.name}
+                        onChange={(e) => setEdit({ ...edit, name: e.target.value })}
+                        className="w-full min-w-0 rounded-lg border border-transparent bg-transparent px-1 py-0.5 font-display text-lg font-bold text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
+                        aria-label="Meal name — edit if the AI got it wrong"
+                      />
+                      <span className={cls("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide", estimate.source === "ai" ? "bg-brand-600 text-white" : "bg-white/20 text-white/80")}>
+                        {estimate.source === "ai" ? "AI estimate" : "sample"}
+                      </span>
+                    </div>
+                    <p className="px-1 text-xs text-white/75">
+                      {Math.round(estimate.confidence * 100)}% confidence · tap any value below to correct it
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="min-w-0 flex-1">
@@ -296,35 +320,38 @@ export function PhotoLogger() {
 
               {status === "review" && estimate && edit && (
                 <div>
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <input
-                          value={edit.name}
-                          onChange={(e) => setEdit({ ...edit, name: e.target.value })}
-                          className="w-full rounded-lg border border-transparent bg-transparent px-1 py-0.5 font-semibold text-ink hover:border-neutral-300 focus:border-brand-600 focus:bg-white focus:outline-none"
-                          aria-label="Meal name — edit if the AI got it wrong"
-                        />
-                        <span className={cls("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide", estimate.source === "ai" ? "bg-brand-600 text-white" : "bg-black/[0.06] text-ink/55")}>
-                          {estimate.source === "ai" ? "AI estimate" : "sample"}
-                        </span>
-                      </div>
-                      <p className="text-xs text-ink/50">
-                        {Math.round(estimate.confidence * 100)}% confidence · <strong>tap any value to correct it</strong> — you decide what gets logged.
-                      </p>
-                      {err && (
-                        <p className="mt-1 flex items-start gap-1 text-xs text-amber-700">
-                          <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
-                          <span>AI unavailable — showing a sample estimate. ({err})</span>
+                  {/* Header inline only when there's no photo to carry it */}
+                  {!preview && (
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <input
+                            value={edit.name}
+                            onChange={(e) => setEdit({ ...edit, name: e.target.value })}
+                            className="w-full rounded-lg border border-transparent bg-transparent px-1 py-0.5 font-semibold text-ink hover:border-neutral-300 focus:border-brand-600 focus:bg-white focus:outline-none"
+                            aria-label="Meal name — edit if the AI got it wrong"
+                          />
+                          <span className={cls("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide", estimate.source === "ai" ? "bg-brand-600 text-white" : "bg-black/[0.06] text-ink/55")}>
+                            {estimate.source === "ai" ? "AI estimate" : "sample"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-ink/50">
+                          {Math.round(estimate.confidence * 100)}% confidence · <strong>tap any value to correct it</strong> — you decide what gets logged.
                         </p>
-                      )}
+                      </div>
+                      <button onClick={reset} className="rounded-full p-1 text-ink/40 hover:bg-black/5">
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
-                    <button onClick={reset} className="rounded-full p-1 text-ink/40 hover:bg-black/5">
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
+                  )}
+                  {err && (
+                    <p className="mb-2 flex items-start gap-1 text-xs text-amber-700">
+                      <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
+                      <span>AI unavailable — showing a sample estimate. ({err})</span>
+                    </p>
+                  )}
 
-                  <div className="mt-3 grid grid-cols-4 gap-2 text-center">
+                  <div className={cls("grid grid-cols-4 gap-2 text-center", !preview && "mt-3")}>
                     <EditStat label="Cal" value={edit.calories} onChange={(v) => setEdit({ ...edit, calories: v })} />
                     <EditStat label="Protein" unit="g" value={edit.protein} onChange={(v) => setEdit({ ...edit, protein: v })} />
                     <EditStat label="Carbs" unit="g" value={edit.carbs} onChange={(v) => setEdit({ ...edit, carbs: v })} />
