@@ -274,6 +274,8 @@ export default function Profile() {
               {cloud
                 ? "Purchases open soon. Until then, Premium access is granted on request — no payment needed."
                 : "Demo prototype: no billing exists; this toggles a local flag so the gating flow can be evaluated."}
+              {" "}
+              <Link href="/pricing" className="font-semibold text-brand-700 hover:underline">Compare plans</Link>
             </p>
           </Card>
 

@@ -18,6 +18,7 @@ export function Footer() {
             links={[
               ["Discover restaurants", "/discover"],
               ["How it works", "/how-it-works"],
+              ["Membership & pricing", "/pricing"],
               ["Your dashboard", "/dashboard"],
               ["Set up profile", "/onboarding"],
             ]}
