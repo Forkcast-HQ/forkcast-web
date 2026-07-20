@@ -73,7 +73,10 @@ export async function setAutoSyncMeals(enabled: boolean): Promise<void> {
 }
 
 /** Fire-and-forget, called right after logMeal() — never throws into the
- * caller, mirrors cloudPushMeal's resilience in lib/cloud.ts. */
+ * caller, mirrors cloudPushMeal's resilience in lib/cloud.ts. Logs the
+ * actual response body (not just network-level failures) so a failed push
+ * is debuggable from the browser console — open DevTools, log a meal, and
+ * look for "[health] sync-meal ...". */
 export function syncMealToGoogleHealth(meal: LoggedMeal): void {
   if (!cloudEnabled()) return;
   authHeaders().then((headers) => {
@@ -82,7 +85,16 @@ export function syncMealToGoogleHealth(meal: LoggedMeal): void {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify({ meal }),
-    }).catch((e) => console.warn("[health] sync-meal failed:", e));
+    })
+      .then(async (res) => {
+        const body = await res.json().catch(() => null);
+        if (!res.ok || body?.ok === false) {
+          console.warn("[health] sync-meal did not succeed:", res.status, body);
+        } else {
+          console.info("[health] sync-meal ok:", body);
+        }
+      })
+      .catch((e) => console.warn("[health] sync-meal network error:", e));
   });
 }
 
