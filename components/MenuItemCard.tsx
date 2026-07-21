@@ -91,7 +91,7 @@ export function MenuItemCard({
               className="h-full w-full object-cover"
             />
             {fit && (
-              <div className="absolute -right-1 -top-1">
+              <div className="absolute right-1.5 top-1.5">
                 <FitBadge score={fit.score} size="sm" />
               </div>
             )}
