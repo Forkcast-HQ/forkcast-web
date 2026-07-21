@@ -153,7 +153,7 @@ export default function Home() {
 
       {/* ---------------- HOW IT WORKS ---------------- */}
       <section className="bg-brand-950 text-white">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <SectionTag dark>How it works</SectionTag>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl text-balance">
@@ -163,16 +163,8 @@ export default function Home() {
               Four steps. No calorie diary required to get value on day one.
             </p>
           </div>
-          <div className="mt-14">
-            <HowItWorks />
-          </div>
-          <div className="mt-12">
-            <Link
-              href="/how-it-works"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-800 transition hover:bg-white/90"
-            >
-              See the full system <ArrowRight className="h-4 w-4" />
-            </Link>
+          <div className="mt-10">
+            <HowItWorks ctaHref="/how-it-works" ctaLabel="See the full system" />
           </div>
         </div>
       </section>

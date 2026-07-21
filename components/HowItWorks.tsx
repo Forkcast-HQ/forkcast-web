@@ -14,8 +14,10 @@
  * from the live catalog. Auto-advances until the visitor takes control.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
+  ArrowRight,
   Check,
   CircleCheck,
   Dumbbell,
@@ -178,7 +180,13 @@ const Chip = ({
   );
 };
 
-export function HowItWorks() {
+export function HowItWorks({
+  ctaHref,
+  ctaLabel,
+}: {
+  ctaHref?: string;
+  ctaLabel?: string;
+}) {
   const [active, setActive] = useState(0);
   const [touched, setTouched] = useState(false);
 
@@ -213,10 +221,9 @@ export function HowItWorks() {
   const dayPill = active >= 2 ? `${left.toLocaleString()} kcal left` : `${targets.calories.toLocaleString()} kcal left`;
 
   return (
-    <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-      {/* Left: step rail + copy */}
-      <div>
-        <div className="flex items-center">
+    <div>
+      {/* full-width step rail */}
+      <div className="flex items-center">
           {STEPS.map((s, i) => (
             <div key={s.n} className="flex items-center" style={{ flex: i === 0 ? "0 0 auto" : "1 1 0%" }}>
               {i > 0 && (
@@ -255,19 +262,30 @@ export function HowItWorks() {
               </button>
             </div>
           ))}
-        </div>
-
-        <div key={active} className="animate-rise mt-7">
-          <div className="font-display text-5xl font-extrabold leading-none text-white/20 sm:text-6xl">
-            {step.n}
-          </div>
-          <h3 className="mt-2 font-display text-2xl font-bold text-white">{step.title}</h3>
-          <p className="mt-2 max-w-md text-sm leading-relaxed text-white/70">{step.body}</p>
-        </div>
       </div>
 
-      {/* Right: the live app card */}
-      <div className="overflow-hidden rounded-[20px] border border-black/5 bg-white shadow-[0_18px_50px_-24px_rgba(0,0,0,0.5)]">
+      <div className="mt-10 grid items-center gap-10 lg:grid-cols-[0.85fr_1.15fr]">
+        {/* Left: copy + CTA */}
+        <div>
+          <div key={active} className="animate-rise">
+            <div className="font-display text-5xl font-extrabold leading-none text-white/20 sm:text-6xl">
+              {step.n}
+            </div>
+            <h3 className="mt-2 font-display text-2xl font-bold text-white">{step.title}</h3>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-white/70">{step.body}</p>
+          </div>
+          {ctaHref && (
+            <Link
+              href={ctaHref}
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-800 transition hover:bg-white/90"
+            >
+              {ctaLabel ?? "Learn more"} <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
+        </div>
+
+        {/* Right: the live app card */}
+        <div className="overflow-hidden rounded-[20px] border border-black/5 bg-white shadow-[0_18px_50px_-24px_rgba(0,0,0,0.5)]">
         {/* app chrome */}
         <div className="flex items-center gap-2 border-b border-black/5 px-4 py-3">
           <span className="flex items-center gap-1.5 font-display text-sm font-bold text-ink">
@@ -293,6 +311,7 @@ export function HowItWorks() {
             photo={photo}
           />
         </div>
+      </div>
       </div>
     </div>
   );
