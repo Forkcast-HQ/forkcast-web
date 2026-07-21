@@ -119,7 +119,7 @@ export default function SignUp() {
       setBusy(false);
       return;
     }
-    router.push(role === "restaurant" ? "/partner" : "/onboarding");
+    router.push(role === "restaurant" ? "/partner/onboarding" : "/onboarding");
   };
 
   if (step === "verify") {
