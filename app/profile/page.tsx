@@ -368,7 +368,7 @@ export default function Profile() {
                   <div>
                     <p className="text-sm font-semibold text-ink">WHOOP</p>
                     <p className="mt-0.5 text-sm text-ink/60">
-                      Connected — recovery score, day strain, and sleep performance show on your dashboard. (WHOOP has no food log, so meal sync stays Fitbit-only.)
+                      Connected — Forkcast reads your recovery score, day strain, calories burned, and sleep performance and shows them on your dashboard. This is read-only and one-way: Forkcast never writes anything back to WHOOP, and nothing is shared beyond your own dashboard. (WHOOP has no food log, so meal sync stays Fitbit-only.)
                     </p>
                   </div>
                   <button
@@ -407,6 +407,11 @@ export default function Profile() {
                     </button>
                   )}
                 </div>
+              )}
+              {!health.whoop.connected && devicePick === "whoop" && (
+                <p className="text-xs text-ink/45">
+                  Read-only: Forkcast reads your WHOOP recovery score, day strain, calories burned, and sleep performance to show on your dashboard — nothing is ever written back to WHOOP.
+                </p>
               )}
             </Card>
           )}

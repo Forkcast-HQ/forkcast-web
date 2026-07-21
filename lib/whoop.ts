@@ -123,8 +123,11 @@ export interface WhoopDailyResult {
   restingHeartRate: number | null;
   hrvMilli: number | null;
   strain: number | null;
+  caloriesBurned: number | null;
   sleepPerformancePct: number | null;
 }
+
+const KJ_PER_KCAL = 4.184;
 
 async function getLatest(accessToken: string, path: string): Promise<Record<string, unknown> | null> {
   const res = await fetch(`${API_BASE}${path}?limit=1`, {
@@ -157,14 +160,20 @@ export async function getLatestSummary(accessToken: string): Promise<WhoopDailyR
   ]);
 
   const recoveryScore = recovery as { score_state?: string; score?: { recovery_score?: number; resting_heart_rate?: number; hrv_rmssd_milli?: number } } | null;
-  const cycleScore = cycle as { score_state?: string; score?: { strain?: number } } | null;
+  const cycleScore = cycle as { score_state?: string; score?: { strain?: number; kilojoule?: number } } | null;
   const sleepScore = sleep as { score_state?: string; score?: { sleep_performance_percentage?: number } } | null;
+
+  const kilojoule = cycleScore?.score_state === "SCORED" ? cycleScore.score?.kilojoule ?? null : null;
 
   return {
     recoveryScore: recoveryScore?.score_state === "SCORED" ? recoveryScore.score?.recovery_score ?? null : null,
     restingHeartRate: recoveryScore?.score_state === "SCORED" ? recoveryScore.score?.resting_heart_rate ?? null : null,
     hrvMilli: recoveryScore?.score_state === "SCORED" ? recoveryScore.score?.hrv_rmssd_milli ?? null : null,
     strain: cycleScore?.score_state === "SCORED" ? cycleScore.score?.strain ?? null : null,
+    // WHOOP reports energy expenditure as kilojoules (the cycle's `score.
+    // kilojoule` field) — converted to kcal here since that's the unit
+    // Forkcast uses everywhere else (dashboard, Fitbit sync).
+    caloriesBurned: kilojoule != null ? Math.round(kilojoule / KJ_PER_KCAL) : null,
     sleepPerformancePct: sleepScore?.score_state === "SCORED" ? sleepScore.score?.sleep_performance_percentage ?? null : null,
   };
 }

@@ -164,6 +164,7 @@ export interface WhoopDaily {
   connected: boolean;
   recoveryScore?: number | null;
   strain?: number | null;
+  caloriesBurned?: number | null;
   sleepPerformancePct?: number | null;
   restingHeartRate?: number | null;
   hrvMilli?: number | null;

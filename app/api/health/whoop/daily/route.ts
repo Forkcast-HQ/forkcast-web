@@ -22,6 +22,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ connected: true, ...summary });
   } catch (e) {
     console.error("[health/whoop/daily] failed:", e);
-    return NextResponse.json({ connected: true, recoveryScore: null, strain: null, sleepPerformancePct: null, error: "fetch_failed" });
+    return NextResponse.json({ connected: true, recoveryScore: null, strain: null, caloriesBurned: null, sleepPerformancePct: null, error: "fetch_failed" });
   }
 }

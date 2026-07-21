@@ -354,6 +354,9 @@ export default function Dashboard() {
             {whoop.strain != null && (
               <Tile icon={<Zap className="h-5 w-5" />} label="WHOOP day strain" value={whoop.strain.toFixed(1)} />
             )}
+            {whoop.caloriesBurned != null && (
+              <Tile icon={<Flame className="h-5 w-5" />} label="WHOOP calories burned" value={<CountUp value={whoop.caloriesBurned} />} />
+            )}
             {whoop.sleepPerformancePct != null && (
               <Tile icon={<Moon className="h-5 w-5" />} label="WHOOP sleep performance" value={<><CountUp value={whoop.sleepPerformancePct} />%</>} />
             )}
