@@ -152,13 +152,13 @@ export function FitScoreExplorer() {
     // varied demo: different allergens, plus one saltier dish so a condition
     // toggle (e.g. Hypertension) visibly triggers a real advisory.
     const r = RESTAURANTS[0];
-    const ids = ["v1", "v6", "v5", "v3", "v4"];
+    const ids = ["v1", "v6", "v5", "v4"];
     let picked = ids.map((id) => r.menu.find((m) => m.id === id)).filter(Boolean) as MenuItem[];
-    if (picked.length < 5) picked = r.menu.slice(0, 5);
+    if (picked.length === 0) picked = r.menu.slice(0, 4);
     return {
       targets: t,
       calT: t.calories * 0.35,
-      dishes: picked.slice(0, 5).map((item, idx) => ({
+      dishes: picked.slice(0, 4).map((item, idx) => ({
         item,
         photo: categoryImg(item.category, idx * 29 + 7, 160, 160),
         allergens: deriveAllergens(item),
