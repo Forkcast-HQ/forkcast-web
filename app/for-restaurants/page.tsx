@@ -10,6 +10,7 @@ import {
   Check,
 } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
+import { HowItWorksRestaurant } from "@/components/HowItWorksRestaurant";
 import { restaurantImg } from "@/lib/images";
 
 export const metadata = {
@@ -83,11 +84,9 @@ export default function ForRestaurants() {
       <section className="bg-brand-950 text-white">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <span className="text-sm font-bold uppercase tracking-widest text-brand-300">Onboarding</span>
-          <h2 className="mt-2 font-display text-3xl font-bold">Live in three steps.</h2>
-          <div className="mt-10 grid gap-8 md:grid-cols-3">
-            <Step n="01" icon={<BadgeCheck className="h-6 w-6" />} title="Claim your listing" body="Confirm your restaurant and locations. Independents welcome — that's exactly the coverage no one else has." />
-            <Step n="02" icon={<Upload className="h-6 w-6" />} title="Add your menu" body="Upload or paste your menu. We auto-generate per-dish nutrition and Fit Scores, which you can review and adjust." />
-            <Step n="03" icon={<Megaphone className="h-6 w-6" />} title="Get featured" body="Opt into clearly-labeled featured placement so the right diners see your best dishes first. Track the lift." />
+          <h2 className="mt-2 font-display text-3xl font-bold">Live in four steps.</h2>
+          <div className="mt-10">
+            <HowItWorksRestaurant />
           </div>
         </div>
       </section>
