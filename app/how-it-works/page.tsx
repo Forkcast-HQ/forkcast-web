@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { HeartPulse, Sparkles, Utensils, Camera, ArrowRight } from "lucide-react";
+import { BudgetBuilder } from "@/components/BudgetBuilder";
+import { FitScoreExplorer } from "@/components/FitScoreExplorer";
 
 export const metadata = {
   title: "How it works — Forkcast",
@@ -54,6 +56,21 @@ export default function HowItWorks() {
         </div>
       </section>
 
+      {/* Daily budget builder */}
+      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+        <span className="text-sm font-bold uppercase tracking-widest text-brand-600">Your daily budget</span>
+        <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink">
+          The math behind your targets — try it.
+        </h2>
+        <p className="mt-3 max-w-2xl text-ink/65">
+          Set your metrics and watch your daily calorie and macro targets recompute live, using the same
+          clinical equation Forkcast runs on day one.
+        </p>
+        <div className="mt-8">
+          <BudgetBuilder />
+        </div>
+      </section>
+
       {/* Fit Score breakdown */}
       <section className="bg-brand-950 text-white">
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
@@ -62,13 +79,7 @@ export default function HowItWorks() {
           <p className="mt-3 max-w-2xl text-white/70">
             Weights shift with your goal — losing weight leans harder on calorie fit and protein.
           </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            <ScorePart title="Calorie fit" w="30–34%" body="How well calories match a single meal's share of your daily target. Overshooting is penalized harder than undershooting." />
-            <ScorePart title="Protein density" w="30–36%" body="Share of calories from protein. ≥30% earns full marks — the lever for satiety and lean mass." />
-            <ScorePart title="Fiber" w="12%" body="Rewards 8g+ per meal — satiety and metabolic health." />
-            <ScorePart title="Sodium" w="12–16%" body="Full marks ≤600mg, zero by 2000mg. Restaurant food's biggest hidden cost." />
-            <ScorePart title="Sugar" w="10–14%" body="Full marks ≤8g, penalized toward 35g. Catches 'healthy' bowls that aren't." />
-          </div>
+          <FitScoreExplorer />
         </div>
       </section>
 
@@ -161,18 +172,6 @@ function StepCard({ icon, n, title, body }: { icon: React.ReactNode; n: string; 
       </div>
       <h3 className="mt-4 font-display text-lg font-bold text-ink">{title}</h3>
       <p className="mt-2 text-sm text-ink/65">{body}</p>
-    </div>
-  );
-}
-
-function ScorePart({ title, w, body }: { title: string; w: string; body: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-      <div className="flex items-baseline justify-between">
-        <p className="font-semibold">{title}</p>
-        <span className="text-xs font-bold text-brand-300">{w}</span>
-      </div>
-      <p className="mt-2 text-xs text-white/60">{body}</p>
     </div>
   );
 }
