@@ -146,8 +146,8 @@ export function FitScoreExplorer() {
   const toggle = (list: string[], set: (v: string[]) => void, v: string) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
-  const { targets, dishes, calT } = useMemo(() => {
-    const t = computeTargets(DEMO_PROFILE);
+  // Dish list is goal-independent — compute once.
+  const dishes = useMemo(() => {
     // Verdant — a launch partner with a fully macro'd menu. Curated for a
     // varied demo: different allergens, plus one saltier dish so a condition
     // toggle (e.g. Hypertension) visibly triggers a real advisory.
@@ -155,18 +155,19 @@ export function FitScoreExplorer() {
     const ids = ["v1", "v6", "v5", "v4"];
     let picked = ids.map((id) => r.menu.find((m) => m.id === id)).filter(Boolean) as MenuItem[];
     if (picked.length === 0) picked = r.menu.slice(0, 4);
-    return {
-      targets: t,
-      calT: t.calories * 0.35,
-      dishes: picked.slice(0, 4).map((item, idx) => ({
-        item,
-        photo: categoryImg(item.category, idx * 29 + 7, 160, 160),
-        allergens: deriveAllergens(item),
-        restaurant: r.name,
-        neighborhood: r.neighborhood,
-      })),
-    };
+    return picked.slice(0, 4).map((item, idx) => ({
+      item,
+      photo: categoryImg(item.category, idx * 29 + 7, 160, 160),
+      allergens: deriveAllergens(item),
+      restaurant: r.name,
+      neighborhood: r.neighborhood,
+    }));
   }, []);
+
+  // Targets depend on the selected goal, so the budget, calorie-fit sub-score,
+  // and overall score all respond when the goal changes.
+  const targets = useMemo(() => computeTargets({ ...DEMO_PROFILE, goal }), [goal]);
+  const calT = targets.calories * 0.35;
 
   const active = dishes[sel].item;
   const result = fitScore(active, targets, goal);
