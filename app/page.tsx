@@ -9,6 +9,7 @@ import {
   Utensils,
 } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
+import { HowItWorks } from "@/components/HowItWorks";
 import { HeroDemo } from "@/components/HeroDemo";
 import { HeroSearch } from "@/components/HeroSearch";
 import { DishMarquee } from "@/components/DishMarquee";
@@ -162,11 +163,8 @@ export default function Home() {
               Four steps. No calorie diary required to get value on day one.
             </p>
           </div>
-          <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <Step n="01" img={categoryImg("breakfast", 1, 640, 420)} icon={<HeartPulse className="h-6 w-6" />} title="Build your profile" body="Height, weight, age, activity, and goal — we compute your targets with clinical formulas (Mifflin-St Jeor), plus allergies and conditions to watch." />
-            <Step n="02" img={categoryImg("salad", 2, 640, 420)} icon={<Sparkles className="h-6 w-6" />} title="See what fits" body="Every nearby dish gets a personal Fit Score from calories, protein, fiber, sodium, and sugar — ranked against what's left of your day." />
-            <Step n="03" img={categoryImg("mediterranean", 3, 640, 420)} icon={<Utensils className="h-6 w-6" />} title="Order or dine in" body="Build a basket and send it to the restaurant, or just walk in — either way, your plan updates the moment you commit." />
-            <Step n="04" img={categoryImg("poke", 4, 640, 420)} icon={<Camera className="h-6 w-6" />} title="Confirm the meal" body="Confirmed orders pre-fill your log; photos cover everything else. Every entry keeps its source, portion, and confidence." />
+          <div className="mt-14">
+            <HowItWorks />
           </div>
           <div className="mt-12">
             <Link

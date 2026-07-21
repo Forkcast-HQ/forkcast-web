@@ -281,3 +281,69 @@ button:disabled,
   .interactive-card { transition: none; }
   .interactive-card:hover { transform: none; }
 }
+
+/* ---- Liquid glass ------------------------------------------------
+   Apple-style frosted, translucent, softly-lit surfaces for icon
+   badges, chips and small shapes. `::before` paints a specular
+   highlight over the fill but under the icon. */
+.glass,
+.glass-dark,
+.glass-red {
+  position: relative;
+  overflow: hidden;
+}
+.glass::before,
+.glass-dark::before,
+.glass-red::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 55%);
+}
+/* Light frosted glass — for use on photos / white surfaces */
+.glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(238, 236, 235, 0.22));
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 5px rgba(32, 30, 29, 0.06),
+    0 8px 20px -10px rgba(32, 30, 29, 0.4);
+}
+/* Smoked glass — for use on dark surfaces */
+.glass-dark {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.25),
+    0 8px 22px -12px rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+.glass-dark::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0) 55%);
+}
+/* Tinted brand glass — for the active / accent shapes */
+.glass-red {
+  background: linear-gradient(135deg, rgba(255, 86, 60, 0.92), rgba(174, 24, 0, 0.82));
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  backdrop-filter: blur(8px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 5px rgba(90, 10, 0, 0.35),
+    0 8px 18px -8px rgba(236, 48, 19, 0.55);
+  color: #fff;
+}
+/* Glass edge for photo tiles / rounded objects (no blur, keeps image crisp) */
+.glass-tile {
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 10px 26px -14px rgba(32, 30, 29, 0.6);
+}
