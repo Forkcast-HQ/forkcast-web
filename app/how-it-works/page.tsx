@@ -72,6 +72,56 @@ export default function HowItWorks() {
         </div>
       </section>
 
+      {/* Why it's different — evidence-carrying numbers */}
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <span className="text-sm font-bold uppercase tracking-widest text-brand-600">Why it&apos;s different</span>
+          <h2 className="mx-auto mt-3 max-w-3xl font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl text-balance">
+            Other apps show you a number. We show you where it came from.
+          </h2>
+        </div>
+        <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-2">
+          {/* Typical AI menu app — flat assertion */}
+          <div className="rounded-3xl border border-black/10 bg-white p-7 opacity-90">
+            <p className="text-sm font-semibold uppercase tracking-wide text-ink/40">Typical AI menu app</p>
+            <div className="mt-5 rounded-2xl border border-black/10 bg-neutral-100 p-5">
+              <p className="font-display text-lg font-bold text-ink">Grilled Chicken Bowl</p>
+              <p className="mt-3 font-display text-4xl font-extrabold text-ink">540 <span className="text-lg text-ink/50">cal</span></p>
+              <p className="mt-1 text-sm text-ink/45">Presented as fact. No source. No range. No way to correct it.</p>
+            </div>
+            <ul className="mt-5 space-y-2.5 text-ink/60">
+              <CompareLi ok={false}>&quot;22 million locations&quot; — AI guesses at scale</CompareLi>
+              <CompareLi ok={false}>Restaurants never see or verify their data</CompareLi>
+              <CompareLi ok={false}>Recommendation is a dead end — no order, no log</CompareLi>
+            </ul>
+          </div>
+          {/* Forkcast — evidence-carrying number */}
+          <div className="rounded-3xl border-2 border-brand-500 bg-brand-50/50 p-7">
+            <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Forkcast</p>
+            <div className="mt-5 rounded-2xl border border-black/5 bg-white p-5 card-shadow">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-display text-lg font-bold text-ink">Grilled Chicken Bowl</p>
+                <span className="shrink-0 rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Verified</span>
+              </div>
+              <p className="mt-3 font-display text-4xl font-extrabold text-ink">
+                540 <span className="text-lg text-ink/50">cal</span>{" "}
+                <span className="align-middle text-base font-bold text-ink/40">±5%</span>
+              </p>
+              <p className="mt-1 text-sm text-ink/55">Reviewed with the restaurant · corrections versioned &amp; public · sponsored never changes scores</p>
+            </div>
+            <ul className="mt-5 space-y-2.5 text-ink/75">
+              <CompareLi ok>Every number carries a source and a ± range</CompareLi>
+              <CompareLi ok>Restaurants review and correct their own menus</CompareLi>
+              <CompareLi ok>Decision → order → confirmed log, one loop</CompareLi>
+            </ul>
+          </div>
+        </div>
+        <p className="mx-auto mt-8 max-w-2xl text-center text-sm text-ink/50">
+          Depth over breadth: every dish verified or honestly labeled an estimate — one market at a time, starting with
+          Boston&apos;s independent restaurants.
+        </p>
+      </section>
+
       {/* How it fits together (high-level) */}
       <section id="architecture" className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 scroll-mt-20">
         <span className="text-sm font-bold uppercase tracking-widest text-brand-600">How it fits together</span>
@@ -124,6 +174,19 @@ function ScorePart({ title, w, body }: { title: string; w: string; body: string 
       </div>
       <p className="mt-2 text-xs text-white/60">{body}</p>
     </div>
+  );
+}
+
+function CompareLi({ children, ok }: { children: React.ReactNode; ok: boolean }) {
+  return (
+    <li className="flex items-start gap-3">
+      <span
+        className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full text-xs font-bold ${ok ? "bg-brand-600 text-white" : "bg-black/10 text-ink/50"}`}
+      >
+        {ok ? "✓" : "×"}
+      </span>
+      <span className="text-sm">{children}</span>
+    </li>
   );
 }
 
