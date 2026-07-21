@@ -276,6 +276,7 @@ export default function Discover() {
                   restaurantSlug={m.restaurantSlug}
                   restaurantName={m.restaurantName}
                   seed={i}
+                  variant="rec"
                 />
               </div>
             ))}

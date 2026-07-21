@@ -379,7 +379,7 @@ export default function Dashboard() {
           <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {recommended.map(({ m, reason }, i) => (
               <div key={m.id} className="w-[88%] min-w-[300px] max-w-md shrink-0 snap-start sm:w-[46%] lg:w-[32%]">
-                <MenuItemCard item={m} restaurantSlug={(m as any).restaurantSlug} restaurantName={(m as any).restaurantName} seed={i} />
+                <MenuItemCard item={m} restaurantSlug={(m as any).restaurantSlug} restaurantName={(m as any).restaurantName} seed={i} variant="rec" />
                 {reason && (
                   <p className="mt-1.5 flex items-center gap-1 pl-1 text-[11px] font-semibold text-brand-700">
                     <Sparkles className="h-3 w-3" /> {reason}
