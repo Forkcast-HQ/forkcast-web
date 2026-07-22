@@ -112,24 +112,34 @@ export function pushWeight(userId: string, w: WeightEntry): void {
     .then(({ error }) => error && warn("pushWeight")(error));
 }
 
-export function pushOrder(userId: string, o: Order): void {
+export function pushOrder(userId: string, o: Order, live?: { customer: string; flags: string[] }): void {
   const s = supa();
   if (!s) return;
+  const row: Record<string, unknown> = {
+    id: o.id,
+    user_id: userId,
+    ref: o.ref,
+    slug: o.slug,
+    restaurant_name: o.restaurantName,
+    fulfill: o.fulfill,
+    placed_at: new Date(o.placedAt).toISOString(),
+    subtotal: o.subtotal,
+    total: o.total,
+    logged: o.logged,
+    dismissed_log: o.dismissedLog ?? false,
+    data: o,
+  };
+  // On initial placement, stamp the live-order fields the restaurant terminal
+  // reads. Omitted on later re-pushes (e.g. markLogged) so terminal-driven
+  // status and flags are preserved (upsert only updates provided columns).
+  if (live) {
+    row.status = "sent";
+    row.customer_name = live.customer;
+    row.flags = live.flags;
+    row.updated_at = new Date().toISOString();
+  }
   s.from("orders")
-    .upsert({
-      id: o.id,
-      user_id: userId,
-      ref: o.ref,
-      slug: o.slug,
-      restaurant_name: o.restaurantName,
-      fulfill: o.fulfill,
-      placed_at: new Date(o.placedAt).toISOString(),
-      subtotal: o.subtotal,
-      total: o.total,
-      logged: o.logged,
-      dismissed_log: o.dismissedLog ?? false,
-      data: o,
-    })
+    .upsert(row)
     .then(({ error }) => error && warn("pushOrder")(error));
 }
 

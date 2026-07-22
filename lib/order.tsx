@@ -276,9 +276,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       setOrders((prev) => [...prev, order]);
       setCart([]);
       setNow(Date.now());
-      if (userId) cloudPushOrder(userId, order);
 
-      // Publish to the sync bus so a partner terminal can claim it.
       // Kitchen flags: profile allergens / dietary preferences vs item text.
       const flags: string[] = [];
       const menuById = new Map(r.menu.map((m) => [m.id, m]));
@@ -297,12 +295,19 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         }
         if (it.note) flags.push(`Request for ${it.name}: "${it.note}"`);
       }
+      const customer = profile?.name || user?.name || "Forkcast diner";
+
+      // Persist to Supabase with the live-order fields the restaurant terminal
+      // reads (status/customer/flags), so a real restaurant receives it.
+      if (userId) cloudPushOrder(userId, order, { customer, flags });
+
+      // Also publish to the same-device sync bus (consumer tracking + demo terminal).
       writeBus({
         orderId: order.id,
         ref: order.ref,
         slug,
         restName: r.name,
-        customer: profile?.name || user?.name || "Forkcast diner",
+        customer,
         placedAt: order.placedAt,
         fulfill,
         items: items.map((it) => ({ itemId: it.itemId, name: it.name, qty: it.qty, price: it.price, calories: it.calories, note: it.note })),
