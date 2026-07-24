@@ -4,7 +4,9 @@
 
 > The core insight: passive menu calorie labels barely change behavior (~24 cal/order), and every nutrition app makes you log *after* you've eaten. Forkcast steers you to the right dish *before* you order — and gets restaurants to pay to be the recommendation.
 
-**🔗 Live demo:** https://seymurhh.github.io/forkcast-live/ (static build on GitHub Pages — source & business docs stay in this private repo).
+**🔗 Live demo:** https://seymurhh.github.io/forkcast-live/ (static build on GitHub Pages — source stays here, private).
+
+**This repo** (`forkcast-web`) is the app only. Business plan, financial model, architecture, and research docs live in a sibling repo, [`Forkcast-HQ/forkcast-docs`](https://github.com/Forkcast-HQ/forkcast-docs) *(currently empty — docs are being cleaned up and will be pushed there soon)*; the mobile handoff spec lives in [`Forkcast-HQ/forkcast-mobile`](https://github.com/Forkcast-HQ/forkcast-mobile).
 
 ---
 
@@ -38,18 +40,9 @@ A full, working Next.js app — not a mockup:
 
 Everything is interactive and persists locally (profile, logged meals, weight) — set up a profile and watch nearby menus reorder around your goals.
 
-### The strategy docs (`/docs`)
-- **[BUSINESS_PLAN.md](docs/BUSINESS_PLAN.md)** — problem, market, competition, model, GTM, funding strategy, milestones, risks, the ask.
-- **[FINANCIAL_MODEL.md](docs/FINANCIAL_MODEL.md)** — 5-year projections, unit economics (LTV:CAC, payback), COGS incl. real AI-inference cost, use of funds, scenarios.
-- **[SYSTEM_ARCHITECTURE.md](docs/SYSTEM_ARCHITECTURE.md)** — full architecture (with diagram), the nutrition-layer moat, tech stack, build roadmap.
-- **[RESEARCH.md](docs/RESEARCH.md)** — the cited evidence base behind every number (CDC, USDA ERS, AHRQ, peer-reviewed, company filings), fact-checked.
+### Strategy & business docs
 
-### July 14, 2026 Codex delivery
-
-- **[DELIVERY_2026-07-14_CODEX.md](docs/DELIVERY_2026-07-14_CODEX.md)** — dated delivery record and verification summary.
-- **[COMPETITIVE_AND_PRODUCT_AUDIT.md](docs/COMPETITIVE_AND_PRODUCT_AUDIT.md)** — competitive positioning, product gaps, and prioritized roadmap.
-- **[NIW_PRODUCT_EVIDENCE_PLAN.md](docs/NIW_PRODUCT_EVIDENCE_PLAN.md)** — product-evidence plan for building a professional, independently verifiable NIW record.
-- **[FABLE_5_PROMPT.md](docs/FABLE_5_PROMPT.md)** — structured Fable 5 handoff prompt covering the completed work and near-term design direction.
+Moved out of this repo — see [`Forkcast-HQ/forkcast-docs`](https://github.com/Forkcast-HQ/forkcast-docs) for the business plan, financial model, system architecture, research dossier, competitive audit, and NIW material *(repo is empty right now — docs are being cleaned up locally before they're pushed there)*.
 
 > The NIW material is an evidence-development and product-planning aid, not legal advice. Immigration filings should be reviewed by qualified counsel.
 
@@ -74,7 +67,7 @@ app/            routes (landing, onboarding, discover, restaurant, dashboard, bu
 components/     Navbar, cards, MacroRing, FitBadge, PhotoLogger, SmartImage, …
 lib/            nutrition.ts (formulas + Fit Score), store.tsx (state), ai.ts (AI seam), images.ts
 data/           restaurants.ts (Boston seed catalog with full per-dish nutrition)
-docs/           business plan, financial model, architecture, research dossier
+supabase/       migrations for the Postgres/Supabase backend
 ```
 
 ---
@@ -87,7 +80,7 @@ The live demo is a **static export** published to GitHub Pages. To redeploy afte
 bash scripts/deploy-pages.sh   # builds + pushes to the public forkcast-live repo
 ```
 
-For an SSR host (Netlify/Vercel) instead, restore `app/api/analyze/route.ts` from `docs/snippets/`, then connect this repo (`netlify.toml` is included).
+For an SSR host (Netlify/Vercel) instead, just connect this repo (`netlify.toml` is included) — `app/api/analyze/route.ts` runs as-is under SSR.
 
 ## Turning on real AI
 
