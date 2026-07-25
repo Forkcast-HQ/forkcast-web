@@ -20,7 +20,7 @@ import React, {
   useState,
 } from "react";
 import type { CartLine, Fulfillment, Order, OrderItem, OrderStatus } from "./types";
-import { getRestaurant } from "@/data/restaurants";
+import { useCatalog } from "./catalogContext";
 import { uid } from "./format";
 import { useAuth } from "./auth";
 import { useUser } from "./store";
@@ -87,6 +87,7 @@ const Ctx = createContext<OrderStoreValue | null>(null);
 export function OrderProvider({ children }: { children: React.ReactNode }) {
   const { user, hydrated: authHydrated } = useAuth();
   const { profile } = useUser();
+  const { getRestaurant } = useCatalog();
   const userId = user?.id ?? null;
 
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -231,7 +232,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         },
       ];
     });
-  }, [cart]);
+  }, [cart, getRestaurant]);
 
   const cartTotals = useCallback(() => {
     return cartItems().reduce(
@@ -318,7 +319,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       });
       return order;
     },
-    [cart, cartItems, profile, user],
+    [cart, cartItems, profile, user, getRestaurant],
   );
 
   const markLogged = useCallback(

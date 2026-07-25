@@ -7,7 +7,7 @@ import type { MenuItem } from "@/lib/types";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
 import { conditionWarnings, deriveTags, fitScore } from "@/lib/nutrition";
-import { getRestaurant } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { flyToBasket } from "@/lib/fly";
 import { SmartImage } from "./SmartImage";
 import { FitBadge } from "./FitBadge";
@@ -43,6 +43,7 @@ export function MenuItemCard({
 }) {
   const { targets, profile } = useUser();
   const { addToCart, cartRestaurantSlug } = useOrder();
+  const { getRestaurant } = useCatalog();
   const [inCart, setInCart] = useState(false);
 
   const handleAddToOrder = (e: React.MouseEvent<HTMLButtonElement>) => {

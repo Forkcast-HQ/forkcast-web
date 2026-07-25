@@ -71,8 +71,9 @@ export interface Restaurant {
   // Nutrition-data provenance for real restaurants:
   //  "published" — values from the restaurant's own public nutrition disclosure
   //  "estimated" — Forkcast engine estimates from the public menu
+  //  "verified" — reviewed and confirmed directly with the restaurant
   // (undefined = original demo catalog entry)
-  dataSource?: "published" | "estimated";
+  dataSource?: "published" | "estimated" | "verified";
   sourceNote?: string; // what was published, what was estimated, retrieval date
   blurb: string;
   // Partner-provided hero photo (licensed via the partner agreement).

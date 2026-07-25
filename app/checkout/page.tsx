@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Store, Bike, Info, ShieldAlert, CreditCard } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useOrder, DELIVERY_FEE, MA_MEALS_TAX } from "@/lib/order";
-import { getRestaurant } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { money, cls } from "@/lib/format";
 import type { Fulfillment } from "@/lib/types";
 
@@ -27,11 +27,12 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { user, hydrated: authHydrated } = useAuth();
   const { hydrated, cartItems, cartTotals, cartRestaurantSlug, placeOrder } = useOrder();
+  const { getRestaurant, loading: catalogLoading } = useCatalog();
   const [fulfill, setFulfill] = useState<Fulfillment>("pickup");
   const [payMethod, setPayMethod] = useState<"Forkcast Pay" | "Card">("Forkcast Pay");
   const [placed, setPlaced] = useState(false);
 
-  if (!hydrated || !authHydrated) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
+  if (!hydrated || !authHydrated || catalogLoading) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
 
   const items = cartItems();
   const rest = cartRestaurantSlug ? getRestaurant(cartRestaurantSlug) : null;

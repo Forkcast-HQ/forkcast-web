@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Search, SlidersHorizontal, Sparkles, ArrowRight, Map as MapIcon, List, Star, Clock, Info, X, LocateFixed } from "lucide-react";
-import { RESTAURANTS, CUISINES, allMenuItems } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { useUser } from "@/lib/store";
 import { fitScore, personalAdjust } from "@/lib/nutrition";
 import { RestaurantCard } from "@/components/RestaurantCard";
@@ -23,6 +23,7 @@ type Sort = "fit" | "distance" | "rating";
 type View = "list" | "map";
 
 export default function Discover() {
+  const { restaurants: RESTAURANTS, cuisines: CUISINES, allMenuItems, loading: catalogLoading } = useCatalog();
   const { profile, targets, consumedToday, hydrated } = useUser();
   const [q, setQ] = useState("");
   const [cuisine, setCuisine] = useState<string | null>(null);
@@ -111,7 +112,7 @@ export default function Discover() {
       map.set(r.slug, Math.max(0, best));
     }
     return map;
-  }, [targets, profile]);
+  }, [targets, profile, RESTAURANTS]);
 
   // With permission granted, distances become real (haversine from the user);
   // otherwise the static values stand, clearly labeled as demo-center-based.
@@ -119,7 +120,7 @@ export default function Discover() {
     if (!coords) return RESTAURANTS;
     return RESTAURANTS.map((r) => ({ ...r, distanceMi: haversineMi(coords.lat, coords.lng, r.lat, r.lng) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coords]);
+  }, [coords, RESTAURANTS]);
 
   const restaurants = useMemo(() => {
     let list = [...located];
@@ -193,7 +194,7 @@ export default function Discover() {
       .sort((a, b) => b.fit - b.adj.penalty - (a.fit - a.adj.penalty))
       .slice(0, 6)
       .map((x) => x.m);
-  }, [targets, profile]);
+  }, [targets, profile, allMenuItems]);
 
   const consumed = hydrated ? consumedToday() : null;
   const remaining =
@@ -453,7 +454,10 @@ export default function Discover() {
                 );
               })}
             </div>
-            {restaurants.length === 0 && (
+            {restaurants.length === 0 && catalogLoading && (
+              <div className="py-16 text-center text-ink/40">Loading restaurants…</div>
+            )}
+            {restaurants.length === 0 && !catalogLoading && (
               <div className="py-16 text-center text-ink/50">
                 <p>No restaurants match those filters.</p>
                 <button onClick={clearFilters} className="mt-3 rounded-full bg-brand-50 px-4 py-2 text-sm font-bold text-brand-700">Clear filters</button>
@@ -484,7 +488,11 @@ export default function Discover() {
                   {targets && (bestFitOf.get(r.slug) ?? 0) > 0 && <FitPill score={bestFitOf.get(r.slug)!} />}
                 </Link>
               ))}
-              {restaurants.length === 0 && <p className="py-10 text-center text-ink/50">No restaurants match those filters.</p>}
+              {restaurants.length === 0 && (
+                <p className="py-10 text-center text-ink/50">
+                  {catalogLoading ? "Loading restaurants…" : "No restaurants match those filters."}
+                </p>
+              )}
             </div>
           </div>
         )}

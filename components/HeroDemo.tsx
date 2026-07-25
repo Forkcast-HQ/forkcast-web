@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { allMenuItems } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { computeTargets, fitScore, GOAL_LABELS } from "@/lib/nutrition";
 import type { Goal, HealthProfile } from "@/lib/types";
 import { FitBadge } from "@/components/FitBadge";
@@ -30,6 +30,7 @@ const SAMPLE: Omit<HealthProfile, "goal"> = {
 };
 
 export function HeroDemo() {
+  const { allMenuItems } = useCatalog();
   const [goal, setGoal] = useState<Goal>("lose");
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -42,18 +43,21 @@ export function HeroDemo() {
       .map((m) => ({ m, fit: fitScore(m, targets, goal) }))
       .sort((a, b) => b.fit.score - a.fit.score)
       .slice(0, 6);
-  }, [targets, goal]);
+  }, [targets, goal, allMenuItems]);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || !dishes.length) return;
     const t = setInterval(() => setIdx((i) => (i + 1) % dishes.length), 3800);
     return () => clearInterval(t);
   }, [paused, dishes.length]);
 
-  const cur = dishes[idx % dishes.length];
+  // dishes is briefly [] while the catalog loads from Supabase.
+  const cur = dishes.length ? dishes[idx % dishes.length] : null;
+  const mealBudget = Math.round(targets.calories * 0.35);
+
+  if (!cur) return null;
   const item = cur.m;
   const fit = cur.fit;
-  const mealBudget = Math.round(targets.calories * 0.35);
 
   return (
     <div

@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, BadgeCheck, Check, Flame, ShieldAlert, ShoppingBag } from "lucide-react";
-import { getRestaurant } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
 import { useAuth } from "@/lib/auth";
@@ -29,6 +29,7 @@ const RANGE_ESTIMATED = 0.15;
 
 export function DishDetail({ slug, id }: { slug: string; id: string }) {
   const router = useRouter();
+  const { getRestaurant, loading: catalogLoading } = useCatalog();
   const restaurant = getRestaurant(slug);
   const item = restaurant?.menu.find((m) => m.id === id);
   const { profile, targets, consumedToday, hydrated } = useUser();
@@ -42,6 +43,10 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
   useEffect(() => {
     setCorrections(correctionsFor(slug, id));
   }, [slug, id]);
+
+  if (catalogLoading) {
+    return <div className="mx-auto max-w-3xl px-4 py-24 text-center text-ink/40">Loading…</div>;
+  }
 
   if (!restaurant || !item) {
     return (

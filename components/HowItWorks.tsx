@@ -27,7 +27,7 @@ import {
   Send,
 } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
-import { RESTAURANTS } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { categoryImg } from "@/lib/images";
 import { computeTargets, fitColor, fitScore } from "@/lib/nutrition";
 import type { HealthProfile } from "@/lib/types";
@@ -187,10 +187,12 @@ export function HowItWorks({
   ctaHref?: string;
   ctaLabel?: string;
 }) {
+  const { restaurants: RESTAURANTS } = useCatalog();
   const [active, setActive] = useState(0);
   const [touched, setTouched] = useState(false);
 
-  const { targets, dish, pct, left, photo } = useMemo(() => {
+  const catalogData = useMemo(() => {
+    if (!RESTAURANTS.length) return null; // catalog still loading from Supabase
     const t = computeTargets(DEMO_PROFILE);
     const item = RESTAURANTS[0].menu[0]; // Harvest Power Bowl (Verdant)
     const fit = fitScore(item, t, DEMO_PROFILE.goal);
@@ -201,7 +203,7 @@ export function HowItWorks({
       left: t.calories - item.calories,
       photo: categoryImg(item.category, 11, 256, 256),
     };
-  }, []);
+  }, [RESTAURANTS]);
 
   // Auto-advance until the visitor interacts.
   useEffect(() => {
@@ -218,6 +220,9 @@ export function HowItWorks({
   };
 
   const step = STEPS[active];
+
+  if (!catalogData) return null;
+  const { targets, dish, pct, left, photo } = catalogData;
   const dayPill = active >= 2 ? `${left.toLocaleString()} kcal left` : `${targets.calories.toLocaleString()} kcal left`;
 
   return (

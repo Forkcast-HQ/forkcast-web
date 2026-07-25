@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Minus, Plus, ShoppingBag, BadgeCheck, AlertTriangle } from "lucide-react";
 import { useUser } from "@/lib/store";
 import { useOrder } from "@/lib/order";
-import { getRestaurant } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { money, cls, pct } from "@/lib/format";
 import { SmartImage } from "@/components/SmartImage";
 import { dishImg } from "@/lib/images";
@@ -17,8 +17,9 @@ export default function BasketPage() {
   const router = useRouter();
   const { targets, consumedToday, hydrated: userHydrated } = useUser();
   const { hydrated, cartItems, cartTotals, changeQty, setLineNote, clearCart, cartRestaurantSlug } = useOrder();
+  const { getRestaurant, loading: catalogLoading } = useCatalog();
 
-  if (!hydrated || !userHydrated) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
+  if (!hydrated || !userHydrated || catalogLoading) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
 
   const items = cartItems();
   const t = cartTotals();

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Star, Clock, MapPin, BadgeCheck, ArrowLeft, Flame, Info } from "lucide-react";
-import { getRestaurant } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { useUser } from "@/lib/store";
 import { fitScore, deriveTags } from "@/lib/nutrition";
 import { SmartImage } from "@/components/SmartImage";
@@ -20,6 +20,7 @@ const FILTERS = [
 ];
 
 export function RestaurantDetail({ slug }: { slug: string }) {
+  const { getRestaurant, loading: catalogLoading } = useCatalog();
   const restaurant = getRestaurant(slug);
   const { profile, targets } = useUser();
   const [sortFit, setSortFit] = useState(true);
@@ -36,6 +37,10 @@ export function RestaurantDetail({ slug }: { slug: string }) {
     if (sortFit && targets) items.sort((a, b) => b.fit - a.fit);
     return items;
   }, [restaurant, targets, profile, sortFit, filter]);
+
+  if (catalogLoading) {
+    return <div className="mx-auto max-w-3xl px-4 py-24 text-center text-ink/40">Loading…</div>;
+  }
 
   if (!restaurant) {
     return (

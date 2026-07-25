@@ -15,10 +15,10 @@ import { HeroSearch } from "@/components/HeroSearch";
 import { DishMarquee } from "@/components/DishMarquee";
 import { ShowcaseCarousel } from "@/components/ShowcaseCarousel";
 import { categoryImg, editorialImg } from "@/lib/images";
-import { RESTAURANTS } from "@/data/restaurants";
+import { fetchCatalog } from "@/lib/catalog";
 
-export default function Home() {
-  const featured = RESTAURANTS;
+export default async function Home() {
+  const featured = await fetchCatalog();
 
   return (
     <>

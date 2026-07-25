@@ -25,7 +25,7 @@ import {
   ShieldAlert,
   Store,
 } from "lucide-react";
-import { RESTAURANTS, getRestaurant } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { useAuth } from "@/lib/auth";
 import { cloudEnabled } from "@/lib/supabase";
 import { readBus, writeBus, clearBus, correctionsFor, addCorrection } from "@/lib/bus";
@@ -39,6 +39,7 @@ const FIELDS: MenuCorrection["field"][] = ["calories", "protein", "carbs", "fat"
 
 export default function PartnerTerminal() {
   const { user, hydrated, logOut } = useAuth();
+  const { restaurants: RESTAURANTS, getRestaurant } = useCatalog();
   const cloud = cloudEnabled();
 
   // owner: undefined = still loading; null = none yet; object = their listing
@@ -47,9 +48,16 @@ export default function PartnerTerminal() {
 
   // DEMO transport
   const [bus, setBus] = useState<LiveOrderBus | null>(null);
-  const [slug, setSlug] = useState(RESTAURANTS.find((r) => r.partner)?.slug ?? RESTAURANTS[0].slug);
+  // Empty until the catalog loads (RESTAURANTS starts empty while it fetches
+  // from Supabase) — the effect below picks a default slug once it can.
+  const [slug, setSlug] = useState("");
   const [corrections, setCorrections] = useState<MenuCorrection[]>([]);
   const [demoCompleted, setDemoCompleted] = useState<LiveOrderBus[]>([]);
+
+  useEffect(() => {
+    if (slug || !RESTAURANTS.length) return;
+    setSlug(RESTAURANTS.find((r) => r.partner)?.slug ?? RESTAURANTS[0].slug);
+  }, [RESTAURANTS, slug]);
 
   // LIVE transport
   const [dbActive, setDbActive] = useState<LiveOrderBus[]>([]);
@@ -366,6 +374,7 @@ function GateShell({ title, body, children }: { title: string; body: string; chi
 }
 
 function CorrectionEditor({ slug, onSaved }: { slug: string; onSaved: () => void }) {
+  const { getRestaurant } = useCatalog();
   const restaurant = getRestaurant(slug)!;
   const [itemId, setItemId] = useState(restaurant.menu[0]?.id ?? "");
   const [field, setField] = useState<MenuCorrection["field"]>("calories");

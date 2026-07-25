@@ -20,7 +20,7 @@ import { ArrowRight, Sparkles, Trash2, Camera, Utensils, PencilLine, Flame, Trop
 import { useAuth } from "@/lib/auth";
 import { useUser } from "@/lib/store";
 import { GOAL_LABELS, bmiInfo, kgToLb, lbToKg, fitScore, personalAdjust } from "@/lib/nutrition";
-import { allMenuItems } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { coachTip } from "@/lib/ai";
 import { usePremium } from "@/lib/premium";
 import { getDailyActivity, getWhoopDaily, type DailyActivity, type WhoopDaily } from "@/lib/health";
@@ -43,6 +43,7 @@ export default function Dashboard() {
   const router = useRouter();
   const { user, hydrated: authHydrated } = useAuth();
   const { profile, targets, calibration, hydrated, meals, weights, consumedToday, todaysMeals, removeMeal, streak, addWeight } = useUser();
+  const { allMenuItems } = useCatalog();
   const [weighIn, setWeighIn] = useState("");
   const [weighSaved, setWeighSaved] = useState(false);
 
@@ -182,7 +183,7 @@ export default function Dashboard() {
       .sort((a, b) => b.n - a.n)
       .slice(0, 3);
     return { avg, onTarget, daysLogged: last7.length, topSpots, catCount, restCount, windows, mealsLogged: recent.length };
-  }, [meals, targets]);
+  }, [meals, targets, allMenuItems]);
 
   const weightData = useMemo(() => {
     if (!profile) return [];
@@ -249,7 +250,7 @@ export default function Dashboard() {
       .filter((x) => !x.adj.exclude)
       .sort((a, b) => b.score - a.score)
       .slice(0, 6);
-  }, [targets, profile, patterns]);
+  }, [targets, profile, patterns, allMenuItems]);
 
   if (!authHydrated || !hydrated) {
     return <div className="mx-auto max-w-7xl px-4 py-20 text-center text-ink/40">Loading your plan…</div>;

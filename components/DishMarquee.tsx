@@ -2,12 +2,13 @@
 // pauses on hover, disabled under reduced-motion. Server component.
 
 import Link from "next/link";
-import { RESTAURANTS } from "@/data/restaurants";
+import { fetchCatalog } from "@/lib/catalog";
 import { SmartImage } from "@/components/SmartImage";
 import { categoryImg } from "@/lib/images";
 
-export function DishMarquee() {
-  const dishes = RESTAURANTS.flatMap((r) =>
+export async function DishMarquee() {
+  const restaurants = await fetchCatalog();
+  const dishes = restaurants.flatMap((r) =>
     r.menu.slice(0, 2).map((m, i) => ({
       id: m.id,
       slug: r.slug,

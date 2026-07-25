@@ -27,7 +27,7 @@ import {
   Store,
 } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
-import { RESTAURANTS } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { categoryImg } from "@/lib/images";
 import { computeTargets, fitColor, fitScore } from "@/lib/nutrition";
 import type { HealthProfile } from "@/lib/types";
@@ -182,22 +182,9 @@ const Chip = ({
 };
 
 export function HowItWorksRestaurant() {
+  const { restaurants: RESTAURANTS } = useCatalog();
   const [active, setActive] = useState(0);
   const [touched, setTouched] = useState(false);
-
-  const targets = computeTargets(DEMO_PROFILE);
-  const item = RESTAURANTS[0].menu[0]; // Harvest Power Bowl (Verdant)
-  const fit = fitScore(item, targets, DEMO_PROFILE.goal).score;
-  const photo = categoryImg(item.category, 11, 256, 256);
-  const dish = {
-    name: item.name,
-    kcal: item.calories,
-    protein: Math.round(item.protein),
-    fiber: Math.round(item.fiber),
-    fit,
-    restaurant: RESTAURANTS[0].name,
-    neighborhood: RESTAURANTS[0].neighborhood,
-  };
 
   useEffect(() => {
     if (touched) return;
@@ -212,6 +199,23 @@ export function HowItWorksRestaurant() {
   };
 
   const step = STEPS[active];
+
+  // Catalog loads async from Supabase — briefly empty on first mount.
+  if (!RESTAURANTS.length) return null;
+
+  const targets = computeTargets(DEMO_PROFILE);
+  const item = RESTAURANTS[0].menu[0]; // Harvest Power Bowl (Verdant)
+  const fit = fitScore(item, targets, DEMO_PROFILE.goal).score;
+  const photo = categoryImg(item.category, 11, 256, 256);
+  const dish = {
+    name: item.name,
+    kcal: item.calories,
+    protein: Math.round(item.protein),
+    fiber: Math.round(item.fiber),
+    fit,
+    restaurant: RESTAURANTS[0].name,
+    neighborhood: RESTAURANTS[0].neighborhood,
+  };
 
   return (
     <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr]">

@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 import { ShoppingBag, ClipboardCheck } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useOrder, orderStatus } from "@/lib/order";
-import { getRestaurant } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 
 const SHOW_ON = ["/discover", "/restaurant"];
 
@@ -17,6 +17,7 @@ export function CartBar() {
   const pathname = usePathname();
   const { user, hydrated: authHydrated } = useAuth();
   const { hydrated, cartCount, cartTotals, cartRestaurantSlug, activeOrder, now } = useOrder();
+  const { getRestaurant } = useCatalog();
 
   if (!authHydrated || !hydrated || !user || user.role === "restaurant") return null;
   if (!SHOW_ON.some((p) => pathname.startsWith(p))) return null;

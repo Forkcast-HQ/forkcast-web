@@ -22,8 +22,22 @@ restore_api(){
   cp -R "$API_STASH"/. "$API_DIR"/ 2>/dev/null || true
   rm -rf "$API_STASH"
 }
-trap restore_api EXIT
+
+# dynamicParams=true (needed so the SSR build renders any newly-published
+# restaurant/dish slug on demand, not just ones present at build time) is
+# rejected by Next.js for `output: export` — there's no server to render on
+# demand there, only the generateStaticParams slugs can ever be served.
+# Patch it to false for this build only, then restore the real source.
+RESTAURANT_PAGE="$ROOT/app/restaurant/[slug]/page.tsx"
+DISH_PAGE="$ROOT/app/restaurant/[slug]/dish/[id]/page.tsx"
+restore_dynamic_params(){
+  [ -f "$RESTAURANT_PAGE.bak" ] && mv "$RESTAURANT_PAGE.bak" "$RESTAURANT_PAGE"
+  [ -f "$DISH_PAGE.bak" ] && mv "$DISH_PAGE.bak" "$DISH_PAGE"
+}
+
+trap 'restore_api; restore_dynamic_params' EXIT
 [ -d "$API_DIR" ] && mv "$API_DIR" "$API_STASH"
+sed -i.bak 's/export const dynamicParams = true;/export const dynamicParams = false;/' "$RESTAURANT_PAGE" "$DISH_PAGE"
 
 echo "Building static export..."
 rm -rf "$ROOT/.next" "$OUT"

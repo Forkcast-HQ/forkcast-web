@@ -8,7 +8,7 @@
 
 import { useEffect, useState } from "react";
 import { BadgeCheck, ClipboardList, FlaskConical, Scale, ShieldCheck } from "lucide-react";
-import { RESTAURANTS } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { readCorrections } from "@/lib/bus";
 import { cls } from "@/lib/format";
 
@@ -46,6 +46,7 @@ const METRICS = [
 ];
 
 export default function ImpactPage() {
+  const { restaurants: RESTAURANTS } = useCatalog();
   const [counts, setCounts] = useState({ corrections: 0 });
 
   useEffect(() => {

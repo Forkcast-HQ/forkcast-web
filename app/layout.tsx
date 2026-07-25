@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { AuthProvider } from "@/lib/auth";
 import { UserProvider } from "@/lib/store";
 import { OrderProvider } from "@/lib/order";
+import { CatalogProvider } from "@/lib/catalogContext";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { TodayBar } from "@/components/TodayBar";
@@ -32,20 +33,22 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <AuthProvider>
-          <UserProvider>
-            <OrderProvider>
-              <Navbar />
-              <main id="main-content" tabIndex={-1}>
-                {children}
-              </main>
-              <Footer />
-              <TodayBar />
-              <CartBar />
-              <CoachChat />
-            </OrderProvider>
-          </UserProvider>
-        </AuthProvider>
+        <CatalogProvider>
+          <AuthProvider>
+            <UserProvider>
+              <OrderProvider>
+                <Navbar />
+                <main id="main-content" tabIndex={-1}>
+                  {children}
+                </main>
+                <Footer />
+                <TodayBar />
+                <CartBar />
+                <CoachChat />
+              </OrderProvider>
+            </UserProvider>
+          </AuthProvider>
+        </CatalogProvider>
       </body>
     </html>
   );

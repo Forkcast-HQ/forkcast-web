@@ -13,7 +13,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, Ban, Check, HeartPulse } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
-import { RESTAURANTS } from "@/data/restaurants";
+import { useCatalog } from "@/lib/catalogContext";
 import { categoryImg } from "@/lib/images";
 import {
   COMMON_ALLERGENS,
@@ -36,6 +36,25 @@ const DEMO_PROFILE: HealthProfile = {
   dietary: [],
   avoid: [],
   createdAt: 0,
+};
+
+// Safe placeholder while the catalog is still loading from Supabase — never
+// rendered (see the `!dishes.length` guard below), just keeps every hook in
+// this component fed with a valid MenuItem so none of them can crash.
+const FALLBACK_ITEM: MenuItem = {
+  id: "_loading",
+  name: "",
+  description: "",
+  price: 0,
+  calories: 0,
+  protein: 0,
+  carbs: 0,
+  fat: 0,
+  fiber: 0,
+  sodium: 0,
+  sugar: 0,
+  category: "",
+  tags: [],
 };
 
 const GOALS: { key: Goal; label: string }[] = [
@@ -138,6 +157,7 @@ function ToggleChip({
 }
 
 export function FitScoreExplorer() {
+  const { restaurants: RESTAURANTS } = useCatalog();
   const [goal, setGoal] = useState<Goal>("lose");
   const [sel, setSel] = useState(0);
   const [conditions, setConditions] = useState<string[]>([]);
@@ -146,8 +166,9 @@ export function FitScoreExplorer() {
   const toggle = (list: string[], set: (v: string[]) => void, v: string) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
-  // Dish list is goal-independent — compute once.
+  // Dish list is goal-independent — recompute whenever the catalog loads.
   const dishes = useMemo(() => {
+    if (!RESTAURANTS.length) return [];
     // Verdant — a launch partner with a fully macro'd menu. Curated for a
     // varied demo: different allergens, plus one saltier dish so a condition
     // toggle (e.g. Hypertension) visibly triggers a real advisory.
@@ -162,22 +183,28 @@ export function FitScoreExplorer() {
       restaurant: r.name,
       neighborhood: r.neighborhood,
     }));
-  }, []);
+  }, [RESTAURANTS]);
 
   // Targets depend on the selected goal, so the budget, calorie-fit sub-score,
   // and overall score all respond when the goal changes.
   const targets = useMemo(() => computeTargets({ ...DEMO_PROFILE, goal }), [goal]);
   const calT = targets.calories * 0.35;
 
-  const active = dishes[sel].item;
+  // dishes[sel] can be undefined while the catalog is still loading — every
+  // hook below must still run unconditionally, so fall back to a safe,
+  // never-rendered placeholder rather than skipping any of them.
+  const activeDish = dishes[sel];
+  const active = activeDish?.item ?? FALLBACK_ITEM;
   const result = fitScore(active, targets, goal);
   const subs = subScores(active, calT);
   const scoreT = useTween(result.score);
   const color = fitColor(result.score);
 
-  const hitAllergens = allergens.filter((a) => dishes[sel].allergens.includes(a));
+  const hitAllergens = allergens.filter((a) => (activeDish?.allergens ?? []).includes(a));
   const excluded = hitAllergens.length > 0;
   const condWarns = conditionWarnings(active, conditions);
+
+  if (!dishes.length) return null;
 
   return (
     <div className="mt-8 grid items-start gap-6 lg:grid-cols-[0.82fr_1.18fr]">
