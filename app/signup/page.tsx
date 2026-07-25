@@ -49,14 +49,18 @@ export default function SignUp() {
   const [step, setStep] = useState<"form" | "verify">("form");
   const [sentCode, setSentCode] = useState("");
   const [codeInput, setCodeInput] = useState("");
+  // A signup that just completed on this page navigates explicitly (see
+  // verify() below) — straight to /partner/onboarding for a new restaurant,
+  // not the generic /partner the effect below would otherwise race it to.
+  const [justSignedUp, setJustSignedUp] = useState(false);
 
   useEffect(() => {
-    if (!hydrated || !user) return;
+    if (!hydrated || !user || justSignedUp) return;
     if (user.role === "restaurant") { router.replace("/partner"); return; }
     // Diner arriving via "Become a partner": show the switch screen instead
     // of bouncing to the dashboard.
     if (!wantsRestaurant) router.replace("/dashboard");
-  }, [hydrated, user, router, wantsRestaurant]);
+  }, [hydrated, user, router, wantsRestaurant, justSignedUp]);
 
   // Signed-in diner who clicked "Become a partner"
   if (hydrated && user && user.role !== "restaurant" && wantsRestaurant) {
@@ -119,6 +123,7 @@ export default function SignUp() {
       setBusy(false);
       return;
     }
+    setJustSignedUp(true);
     router.push(role === "restaurant" ? "/partner/onboarding" : "/onboarding");
   };
 
