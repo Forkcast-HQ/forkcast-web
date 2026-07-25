@@ -80,13 +80,21 @@ export default function PartnerTerminal() {
     };
   }, [hydrated, isRestaurant, cloud, user]);
 
+  // "loading" must only apply while the owner-fetch effect above is actually
+  // going to run (hydrated + isRestaurant + cloud) — otherwise a signed-out
+  // visitor or a diner account leaves `owner` at its initial `undefined`
+  // forever (that effect returns early without ever calling setOwner), which
+  // permanently locked mode at "loading" and trapped the render before it
+  // ever reached the sign-in / wrong-role gates below.
   const mode: "loading" | "demo" | "needs-listing" | "live" = !cloud
     ? "demo"
-    : owner === undefined
-      ? "loading"
-      : owner === null
-        ? "needs-listing"
-        : "live";
+    : !hydrated || !isRestaurant
+      ? "needs-listing" // placeholder value; the !user / !isRestaurant gates below intercept before this is ever used to render
+      : owner === undefined
+        ? "loading"
+        : owner === null
+          ? "needs-listing"
+          : "live";
 
   const refreshDemo = useCallback(() => {
     setBus(readBus());
