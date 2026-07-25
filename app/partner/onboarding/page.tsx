@@ -36,6 +36,13 @@ import {
 
 const STEPS = ["Listing", "Menu", "Publish"];
 
+// "View your public page" must always point at the real public domain, not
+// whatever host the owner happens to be browsing the terminal from — a
+// per-deployment Vercel preview URL, for instance, is protected by Vercel's
+// own login wall and isn't actually public. Override via env var if the
+// production domain ever changes (e.g. a custom domain).
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://forkcastmenu.vercel.app";
+
 export default function RestaurantOnboarding() {
   const { user, hydrated } = useAuth();
   const router = useRouter();
@@ -63,7 +70,13 @@ export default function RestaurantOnboarding() {
         address: existing.restaurant.address,
         blurb: existing.restaurant.blurb,
       });
-      setStep(existing.restaurant.status === "published" ? 2 : existing.menu.length ? 1 : 1);
+      // Always land on the menu editor for an existing restaurant — both
+      // "Edit menu" and "Manage listing" on /partner link here, and this
+      // step already gives full access back to listing details (← Back)
+      // or forward to the publish/public-page screen (Review & publish →).
+      // Forcing published restaurants straight to the publish screen (as
+      // before) made "Edit menu" an unreachable dead end once live.
+      setStep(1);
     }
     setLoading(false);
   }, [user]);
@@ -219,7 +232,14 @@ export default function RestaurantOnboarding() {
               <p className="mt-1 text-ink/60">Your verified listing and {menu.length} {menu.length === 1 ? "dish" : "dishes"} are now discoverable to diners.</p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <Link href="/partner" className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-700">Go to order terminal <ArrowRight className="h-4 w-4" /></Link>
-                <Link href={`/restaurant/${rest.slug}`} className="inline-flex items-center gap-2 rounded-full border border-black/10 px-6 py-3 text-sm font-semibold text-ink hover:border-black/25">View your public page</Link>
+                <a
+                  href={`${SITE_URL}/restaurant/${rest.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-black/10 px-6 py-3 text-sm font-semibold text-ink hover:border-black/25"
+                >
+                  View your public page
+                </a>
               </div>
             </div>
           ) : (
