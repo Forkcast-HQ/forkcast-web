@@ -14,3 +14,6 @@ next-env.d.ts
 # transient deploy stash
 .api-stash
 docs/niw/~$*
+
+# local-only business docs (deliberately not in this repo, see forkcast-docs)
+/Forkcast-Docs-Local
