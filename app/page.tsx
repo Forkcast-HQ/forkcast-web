@@ -101,7 +101,7 @@ export default async function Home() {
             </h2>
             <p className="mt-5 text-lg text-ink/65">
               Americans now eat a third of their calories away from home — and every
-              existing app reacts <em>after</em> the plate is empty. Forkcast acts{" "}
+              existing app reacts <em>after</em> the plate is empty. Palatify acts{" "}
               <strong>before</strong> you order.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -195,7 +195,7 @@ export default async function Home() {
           <SmartImage
             src={editorialImg("restaurant-spread", 1600, 640)}
             alt=""
-            label="Forkcast"
+            label="Palatify"
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/70 to-ink/50" />

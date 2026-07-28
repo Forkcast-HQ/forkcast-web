@@ -1,4 +1,4 @@
-// Server-only: resolves a valid access token for a Forkcast user's connected
+// Server-only: resolves a valid access token for a Palatify user's connected
 // device, transparently refreshing it (and persisting the refresh) when
 // expired. Provider-aware since migration 0005 (a user can hold both a
 // Fitbit/Google Health connection and a WHOOP connection at once). Used by

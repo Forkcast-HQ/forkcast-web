@@ -2,7 +2,7 @@
 // exclusively by app/api/health/whoop/** route handlers; never import this
 // into a "use client" component.
 //
-// WHOOP is read-only for Forkcast: it has no nutrition-log endpoint (unlike
+// WHOOP is read-only for Palatify: it has no nutrition-log endpoint (unlike
 // the Google Health/Fitbit integration in lib/googleHealth.ts), so there is
 // no meal auto-sync here — just recovery score, day strain, and sleep
 // performance surfaced on the dashboard.
@@ -172,7 +172,7 @@ export async function getLatestSummary(accessToken: string): Promise<WhoopDailyR
     strain: cycleScore?.score_state === "SCORED" ? cycleScore.score?.strain ?? null : null,
     // WHOOP reports energy expenditure as kilojoules (the cycle's `score.
     // kilojoule` field) — converted to kcal here since that's the unit
-    // Forkcast uses everywhere else (dashboard, Fitbit sync).
+    // Palatify uses everywhere else (dashboard, Fitbit sync).
     caloriesBurned: kilojoule != null ? Math.round(kilojoule / KJ_PER_KCAL) : null,
     sleepPerformancePct: sleepScore?.score_state === "SCORED" ? sleepScore.score?.sleep_performance_percentage ?? null : null,
   };

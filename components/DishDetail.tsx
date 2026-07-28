@@ -246,7 +246,7 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
                 ? `menu data reviewed with ${restaurant.name}; corrections are versioned and timestamped.`
                 : published
                   ? restaurant.sourceNote ?? `as published by ${restaurant.name}.`
-                  : restaurant.sourceNote ?? `estimated from ${restaurant.name}'s public menu by the Forkcast nutrition engine; not yet reviewed by the restaurant.`}
+                  : restaurant.sourceNote ?? `estimated from ${restaurant.name}'s public menu by the Palatify nutrition engine; not yet reviewed by the restaurant.`}
               {" "}Values are estimates with a ±{Math.round(range * 100)}% range, not measurements.
             </p>
           </div>
@@ -256,7 +256,7 @@ export function DishDetail({ slug, id }: { slug: string; id: string }) {
             <p className="flex items-start gap-2.5 text-xs text-amber-900">
               <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
-                <strong>Allergens &amp; preparation.</strong> Forkcast cannot guarantee allergen absence — kitchens change and
+                <strong>Allergens &amp; preparation.</strong> Palatify cannot guarantee allergen absence — kitchens change and
                 cross-contact happens. Always confirm directly with the restaurant before ordering.
                 {profile?.avoid?.length ? ` Your profile flags: ${profile.avoid.join(", ")}.` : ""}
               </span>

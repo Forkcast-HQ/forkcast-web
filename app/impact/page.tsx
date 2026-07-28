@@ -15,7 +15,7 @@ import { cls } from "@/lib/format";
 const METRICS = [
   {
     name: "Pre-order decision rate",
-    definition: "Share of logged restaurant meals whose dish was viewed in Forkcast before the order was placed.",
+    definition: "Share of logged restaurant meals whose dish was viewed in Palatify before the order was placed.",
     why: "Measures whether the product changes the decision, not just records it.",
   },
   {
@@ -62,7 +62,7 @@ export default function ImpactPage() {
       <p className="kicker text-brand-700">Evidence, not claims</p>
       <h1 className="mt-1 font-display text-3xl font-extrabold text-ink sm:text-4xl">Impact &amp; evidence</h1>
       <p className="mt-3 max-w-2xl text-ink/65">
-        Forkcast&apos;s public-benefit case — better nutrition transparency for restaurant meals, especially at the
+        Palatify&apos;s public-benefit case — better nutrition transparency for restaurant meals, especially at the
         independent restaurants federal menu-labeling rules don&apos;t reach — will be made with measured evidence.
         This page defines the measurements <em>before</em> the pilot, and reports nothing that hasn&apos;t happened.
       </p>
@@ -146,7 +146,7 @@ export default function ImpactPage() {
             {RESTAURANTS.length} restaurants · {dishes} dishes · {partnerDishes} dishes under the demo partner-verified pattern.
             Rows marked <strong>restaurant-published</strong> quote real public nutrition disclosures (retrieval dates in
             each listing); rows marked engine estimate cover real restaurants that publish no nutrition, clearly labeled.
-            No listed restaurant has authorized or partnered with Forkcast — prices, ratings, and delivery estimates are
+            No listed restaurant has authorized or partnered with Palatify — prices, ratings, and delivery estimates are
             placeholders. This table becomes the verified ledger as pilot restaurants sign on.
           </p>
         </div>

@@ -9,7 +9,7 @@ export function Footer() {
           <div className="md:col-span-1">
             <Logo />
             <p className="mt-4 max-w-xs text-sm text-ink/60">
-              Know before you go. Forkcast helps you eat out without losing the
+              Know before you go. Palatify helps you eat out without losing the
               plot on your goals.
             </p>
           </div>
@@ -45,12 +45,12 @@ export function Footer() {
         </div>
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-black/5 pt-6 text-xs text-ink/50 sm:flex-row sm:items-center">
           <p>
-            © {2026} Forkcast — demonstration prototype. Nutrition values are realistic estimates. ·{" "}
+            © {2026} Palatify — demonstration prototype. Nutrition values are realistic estimates. ·{" "}
             <Link href="/pricing" className="hover:text-brand-700">Pricing</Link> ·{" "}
             <Link href="/privacy" className="hover:text-brand-700">Privacy</Link> ·{" "}
             <Link href="/terms" className="hover:text-brand-700">Terms</Link>
           </p>
-          <p>Boston, MA · Built for the Forkcast pitch.</p>
+          <p>Boston, MA · Built for the Palatify pitch.</p>
         </div>
       </div>
     </footer>

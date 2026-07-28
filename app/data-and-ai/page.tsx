@@ -2,11 +2,11 @@ import { LegalPage, LSection } from "@/components/LegalPage";
 import { BadgeCheck } from "lucide-react";
 
 export const metadata = {
-  title: "Source of Data & AI — Forkcast",
-  description: "Where every number in Forkcast comes from, and how our AI works.",
+  title: "Source of Data & AI — Palatify",
+  description: "Where every number in Palatify comes from, and how our AI works.",
 };
 
-// Forkcast's answer to the industry-standard "source of data" page — with the
+// Palatify's answer to the industry-standard "source of data" page — with the
 // things most apps leave out: per-value provenance, named AI providers,
 // uncertainty labeling, and a correction policy.
 
@@ -14,17 +14,17 @@ export default function DataAndAiPage() {
   return (
     <LegalPage kicker="Transparency" title="Source of Data & AI" updated="July 19, 2026">
       <p>
-        Forkcast does not provide medical advice, clinical guidance, or treatment plans.
+        Palatify does not provide medical advice, clinical guidance, or treatment plans.
         Everything in the app is general nutrition information for educational and
         decision-support purposes. It is not intended to diagnose, treat, cure, or
         prevent any condition, and it never substitutes for a physician or registered
-        dietitian. Forkcast makes no disease-related claims and is not marketed for
+        dietitian. Palatify makes no disease-related claims and is not marketed for
         medical use.
       </p>
 
       <LSection title="Where every nutrition number comes from">
         <p>
-          Unlike most nutrition apps, Forkcast attaches a source to <em>every</em> value it
+          Unlike most nutrition apps, Palatify attaches a source to <em>every</em> value it
           shows, at one of three levels:
         </p>
         <p>
@@ -61,7 +61,7 @@ export default function DataAndAiPage() {
           models and never for advertising.
         </p>
         <p>
-          AI estimates are uncertain by nature, so Forkcast treats them accordingly:
+          AI estimates are uncertain by nature, so Palatify treats them accordingly:
           photo estimates show a confidence level, every value is editable before it
           reaches your log, and your corrections are kept. If all providers fail, the
           app says so — it never invents a number to fill silence. The coach will not
@@ -75,7 +75,7 @@ export default function DataAndAiPage() {
           Allergen and condition notices are generated from menu text and your profile.
           They are advisories, not guarantees: menu descriptions are incomplete and
           kitchens change. <strong>Always confirm allergens directly with the restaurant
-          before ordering.</strong> When you order through Forkcast, your flagged allergens
+          before ordering.</strong> When you order through Palatify, your flagged allergens
           are passed to the restaurant with the order — but that transmission also does
           not replace direct confirmation.
         </p>

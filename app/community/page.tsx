@@ -6,7 +6,7 @@
 import Link from "next/link";
 import { CalendarDays, ChefHat, Footprints, HeartPulse, Store, Users } from "lucide-react";
 
-export const metadata = { title: "Community — Forkcast" };
+export const metadata = { title: "Community — Palatify" };
 
 const PLANNED = [
   {
@@ -37,7 +37,7 @@ export default function CommunityPage() {
       <p className="kicker text-brand-700">Boston</p>
       <h1 className="mt-1 font-display text-3xl font-extrabold text-ink sm:text-4xl">Community</h1>
       <p className="mt-3 max-w-2xl text-lg text-ink/65">
-        Eating well is easier together. Alongside the app, Forkcast will run free, health-focused community
+        Eating well is easier together. Alongside the app, Palatify will run free, health-focused community
         events with our partner restaurants.
       </p>
 
@@ -45,7 +45,7 @@ export default function CommunityPage() {
       <div className="mt-6 flex items-start gap-3 rounded-2xl border-2 border-ink/40 bg-white p-5">
         <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
         <p className="text-sm text-ink/70">
-          <strong className="text-ink">No events are scheduled yet.</strong> The calendar opens when Forkcast launches in Boston
+          <strong className="text-ink">No events are scheduled yet.</strong> The calendar opens when Palatify launches in Boston
           with its first verified partner restaurants. What follows is the plan — not a promise of dates.
         </p>
       </div>

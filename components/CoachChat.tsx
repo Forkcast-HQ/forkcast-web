@@ -1,6 +1,6 @@
 "use client";
 
-// Forkcast Coach — floating AI chat for diners. Honest constraints:
+// Palatify Coach — floating AI chat for diners. Honest constraints:
 // answers carry a not-medical-advice footer; when the server AI key isn't
 // available (e.g. the static demo site), the widget says so instead of faking.
 
@@ -23,7 +23,7 @@ const QUICK_PERSONAL = [
   "High-protein picks under 600 cal?",
 ];
 const QUICK_GENERAL = [
-  "How does Forkcast work?",
+  "How does Palatify work?",
   "What makes a restaurant meal balanced?",
   "Why should I set up a profile?",
 ];
@@ -89,7 +89,7 @@ export function CoachChat() {
           role: "assistant",
           content: res.ok && body.reply
             ? body.reply
-            : `The coach can't answer right now${body?.error ? ` (${body.error})` : ""}. Everything else in Forkcast still works.`,
+            : `The coach can't answer right now${body?.error ? ` (${body.error})` : ""}. Everything else in Palatify still works.`,
         },
       ]);
     } catch {
@@ -104,7 +104,7 @@ export function CoachChat() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          aria-label="Open Forkcast Coach"
+          aria-label="Open Palatify Coach"
           className="fixed bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))] right-4 z-50 grid h-14 w-14 place-items-center rounded-full bg-ink text-white shadow-[0_8px_30px_-6px_rgba(32,30,29,0.5)] transition hover:scale-105 hover:bg-black"
         >
           <MessageCircle className="h-6 w-6" />
@@ -118,7 +118,7 @@ export function CoachChat() {
             <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-600"><Sparkles className="h-4 w-4" /></span>
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-1.5 font-display text-sm font-bold">
-                Forkcast Coach
+                Palatify Coach
                 {isPremium ? (
                   <span className="inline-flex items-center gap-0.5 rounded-full bg-brand-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"><Crown className="h-2.5 w-2.5" /> Premium</span>
                 ) : trialActive ? (
@@ -140,7 +140,7 @@ export function CoachChat() {
               <div className="rounded-2xl border-2 border-brand-500 bg-brand-50 p-4">
                 <p className="flex items-center gap-1.5 font-display font-bold text-ink"><Crown className="h-4 w-4 text-brand-600" /> Your {TRIAL_DAYS}-day trial has ended</p>
                 <p className="mt-1.5 text-sm text-ink/65">
-                  The coach, unlimited photo AI, and metabolic calibration are part of <strong>Forkcast Premium</strong> ({PRICE_LINE}).
+                  The coach, unlimited photo AI, and metabolic calibration are part of <strong>Palatify Premium</strong> ({PRICE_LINE}).
                   Everything core stays free forever: Fit Scores, discovery, ordering, and confirmed meal logging.
                 </p>
                 {premiumRequested ? (
@@ -161,7 +161,7 @@ export function CoachChat() {
                 <p className="text-sm text-ink/60">
                   {profile
                     ? <>Hi{profile.name ? ` ${profile.name.split(" ")[0]}` : ""} — I can help you pick dishes for what&apos;s left of your day, explain your numbers, or navigate menus with your flags in mind.</>
-                    : <>Hi — I can answer general nutrition and Forkcast questions. <Link href="/onboarding" className="font-semibold text-brand-700 underline" onClick={() => setOpen(false)}>Set up your profile</Link> and I&apos;ll tailor everything to your own targets, allergies, and remaining budget.</>}
+                    : <>Hi — I can answer general nutrition and Palatify questions. <Link href="/onboarding" className="font-semibold text-brand-700 underline" onClick={() => setOpen(false)}>Set up your profile</Link> and I&apos;ll tailor everything to your own targets, allergies, and remaining budget.</>}
                 </p>
                 <div className="mt-3 flex flex-col gap-1.5">
                   {(profile ? QUICK_PERSONAL : QUICK_GENERAL).map((qp) => (

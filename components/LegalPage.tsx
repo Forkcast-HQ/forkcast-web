@@ -17,8 +17,8 @@ export function LegalPage({
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
       <span className="text-sm font-bold uppercase tracking-widest text-brand-600">{kicker}</span>
       <h1 className="mt-2 font-display text-4xl font-extrabold tracking-tight text-ink">{title}</h1>
-      <p className="mt-2 text-sm text-ink/50">Last updated: {updated} · Applies to the Forkcast web app and mobile apps.</p>
-      <div className="prose-forkcast mt-8 space-y-4 text-[15px] leading-relaxed text-ink/80">{children}</div>
+      <p className="mt-2 text-sm text-ink/50">Last updated: {updated} · Applies to the Palatify web app and mobile apps.</p>
+      <div className="prose-palatify mt-8 space-y-4 text-[15px] leading-relaxed text-ink/80">{children}</div>
     </div>
   );
 }

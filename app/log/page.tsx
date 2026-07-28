@@ -49,7 +49,7 @@ export default function LogPage() {
     const payload = {
       exported: new Date().toISOString(),
       disclaimer:
-        "Forkcast meal log export. Nutrition values are estimates or partner-reviewed data, not measurements. Order references refer to demo (prototype) orders unless otherwise stated.",
+        "Palatify meal log export. Nutrition values are estimates or partner-reviewed data, not measurements. Order references refer to demo (prototype) orders unless otherwise stated.",
       entries: meals.map((m) => ({
         loggedAt: new Date(m.loggedAt).toISOString(),
         name: m.name,
@@ -73,7 +73,7 @@ export default function LogPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `forkcast-log-${todayKey()}.json`;
+    a.download = `palatify-log-${todayKey()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

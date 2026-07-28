@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "The opportunity — Forkcast",
-  description: "Why Forkcast, the market, the model, and the ask.",
+  title: "The opportunity — Palatify",
+  description: "Why Palatify, the market, the model, and the ask.",
 };
 
 export default function Business() {
@@ -29,7 +29,7 @@ export default function Business() {
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-white/70">
             Americans eat a record share of meals out and badly misjudge what&apos;s
-            in them. Every nutrition app still makes you log <em>after</em>. Forkcast
+            in them. Every nutrition app still makes you log <em>after</em>. Palatify
             recommends the right dish at a nearby restaurant <em>before</em> you order —
             and gets restaurants to pay to be the recommendation.
           </p>

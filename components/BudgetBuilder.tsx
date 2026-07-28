@@ -194,7 +194,7 @@ export function BudgetBuilder() {
 
         <p className="mt-4 text-xs leading-relaxed text-ink/45">
           Computed with the Mifflin-St Jeor equation — the same clinical formula dietitians use — then
-          adjusted for your goal. This is exactly what Forkcast sets as your budget on day one.
+          adjusted for your goal. This is exactly what Palatify sets as your budget on day one.
         </p>
       </div>
     </div>

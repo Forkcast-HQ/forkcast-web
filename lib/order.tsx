@@ -1,6 +1,6 @@
 "use client";
 
-// Forkcast ordering layer — basket, prototype-safe checkout, simulated kitchen
+// Palatify ordering layer — basket, prototype-safe checkout, simulated kitchen
 // status, and the post-order "Log this meal?" confirmation workflow.
 //
 // HONESTY CONSTRAINTS (carry into production):
@@ -56,7 +56,7 @@ export const STATUS_STEP: Record<OrderStatus, number> = {
   ready: 3,
 };
 
-const ordersKey = (id: string) => `forkcast.orders.${id}`;
+const ordersKey = (id: string) => `palatify.orders.${id}`;
 
 interface PersistShape {
   cart: CartLine[];
@@ -296,7 +296,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         }
         if (it.note) flags.push(`Request for ${it.name}: "${it.note}"`);
       }
-      const customer = profile?.name || user?.name || "Forkcast diner";
+      const customer = profile?.name || user?.name || "Palatify diner";
 
       // Persist to Supabase with the live-order fields the restaurant terminal
       // reads (status/customer/flags), so a real restaurant receives it.

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Forkcast AI layer (swappable).
+// Palatify AI layer (swappable).
 //
 // REAL AI: analyzeMeal always POSTs to /api/analyze, which calls a vision
 // model server-side. On deployments without the API (static export) or

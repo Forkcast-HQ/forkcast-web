@@ -1,8 +1,8 @@
 import { LegalPage, LSection } from "@/components/LegalPage";
 
 export const metadata = {
-  title: "Privacy Policy — Forkcast",
-  description: "How Forkcast collects, uses, protects, and deletes your data.",
+  title: "Privacy Policy — Palatify",
+  description: "How Palatify collects, uses, protects, and deletes your data.",
 };
 
 // DRAFT for legal review before store submission. Written to be accurate to
@@ -12,7 +12,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage kicker="Legal" title="Privacy Policy" updated="July 19, 2026">
       <p>
-        Forkcast helps you choose, order, and log restaurant meals against your own
+        Palatify helps you choose, order, and log restaurant meals against your own
         nutrition targets. That requires health-related information, so we hold
         ourselves to a stricter standard than a typical app: we collect only what the
         product needs, we never sell or rent your data, we never use your health data
@@ -95,7 +95,7 @@ export default function PrivacyPage() {
       <LSection title="Restaurants and third-party content">
         <p>
           All restaurant names, logos, and brands are the property of their respective
-          owners. Forkcast is not affiliated with, endorsed by, or sponsored by any
+          owners. Palatify is not affiliated with, endorsed by, or sponsored by any
           restaurant or brand unless a partnership is explicitly labeled in the app.
           Nutrition values carry their source with them: partner-verified, published by
           the restaurant, or estimated by our engine with an uncertainty label — see{" "}
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
 
       <LSection title="Children">
         <p>
-          Forkcast is not directed to children under 13, and we do not knowingly collect
+          Palatify is not directed to children under 13, and we do not knowingly collect
           personal information from them. If you believe a child has provided us
           information, contact us and we will delete it.
         </p>

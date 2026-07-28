@@ -4,8 +4,8 @@ import { BudgetBuilder } from "@/components/BudgetBuilder";
 import { FitScoreExplorer } from "@/components/FitScoreExplorer";
 
 export const metadata = {
-  title: "How it works — Forkcast",
-  description: "The science, the Fit Score, and the system architecture behind Forkcast.",
+  title: "How it works — Palatify",
+  description: "The science, the Fit Score, and the system architecture behind Palatify.",
 };
 
 export default function HowItWorks() {
@@ -19,7 +19,7 @@ export default function HowItWorks() {
             Real formulas. Honest estimates. A recommendation you can act on.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-ink/65">
-            Forkcast turns your body metrics into daily targets, scores every nearby
+            Palatify turns your body metrics into daily targets, scores every nearby
             dish against them, and closes the loop with a quick photo. No black boxes —
             here&apos;s exactly how each part works.
           </p>
@@ -64,7 +64,7 @@ export default function HowItWorks() {
         </h2>
         <p className="mt-3 max-w-2xl text-ink/65">
           Set your metrics and watch your daily calorie and macro targets recompute live, using the same
-          clinical equation Forkcast runs on day one.
+          clinical equation Palatify runs on day one.
         </p>
         <div className="mt-8">
           <BudgetBuilder />
@@ -106,9 +106,9 @@ export default function HowItWorks() {
               <CompareLi ok={false}>Recommendation is a dead end — no order, no log</CompareLi>
             </ul>
           </div>
-          {/* Forkcast — evidence-carrying number */}
+          {/* Palatify — evidence-carrying number */}
           <div className="rounded-3xl border-2 border-brand-500 bg-brand-50/50 p-7">
-            <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Forkcast</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Palatify</p>
             <div className="mt-5 rounded-2xl border border-black/5 bg-white p-5 card-shadow">
               <div className="flex items-start justify-between gap-2">
                 <p className="font-display text-lg font-bold text-ink">Grilled Chicken Bowl</p>

@@ -24,10 +24,10 @@ export const FREE_DAILY_MESSAGES = 25; // coach-chat cap during trial (Premium: 
 export const PRICE_LINE = "$4.99/mo or $39.99/yr";
 
 const DAY = 86400000;
-const premiumKey = (id: string) => `forkcast.premium.${id}`;
+const premiumKey = (id: string) => `palatify.premium.${id}`;
 const chatCountKey = (id: string) => {
   const d = new Date();
-  return `forkcast.chatcount.${id}.${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  return `palatify.chatcount.${id}.${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 };
 
 export interface PremiumState {
@@ -96,8 +96,8 @@ export function usePremium(): PremiumState {
 
   useEffect(() => {
     refresh();
-    window.addEventListener("forkcast-premium-change", refresh);
-    return () => window.removeEventListener("forkcast-premium-change", refresh);
+    window.addEventListener("palatify-premium-change", refresh);
+    return () => window.removeEventListener("palatify-premium-change", refresh);
   }, [refresh]);
 
   // Cloud: server-side plan decides (with optional expiry). Demo: local flag.
@@ -135,7 +135,7 @@ export function usePremium(): PremiumState {
             console.warn("[premium] request failed:", error.message);
             setRequested(false);
           }
-          window.dispatchEvent(new Event("forkcast-premium-change"));
+          window.dispatchEvent(new Event("palatify-premium-change"));
         });
       return;
     }
@@ -144,7 +144,7 @@ export function usePremium(): PremiumState {
     } catch {
       /* ignore */
     }
-    window.dispatchEvent(new Event("forkcast-premium-change"));
+    window.dispatchEvent(new Event("palatify-premium-change"));
   }, [id, cloud, user]);
 
   const cancelDemo = useCallback(() => {
@@ -154,7 +154,7 @@ export function usePremium(): PremiumState {
     } catch {
       /* ignore */
     }
-    window.dispatchEvent(new Event("forkcast-premium-change"));
+    window.dispatchEvent(new Event("palatify-premium-change"));
   }, [id, cloud]);
 
   return {

@@ -99,7 +99,7 @@ export default function Profile() {
   };
 
   const handleDisconnectHealth = async () => {
-    if (!confirm("Disconnect Fitbit / Google Health? Forkcast will stop syncing meals and steps/calories won't show on your dashboard.")) return;
+    if (!confirm("Disconnect Fitbit / Google Health? Palatify will stop syncing meals and steps/calories won't show on your dashboard.")) return;
     setHealthLoading("google_health");
     const ok = await disconnectGoogleHealth();
     setHealth((h) => (ok ? { ...h, googleHealth: { connected: false } } : h));
@@ -368,7 +368,7 @@ export default function Profile() {
                   <div>
                     <p className="text-sm font-semibold text-ink">WHOOP</p>
                     <p className="mt-0.5 text-sm text-ink/60">
-                      Connected — Forkcast reads your recovery score, day strain, calories burned, and sleep performance and shows them on your dashboard. This is read-only and one-way: Forkcast never writes anything back to WHOOP, and nothing is shared beyond your own dashboard. (WHOOP has no food log, so meal sync stays Fitbit-only.)
+                      Connected — Palatify reads your recovery score, day strain, calories burned, and sleep performance and shows them on your dashboard. This is read-only and one-way: Palatify never writes anything back to WHOOP, and nothing is shared beyond your own dashboard. (WHOOP has no food log, so meal sync stays Fitbit-only.)
                     </p>
                   </div>
                   <button
@@ -395,7 +395,7 @@ export default function Profile() {
                   </select>
                   {devicePick === "apple_watch" || devicePick === "samsung_health" ? (
                     <p className="text-xs text-ink/45">
-                      Needs Forkcast's mobile app — {devicePick === "apple_watch" ? "Apple Health" : "Samsung Health"} data lives on-device, not in a cloud API like Fitbit/WHOOP.
+                      Needs Palatify's mobile app — {devicePick === "apple_watch" ? "Apple Health" : "Samsung Health"} data lives on-device, not in a cloud API like Fitbit/WHOOP.
                     </p>
                   ) : (
                     <button
@@ -410,7 +410,7 @@ export default function Profile() {
               )}
               {!health.whoop.connected && devicePick === "whoop" && (
                 <p className="text-xs text-ink/45">
-                  Read-only: Forkcast reads your WHOOP recovery score, day strain, calories burned, and sleep performance to show on your dashboard — nothing is ever written back to WHOOP.
+                  Read-only: Palatify reads your WHOOP recovery score, day strain, calories burned, and sleep performance to show on your dashboard — nothing is ever written back to WHOOP.
                 </p>
               )}
             </Card>
@@ -431,7 +431,7 @@ export default function Profile() {
             {isPremium ? (
               cloud ? (
                 <a
-                  href={`mailto:support@prosperiumars.com?subject=Forkcast%20membership%20—%20manage%20or%20cancel&body=Account%20email%3A%20${encodeURIComponent(user?.email ?? "")}`}
+                  href={`mailto:support@prosperiumars.com?subject=Palatify%20membership%20—%20manage%20or%20cancel&body=Account%20email%3A%20${encodeURIComponent(user?.email ?? "")}`}
                   className="inline-flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-ink/70 hover:border-black/20"
                 >
                   Manage or cancel membership

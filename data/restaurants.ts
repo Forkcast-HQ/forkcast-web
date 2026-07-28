@@ -1,7 +1,7 @@
 import type { MenuItem, Restaurant } from "@/lib/types";
 
 // Boston-area seed catalog. Nutrition values are realistic, dish-level estimates
-// (the kind Forkcast would compute from a menu via its nutrition engine).
+// (the kind Palatify would compute from a menu via its nutrition engine).
 // Sodium in mg, everything else in grams unless noted.
 
 const mi = (
@@ -44,7 +44,7 @@ export const RESTAURANTS: Restaurant[] = [
     lng: -71.0793,
     partner: true,
     blurb:
-      "Chef-built grain bowls and salads with every macro published. A Forkcast launch partner.",
+      "Chef-built grain bowls and salads with every macro published. A Palatify launch partner.",
     category: "salad-bar",
     tags: ["healthy", "gluten-free options", "high-protein"],
     menu: [
@@ -248,7 +248,7 @@ export const RESTAURANTS: Restaurant[] = [
   // ================= REAL RESTAURANTS =================
   // The entries below are real restaurants. Nutrition provenance is labeled
   // per restaurant via dataSource/sourceNote. Prices, ratings, delivery
-  // estimates, and coordinates are approximate placeholders — Forkcast is
+  // estimates, and coordinates are approximate placeholders — Palatify is
   // NOT affiliated with any of these businesses. Where a restaurant publishes
   // nutrition, we quote it and estimate only the missing fields (noted).
 
@@ -268,9 +268,9 @@ export const RESTAURANTS: Restaurant[] = [
     partner: false,
     dataSource: "published",
     sourceNote:
-      "Calories, protein, carbs, and fat as published at sweetgreen.com/menu (retrieved July 15, 2026, Summer menu). Fiber, sodium, and sugar are Forkcast engine estimates. Not affiliated with Sweetgreen, Inc.",
+      "Calories, protein, carbs, and fat as published at sweetgreen.com/menu (retrieved July 15, 2026, Summer menu). Fiber, sodium, and sugar are Palatify engine estimates. Not affiliated with Sweetgreen, Inc.",
     blurb:
-      "The national fast-casual salad chain publishes per-dish macros and allergens — the transparency standard Forkcast wants every independent restaurant to reach.",
+      "The national fast-casual salad chain publishes per-dish macros and allergens — the transparency standard Palatify wants every independent restaurant to reach.",
     category: "salad-bar",
     tags: ["healthy", "published nutrition", "vegan options"],
     menu: [
@@ -303,7 +303,7 @@ export const RESTAURANTS: Restaurant[] = [
     partner: false,
     dataSource: "published",
     sourceNote:
-      "Nutrition from thehalalguys.com/nutritional-guide (retrieved July 15, 2026; page dated April 2026). Platter values combine the published protein + rice servings; fields the guide leaves blank are Forkcast estimates. Halal certification per their published program. Not affiliated with The Halal Guys.",
+      "Nutrition from thehalalguys.com/nutritional-guide (retrieved July 15, 2026; page dated April 2026). Platter values combine the published protein + rice servings; fields the guide leaves blank are Palatify estimates. Halal certification per their published program. Not affiliated with The Halal Guys.",
     blurb:
       "The halal street-cart institution publishes a full nutrition and allergen guide — platters, gyros, falafel and all. A model case for halal-conscious diners.",
     category: "mediterranean-resto",
@@ -335,9 +335,9 @@ export const RESTAURANTS: Restaurant[] = [
     partner: false,
     dataSource: "estimated",
     sourceNote:
-      "Boston's homegrown vegetarian fast-food chain publishes ingredients but not full per-dish macros — all values are Forkcast engine estimates from the public menu (July 2026). Not affiliated with Clover Food Lab.",
+      "Boston's homegrown vegetarian fast-food chain publishes ingredients but not full per-dish macros — all values are Palatify engine estimates from the public menu (July 2026). Not affiliated with Clover Food Lab.",
     blurb:
-      "A Boston vegetarian institution built around seasonal sandwiches — exactly the beloved independent that publishes no nutrition numbers. Forkcast estimates them, honestly labeled.",
+      "A Boston vegetarian institution built around seasonal sandwiches — exactly the beloved independent that publishes no nutrition numbers. Palatify estimates them, honestly labeled.",
     category: "cafe",
     tags: ["vegetarian", "vegan options", "local"],
     menu: [
@@ -365,7 +365,7 @@ export const RESTAURANTS: Restaurant[] = [
     partner: false,
     dataSource: "estimated",
     sourceNote:
-      "This organic vegetarian cafe does not publish per-dish macros — all values are Forkcast engine estimates from the public menu (July 2026). Not affiliated with Life Alive.",
+      "This organic vegetarian cafe does not publish per-dish macros — all values are Palatify engine estimates from the public menu (July 2026). Not affiliated with Life Alive.",
     blurb:
       "Warm grain bowls, broths, and smoothies from a much-loved plant-based cafe — a vegan/vegetarian showcase for confidence-labeled estimation.",
     category: "cafe",
@@ -395,9 +395,9 @@ export const RESTAURANTS: Restaurant[] = [
     partner: false,
     dataSource: "estimated",
     sourceNote:
-      "A Boston-area burrito institution with no published nutrition — all values are Forkcast engine estimates from the public menu (July 2026). Not affiliated with Anna's Taqueria.",
+      "A Boston-area burrito institution with no published nutrition — all values are Palatify engine estimates from the public menu (July 2026). Not affiliated with Anna's Taqueria.",
     blurb:
-      "Beloved super burritos since 1995 and not a nutrition number in sight — the everyday independent Forkcast exists to make legible.",
+      "Beloved super burritos since 1995 and not a nutrition number in sight — the everyday independent Palatify exists to make legible.",
     category: "mexican-resto",
     tags: ["local", "vegetarian options"],
     menu: [

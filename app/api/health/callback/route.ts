@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 // Google's OAuth redirect lands here as a plain browser GET — no
 // Authorization header, no live Supabase session. The `state` param (minted
 // in app/api/health/connect and stored in oauth_states) is how we recover
-// which Forkcast user was connecting.
+// which Palatify user was connecting.
 function redirectTo(origin: string, path: string) {
   return NextResponse.redirect(new URL(path, origin));
 }

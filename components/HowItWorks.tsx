@@ -3,7 +3,7 @@
 /**
  * HowItWorks — the landing-page "How it works" flow.
  *
- * A single live Forkcast app card that updates in place across four steps:
+ * A single live Palatify app card that updates in place across four steps:
  *   01 Build your profile → your daily budget ring
  *   02 See what fits      → a real dish gets its Fit Score
  *   03 Order or dine in   → the dish drops onto the plate, budget updates
@@ -297,7 +297,7 @@ export function HowItWorks({
             <span className="glass-red grid h-4 w-4 place-items-center rounded-[5px]">
               <Flame className="h-2.5 w-2.5" />
             </span>
-            Forkcast
+            Palatify
           </span>
           <span className="text-xs font-medium text-ink/45">· Today</span>
           <span className="ml-auto rounded-full bg-brand-50 px-2.5 py-1 text-[11.5px] font-semibold text-brand-700">

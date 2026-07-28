@@ -216,7 +216,7 @@ export default function PartnerTerminal() {
 
       <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="kicker text-brand-700">Forkcast for restaurants</p>
+          <p className="kicker text-brand-700">Palatify for restaurants</p>
           <h1 className="mt-1 flex items-center gap-2.5 font-display text-3xl font-extrabold text-ink">
             <MonitorSmartphone className="h-7 w-7 text-ink/40" /> {mode === "live" ? owner!.name : "Partner terminal"}
           </h1>
@@ -348,7 +348,7 @@ export default function PartnerTerminal() {
                   {RESTAURANTS.map((r) => (<option key={r.slug} value={r.slug}>{r.name}{r.partner ? " · partner" : ""}</option>))}
                 </select>
               </div>
-              <p className="mt-1.5 text-xs text-ink/55">Restaurants review Forkcast&apos;s nutrition values and correct them. Every correction is <strong>versioned and timestamped, never silent</strong>.</p>
+              <p className="mt-1.5 text-xs text-ink/55">Restaurants review Palatify&apos;s nutrition values and correct them. Every correction is <strong>versioned and timestamped, never silent</strong>.</p>
               {seedRestaurant && <CorrectionEditor slug={slug} onSaved={refreshDemo} />}
               <div className="mt-5 border-t border-black/5 pt-4">
                 <p className="flex items-center gap-1.5 text-sm font-bold text-ink"><History className="h-4 w-4 text-ink/40" /> Correction log — {seedRestaurant?.name}</p>

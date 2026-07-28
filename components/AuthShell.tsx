@@ -44,7 +44,7 @@ export function AuthShell({
         <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-600 opacity-90" aria-hidden="true" />
         <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full border-[14px] border-brand-600/40" aria-hidden="true" />
         <div className="relative">
-          <Logo textClass="text-white" />
+          <Logo variant="dark" />
         </div>
         <div className="relative">
           <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-brand-300">

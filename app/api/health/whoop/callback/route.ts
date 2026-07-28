@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 // app/api/health/callback/route.ts (Google Health): no Authorization header,
 // no live Supabase session, so the `state` param (minted in
 // app/api/health/whoop/connect, stored in oauth_states) recovers which
-// Forkcast user was connecting.
+// Palatify user was connecting.
 function redirectTo(origin: string, path: string) {
   return NextResponse.redirect(new URL(path, origin));
 }

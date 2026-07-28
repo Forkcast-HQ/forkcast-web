@@ -14,7 +14,7 @@ import { HowItWorksRestaurant } from "@/components/HowItWorksRestaurant";
 import { restaurantImg } from "@/lib/images";
 
 export const metadata = {
-  title: "For restaurants — Forkcast",
+  title: "For restaurants — Palatify",
   description: "Get discovered by diners who came to eat well.",
 };
 
@@ -32,7 +32,7 @@ export default function ForRestaurants() {
               Get discovered by diners who came to eat well.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-ink/65">
-              Forkcast turns your menu into per-dish nutrition, surfaces your best
+              Palatify turns your menu into per-dish nutrition, surfaces your best
               options to people actively chasing a goal, and sends you higher-intent,
               more loyal customers — chains and independents alike.
             </p>
@@ -132,7 +132,7 @@ export default function ForRestaurants() {
             href="/signup?role=restaurant"
             className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-7 py-4 text-base font-semibold text-white hover:bg-brand-700"
           >
-            Partner with Forkcast <ArrowRight className="h-5 w-5" />
+            Partner with Palatify <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
       </section>

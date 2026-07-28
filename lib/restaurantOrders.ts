@@ -19,7 +19,7 @@ function mapRow(r: any): LiveOrderBus {
     ref: r.ref,
     slug: r.slug,
     restName: r.restaurant_name,
-    customer: r.customer_name || "Forkcast diner",
+    customer: r.customer_name || "Palatify diner",
     placedAt: new Date(r.placed_at).getTime(),
     fulfill: r.fulfill,
     items: (o.items ?? []).map((it) => ({

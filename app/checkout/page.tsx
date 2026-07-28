@@ -29,7 +29,7 @@ export default function CheckoutPage() {
   const { hydrated, cartItems, cartTotals, cartRestaurantSlug, placeOrder } = useOrder();
   const { getRestaurant, loading: catalogLoading } = useCatalog();
   const [fulfill, setFulfill] = useState<Fulfillment>("pickup");
-  const [payMethod, setPayMethod] = useState<"Forkcast Pay" | "Card">("Forkcast Pay");
+  const [payMethod, setPayMethod] = useState<"Palatify Pay" | "Card">("Palatify Pay");
   const [placed, setPlaced] = useState(false);
 
   if (!hydrated || !authHydrated || catalogLoading) return <Shell><p className="py-20 text-center text-ink/40">Loading…</p></Shell>;
@@ -138,7 +138,7 @@ export default function CheckoutPage() {
               <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700">Demo — nothing is charged</span>
             </div>
             <div className="mt-4 flex gap-2.5">
-              {(["Forkcast Pay", "Card"] as const).map((m) => (
+              {(["Palatify Pay", "Card"] as const).map((m) => (
                 <button
                   key={m}
                   onClick={() => setPayMethod(m)}
@@ -151,7 +151,7 @@ export default function CheckoutPage() {
                     <CreditCard className="h-4 w-4 text-ink/50" /> {m}
                   </span>
                   <span className="mt-0.5 block text-xs text-ink/50">
-                    {m === "Forkcast Pay" ? "Planned wallet — mock" : "No card entry — payment processing not connected"}
+                    {m === "Palatify Pay" ? "Planned wallet — mock" : "No card entry — payment processing not connected"}
                   </span>
                 </button>
               ))}

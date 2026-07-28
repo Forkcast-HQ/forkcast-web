@@ -29,7 +29,7 @@ import {
 } from "./cloud";
 import { syncMealToGoogleHealth } from "./health";
 
-const dataKey = (id: string) => `forkcast.data.${id}`;
+const dataKey = (id: string) => `palatify.data.${id}`;
 
 interface PersistShape {
   profile: HealthProfile | null;

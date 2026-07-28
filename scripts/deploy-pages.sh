@@ -8,8 +8,8 @@ set -eo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT="$ROOT/out"
-PAGES_REPO="https://github.com/Seymurhh/forkcast-live.git"
-BASE="/forkcast-live"
+PAGES_REPO="https://github.com/Seymurhh/palatify-live.git"
+BASE="/palatify-live"
 
 # Static export cannot include server route handlers (POST /api/analyze).
 # Stash app/api for the export build, then restore it (SSR/dev keep it).
@@ -59,8 +59,8 @@ fi
 git config user.name "Seymur Hasanov"
 git config user.email "shasanov@seas.harvard.edu"
 git add -A
-git commit -q -m "Forkcast static site (compiled app only)"
+git commit -q -m "Palatify static site (compiled app only)"
 git remote add origin "$PAGES_REPO" 2>/dev/null || git remote set-url origin "$PAGES_REPO"
 git push -f origin main
 
-echo "Deployed -> https://seymurhh.github.io/forkcast-live/"
+echo "Deployed -> https://seymurhh.github.io/palatify-live/"

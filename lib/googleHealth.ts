@@ -49,7 +49,7 @@ function env(name: string): string {
 }
 
 /** Builds the Google OAuth 2.0 consent URL. `state` should be a random,
- * single-use token you can look up to recover which Forkcast user is
+ * single-use token you can look up to recover which Palatify user is
  * connecting (see app/api/health/connect/route.ts). */
 export function buildAuthUrl(state: string): string {
   const params = new URLSearchParams({
@@ -140,10 +140,10 @@ export interface MealForSync {
 
 /** dataPoint id must be lowercase letters/numbers/hyphens, 4-63 chars
  * (confirmed in the `DataPoint.name` format docs) — deriving it from the
- * Forkcast meal id makes re-syncing an edited meal idempotent (create once,
+ * Palatify meal id makes re-syncing an edited meal idempotent (create once,
  * PATCH thereafter) instead of creating duplicates. */
 function nutritionDataPointId(mealId: string): string {
-  return `forkcast-${mealId}`.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 63);
+  return `palatify-${mealId}`.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 63);
 }
 
 export async function pushNutritionLog(accessToken: string, meal: MealForSync): Promise<void> {

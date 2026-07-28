@@ -1,13 +1,13 @@
 // Cross-surface sync bus + versioned menu corrections.
 // Design-handoff protocol: localStorage is the prototype transport
-// (`forkcast-live-order`, `forkcast-corrections`). Replace with a real
+// (`palatify-live-order`, `palatify-corrections`). Replace with a real
 // backend channel (e.g. Postgres + subscriptions) in production.
 
 import type { LiveOrderBus, MenuCorrection } from "./types";
 import { uid } from "./format";
 
-const BUS_KEY = "forkcast-live-order";
-const CORRECTIONS_KEY = "forkcast-corrections";
+const BUS_KEY = "palatify-live-order";
+const CORRECTIONS_KEY = "palatify-corrections";
 
 export function readBus(): LiveOrderBus | null {
   if (typeof window === "undefined") return null;

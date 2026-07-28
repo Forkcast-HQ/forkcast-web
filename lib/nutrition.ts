@@ -1,4 +1,4 @@
-// Forkcast nutrition engine — real, citable formulas (no black boxes).
+// Palatify nutrition engine — real, citable formulas (no black boxes).
 //
 // BMR: Mifflin-St Jeor (1990) — the most accurate widely-used predictive equation.
 // TDEE: BMR x activity factor (Harris-Benedict activity multipliers).

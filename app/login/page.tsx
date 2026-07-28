@@ -9,7 +9,7 @@ import { AuthShell, AuthField, type AuthPanelContent } from "@/components/AuthSh
 import { cls } from "@/lib/format";
 
 const RESTAURANT_PANEL: AuthPanelContent = {
-  kicker: "Forkcast for restaurants",
+  kicker: "Palatify for restaurants",
   headline: "Your order terminal and menu tools.",
   bullets: [
     "Live orders with customer allergy flags",

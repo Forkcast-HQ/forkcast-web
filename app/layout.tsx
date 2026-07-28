@@ -12,7 +12,7 @@ import { CartBar } from "@/components/CartBar";
 import { CoachChat } from "@/components/CoachChat";
 
 export const metadata: Metadata = {
-  title: "Forkcast — Know before you go",
+  title: "Palatify — Know before you go",
   description:
     "Nutrition-aware restaurant recommendations. Plan what you'll eat out before you go, match dishes to your goals, and track every meal.",
 };

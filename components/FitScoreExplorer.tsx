@@ -6,7 +6,7 @@
  * Pick a real catalog dish and a goal; the real fitScore() engine runs
  * and the five weighted sub-scores animate in, with the "why" reasons
  * and warnings. Adding a health condition or an allergen shows how
- * Forkcast adapts — condition advisories (real conditionWarnings()) and
+ * Palatify adapts — condition advisories (real conditionWarnings()) and
  * allergen exclusion — WITHOUT changing the Fit Score itself. Dark theme.
  */
 
@@ -296,7 +296,7 @@ export function FitScoreExplorer() {
             <Ban className="mt-0.5 h-5 w-5 shrink-0 text-[#f09595]" />
             <div className="text-sm text-white/85">
               <span className="font-semibold text-white">Contains {hitAllergens.join(", ")}.</span> Excluded from your
-              recommendations — still shown on the menu, always flagged. Forkcast never hides a dish, it just won&apos;t
+              recommendations — still shown on the menu, always flagged. Palatify never hides a dish, it just won&apos;t
               suggest it.
             </div>
           </div>

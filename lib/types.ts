@@ -1,4 +1,4 @@
-// Shared domain types for Forkcast
+// Shared domain types for Palatify
 
 export type Sex = "male" | "female";
 export type Goal = "lose" | "maintain" | "gain";
@@ -67,10 +67,10 @@ export interface Restaurant {
   distanceMi: number;
   lat: number;
   lng: number;
-  partner: boolean; // featured Forkcast partner (demo verification pattern)
+  partner: boolean; // featured Palatify partner (demo verification pattern)
   // Nutrition-data provenance for real restaurants:
   //  "published" — values from the restaurant's own public nutrition disclosure
-  //  "estimated" — Forkcast engine estimates from the public menu
+  //  "estimated" — Palatify engine estimates from the public menu
   //  "verified" — reviewed and confirmed directly with the restaurant
   // (undefined = original demo catalog entry)
   dataSource?: "published" | "estimated" | "verified";

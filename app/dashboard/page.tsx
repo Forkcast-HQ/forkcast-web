@@ -55,7 +55,7 @@ export default function Dashboard() {
   const tipFetched = useRef(false);
   useEffect(() => {
     if (!user || !profile || !targets || !hydrated || !hasAccess || tipFetched.current) return;
-    const key = `forkcast.aitip.${user.id}.${todayKey()}`;
+    const key = `palatify.aitip.${user.id}.${todayKey()}`;
     try {
       const cached = localStorage.getItem(key);
       if (cached) { setAiTip(cached); tipFetched.current = true; return; }
@@ -207,7 +207,7 @@ export default function Dashboard() {
     if (!goalKg || !profile) return null;
     const h = profile.heightCm / 100;
     if (goalKg / (h * h) < 18.5) {
-      return "That goal weight is below the healthy BMI range, so Forkcast won't coach toward it. Consider discussing targets with a clinician.";
+      return "That goal weight is below the healthy BMI range, so Palatify won't coach toward it. Consider discussing targets with a clinician.";
     }
     if (weights.length < 3) return "Log a few weigh-ins and your trend toward the goal will appear here.";
     const first = weights[Math.max(0, weights.length - 8)];
@@ -673,7 +673,7 @@ export default function Dashboard() {
                 2,750 — no formula required.
               </p>
               <p>
-                Forkcast starts you on the clinical-standard Mifflin-St Jeor estimate, then blends toward your observed
+                Palatify starts you on the clinical-standard Mifflin-St Jeor estimate, then blends toward your observed
                 burn as your logs accumulate — weighted by data confidence, capped conservatively, and recalculated over
                 a rolling 28-day window so one unusual week can&apos;t distort your target. Sparse days (under 1,000 kcal
                 logged) are treated as incomplete and excluded rather than misread as dieting.

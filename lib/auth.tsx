@@ -44,19 +44,19 @@ interface AuthValue {
   resetPassword: (input: { email: string; newPassword: string }) => Promise<AuthResult>;
 }
 
-const LAST_EMAIL_KEY = "forkcast.lastEmail";
+const LAST_EMAIL_KEY = "palatify.lastEmail";
 const rememberEmail = (e: string) => { try { localStorage.setItem(LAST_EMAIL_KEY, e); } catch { /* ignore */ } };
 export const lastEmail = (): string => { try { return localStorage.getItem(LAST_EMAIL_KEY) ?? ""; } catch { return ""; } };
 
-const ACCOUNTS_KEY = "forkcast.accounts";
-const SESSION_KEY = "forkcast.session";
+const ACCOUNTS_KEY = "palatify.accounts";
+const SESSION_KEY = "palatify.session";
 
 function hash(s: string): string {
   let h = 5381;
   for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
   return h.toString(16);
 }
-const pwHash = (pw: string) => hash(pw + "::forkcast.v1");
+const pwHash = (pw: string) => hash(pw + "::palatify.v1");
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
 
 const Ctx = createContext<AuthValue | null>(null);

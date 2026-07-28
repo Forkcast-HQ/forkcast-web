@@ -41,7 +41,7 @@ const STEPS = ["Listing", "Menu", "Publish"];
 // per-deployment Vercel preview URL, for instance, is protected by Vercel's
 // own login wall and isn't actually public. Override via env var if the
 // production domain ever changes (e.g. a custom domain).
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://forkcastmenu.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://palatify.com";
 
 export default function RestaurantOnboarding() {
   const { user, hydrated } = useAuth();
@@ -99,7 +99,7 @@ export default function RestaurantOnboarding() {
       <Centered>
         <Card>
           <h1 className="font-display text-2xl font-bold text-ink">Cloud storage required</h1>
-          <p className="mt-2 text-ink/60">Listing setup needs the connected Forkcast backend. This build is running in local demo mode.</p>
+          <p className="mt-2 text-ink/60">Listing setup needs the connected Palatify backend. This build is running in local demo mode.</p>
         </Card>
       </Centered>
     );
@@ -179,7 +179,7 @@ export default function RestaurantOnboarding() {
       <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-brand-600">
         <Store className="h-4 w-4" /> Restaurant setup
       </div>
-      <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink">Get your restaurant on Forkcast</h1>
+      <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink">Get your restaurant on Palatify</h1>
 
       {/* stepper */}
       <div className="mt-6 flex items-center gap-2">
@@ -228,7 +228,7 @@ export default function RestaurantOnboarding() {
           {rest.status === "published" ? (
             <div className="rounded-2xl border-2 border-brand-500 bg-brand-50/50 p-6 text-center">
               <CircleCheck className="mx-auto h-10 w-10 text-brand-600" />
-              <h2 className="mt-3 font-display text-2xl font-bold text-ink">{rest.name} is live on Forkcast</h2>
+              <h2 className="mt-3 font-display text-2xl font-bold text-ink">{rest.name} is live on Palatify</h2>
               <p className="mt-1 text-ink/60">Your verified listing and {menu.length} {menu.length === 1 ? "dish" : "dishes"} are now discoverable to diners.</p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <Link href="/partner" className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-700">Go to order terminal <ArrowRight className="h-4 w-4" /></Link>

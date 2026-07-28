@@ -3,7 +3,7 @@
 /**
  * HowItWorksRestaurant — the For Restaurants onboarding flow.
  *
- * The live card is the partner's Forkcast dashboard, updating in place:
+ * The live card is the partner's Palatify dashboard, updating in place:
  *   01 Claim your listing    → verified badge goes live
  *   02 Add your menu         → per-dish nutrition + Fit Score auto-compute
  *   03 Verify & publish      → review, publish, live to diners
@@ -44,7 +44,7 @@ const STEPS = [
     n: "02",
     label: "Menu",
     title: "Add your menu",
-    body: "Upload or paste your menu. Forkcast auto-computes per-dish calories, macros, and a Fit Score for every item — no lab bill.",
+    body: "Upload or paste your menu. Palatify auto-computes per-dish calories, macros, and a Fit Score for every item — no lab bill.",
     pill: "Analyzing",
   },
   {
@@ -278,7 +278,7 @@ export function HowItWorksRestaurant() {
             <span className="glass-red grid h-[18px] w-[18px] place-items-center rounded-md">
               <Store className="h-2.5 w-2.5" />
             </span>
-            Forkcast
+            Palatify
           </span>
           <span className="text-xs font-medium text-ink/45">· Partner</span>
           <span className="ml-auto rounded-full bg-brand-50 px-2.5 py-1 text-[11.5px] font-semibold text-brand-700">

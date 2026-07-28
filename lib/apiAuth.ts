@@ -1,7 +1,7 @@
 // Server-side identity check for API routes — new as of the Google
 // Health / Fitbit integration. Every route in this app before this feature
 // was stateless (app/api/analyze, app/api/chat); this is the first place
-// a route needs to know "which signed-in Forkcast user is calling."
+// a route needs to know "which signed-in Palatify user is calling."
 //
 // Convention: the client attaches the current Supabase session's access
 // token as `Authorization: Bearer <token>` (grabbed via

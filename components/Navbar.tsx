@@ -58,7 +58,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-cream/85 shadow-[0_8px_30px_-24px_rgba(32,22,15,0.45)] backdrop-blur-xl">
       <nav aria-label="Primary navigation" className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <Link href="/" className="shrink-0 rounded-xl" aria-label="Forkcast home">
+          <Link href="/" className="shrink-0 rounded-xl" aria-label="Palatify home">
             <Logo />
           </Link>
           <span className="hidden rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-700 lg:inline-flex">
