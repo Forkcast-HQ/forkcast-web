@@ -1,9 +1,14 @@
 import { cls } from "@/lib/format";
+import { accentArcPath, CUT_PCT, CUT_ROTATE, DRAWN_PCT } from "@/lib/mark";
 
 /**
- * Palatify combination mark: an open ring with a short accent stroke,
- * paired with the lowercase "palatify" wordmark. `variant="dark"` renders
- * the mark in a solid dark pill for use on dark backgrounds.
+ * Palatify combination mark. The plate is a ring with a 54° cut at the
+ * upper-right; the accent arc is CONCENTRIC with it — same centre, radius
+ * ×1.13 — sitting just outside the cut. `variant="dark"` renders the mark
+ * in a solid dark pill for use on dark backgrounds.
+ *
+ * At this size the stroke is deliberately heavier than the mark's drawn
+ * ratio: a hairline rim disappears at 24px. The geometry is identical.
  */
 export function Logo({
   className,
@@ -13,8 +18,8 @@ export function Logo({
   variant?: "light" | "dark";
 }) {
   const isDark = variant === "dark";
-  const ringStroke = isDark ? "#F7F4EC" : "#171310";
-  const textClass = isDark ? "text-white" : "text-ink";
+  const ink = isDark ? "#F3F2F2" : "#201e1d";
+  const textClass = isDark ? "text-cream" : "text-ink";
 
   return (
     <span
@@ -24,23 +29,23 @@ export function Logo({
         className,
       )}
     >
-      <svg viewBox="0 0 32 32" className="h-6 w-6 shrink-0" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 100 100" className="h-6 w-6 shrink-0 overflow-visible" fill="none" aria-hidden="true">
         <circle
-          cx="16"
-          cy="17"
-          r="10"
-          stroke={ringStroke}
-          strokeWidth="3.4"
+          cx="50"
+          cy="50"
+          r="30"
+          pathLength={100}
+          stroke={ink}
+          strokeWidth="9"
           strokeLinecap="round"
-          strokeDasharray="52 15"
-          transform="rotate(-35 16 17)"
+          strokeDasharray={`${DRAWN_PCT} ${CUT_PCT}`}
+          transform={`rotate(${CUT_ROTATE} 50 50)`}
         />
         <path
-          d="M18 5.5c3 .6 5.2 2.8 6 5.6"
+          d={accentArcPath(50, 50, 30)}
           stroke="#D9552E"
-          strokeWidth="3.4"
+          strokeWidth="9"
           strokeLinecap="round"
-          fill="none"
         />
       </svg>
       <span className={cls("font-display text-xl font-semibold tracking-tight lowercase", textClass)}>
