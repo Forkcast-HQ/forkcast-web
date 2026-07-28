@@ -40,8 +40,11 @@ still deploys from the `forkcast-web` repo — see 2026-07-26 entry)
 
 ### Still open, in order
 
-1. Push the app-code rename (git commit + push) — currently only on disk
-   locally, not committed.
+1. **`git push` the app-code rename** — committed locally (`38b4c6a`, 50
+   files: the Forkcast→Palatify rename plus the new logo, see below), but
+   this session has no GitHub credentials configured, so `git push` failed
+   with "could not read Username for 'https://github.com'". Push from a
+   machine with GitHub auth set up.
 2. Set `NEXT_PUBLIC_SITE_URL=https://palatify.com` in Vercel → Settings →
    Environment Variables, then redeploy.
 3. Update the Google Health and Whoop OAuth redirect URIs — **only after**
@@ -51,6 +54,26 @@ still deploys from the `forkcast-web` repo — see 2026-07-26 entry)
    untouched pending that coordination.
 4. Optional, lower priority: rename the GitHub org/repos, the Supabase
    project label, and the local `Forkcast-Docs-Local` folder name.
+
+### Logo — 2026-07-27
+
+- Applied the chosen combination mark (open ring + accent stroke, lowercase
+  "palatify" wordmark) to the web app only, per instruction — mobile app
+  icon not touched. Rebuilt `components/Logo.tsx` as an inline SVG/text
+  recreation (light variant for cream/white backgrounds, dark pill variant
+  for the dark marketing panel in `AuthShell.tsx`), replacing the old
+  fork+leaf icon and split-color "Fork/cast" wordmark that survived the
+  earlier rename untouched (it was two separate JSX text nodes, so the
+  bulk find-and-replace never matched it).
+- **Note on the source assets:** the two logo crops you attached render
+  correctly when viewed, but this session's shell sandbox could not read
+  their raw file bytes (only list them) to copy them in directly — so the
+  logo was rebuilt as a vector recreation rather than using your exact PNG
+  files. Close, but worth a visual side-by-side check against the original
+  before treating this as final; a follow-up session with direct file
+  access to the PDF/PNGs could swap in the exact exported assets instead.
+- Bundled into the same commit as the rename push above (not yet pushed —
+  see item 1).
 
 ## Current state — as of 2026-07-25
 
