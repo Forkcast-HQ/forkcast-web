@@ -296,8 +296,20 @@ button:disabled,
   /* --- Orbit rig --- */
   .orbit-spin { animation: orbitSpin var(--dur, 44s) linear infinite; }
   .orbit-spin-rev { animation: orbitSpin var(--dur, 44s) linear infinite reverse; }
+
+  /* Sway, not spin: the chip ring breathes a few degrees either side of
+     rest, so no chip ever travels into the bottom sector where the score
+     readout lives. `-rev` runs the same curve backwards to keep the chips
+     themselves upright. */
+  .orbit-sway { animation: orbitSway 14s ease-in-out infinite; }
+  .orbit-sway-rev { animation: orbitSway 14s ease-in-out infinite reverse; }
+  .chip-bob { animation: chipBob 6.5s ease-in-out infinite; }
+
   .orbit-rig[data-paused="true"] .orbit-spin,
-  .orbit-rig[data-paused="true"] .orbit-spin-rev { animation-play-state: paused; }
+  .orbit-rig[data-paused="true"] .orbit-spin-rev,
+  .orbit-rig[data-paused="true"] .orbit-sway,
+  .orbit-rig[data-paused="true"] .orbit-sway-rev,
+  .orbit-rig[data-paused="true"] .chip-bob { animation-play-state: paused; }
 
   .arc-draw {
     stroke-dasharray: var(--len, 200);
@@ -372,6 +384,14 @@ button:disabled,
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+@keyframes orbitSway {
+  0%, 100% { transform: rotate(-5.5deg); }
+  50% { transform: rotate(5.5deg); }
+}
+@keyframes chipBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
 @keyframes arcDraw {
   to { stroke-dashoffset: 0; }
 }
@@ -398,7 +418,8 @@ button:disabled,
 @media (prefers-reduced-motion: reduce) {
   .line-mask > span { transform: none; animation: none; }
   .word > span { transform: none; animation: none; }
-  .orbit-spin, .orbit-spin-rev, .drift, .kenburns, .band-track, .mark-draw {
+  .orbit-spin, .orbit-spin-rev, .orbit-sway, .orbit-sway-rev, .chip-bob,
+  .drift, .kenburns, .band-track, .mark-draw {
     animation: none !important;
   }
   .arc-draw { stroke-dashoffset: 0; animation: none; }

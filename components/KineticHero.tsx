@@ -19,14 +19,24 @@ import { PlateOrbit } from "@/components/PlateOrbit";
 import { SignInPanel } from "@/components/SignInPanel";
 
 /** Split a line into word-masked spans with a running stagger. */
-function Words({ text, from, accent }: { text: string; from: number; accent?: boolean }) {
+function Words({
+  text,
+  from,
+  step = 85,
+  accent,
+}: {
+  text: string;
+  from: number;
+  step?: number;
+  accent?: boolean;
+}) {
   return (
     <span className="block">
       {text.split(" ").map((w, i) => (
         <span key={`${w}-${i}`} className="word mr-[0.22em]">
           <span
             className={accent ? "text-brand-600" : undefined}
-            style={{ ["--d" as string]: `${from + i * 85}ms` }}
+            style={{ ["--d" as string]: `${from + i * step}ms` }}
           >
             {w}
           </span>
@@ -46,7 +56,8 @@ export function KineticHero() {
 
       {/* 4.5rem = the sticky Navbar's height. Keep these in sync. */}
       <div className="relative z-[2] mx-auto flex min-h-[calc(100svh-4.5rem)] max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:gap-14">
+        {/* The plate gets the larger share of the row — it's the argument. */}
+        <div className="grid items-center gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:gap-10">
           {/* ---- Type ---- */}
           <div>
             <p className="kicker word text-brand-700">
@@ -58,13 +69,14 @@ export function KineticHero() {
               <Words text="Stay on plan." from={330} accent />
             </h1>
 
-            <p className="word mt-7 max-w-md text-lg leading-relaxed text-ink/65">
-              <span style={{ ["--d" as string]: "620ms" }}>
-                Set your goals once. Every menu near you re-ranks around
-              </span>
-            </p>
-            <p className="word max-w-md text-lg leading-relaxed text-ink/65">
-              <span style={{ ["--d" as string]: "690ms" }}>what&apos;s left of your day.</span>
+            {/* One paragraph, word-masked — so it breaks wherever the column
+                is narrow instead of at a hard-coded midpoint. */}
+            <p className="mt-7 max-w-md text-lg leading-relaxed text-ink/65">
+              <Words
+                text="Set your goals once. Every menu near you re-ranks around what's left of your day."
+                from={600}
+                step={38}
+              />
             </p>
 
             <div className="stagger mt-10 flex flex-wrap items-center gap-3">
@@ -90,7 +102,7 @@ export function KineticHero() {
           </div>
 
           {/* ---- The object ---- */}
-          <div className="relative mx-auto w-full max-w-[560px] lg:justify-self-end">
+          <div className="relative mx-auto w-full max-w-[680px] lg:justify-self-end">
             <PlateOrbit />
           </div>
         </div>

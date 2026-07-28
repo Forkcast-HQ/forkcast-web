@@ -1,27 +1,43 @@
 "use client";
 
 /**
- * LivingCanvas — the page's ground is never still.
+ * LivingCanvas — the page's ground, and it means something.
  *
- * A flow field: a few hundred particles tracing a slowly-evolving vector
- * field, painted as fading trails on a cream canvas. Ink-coloured with a
- * small accent minority. The cursor pushes the field around it, so the
- * background reacts to the reader without ever demanding attention.
+ * Concentric rings expand slowly from a handful of emitters and fade out:
+ * the brand mark's own geometry, repeated at every scale, like plates being
+ * set down across a room. Replaces an earlier flow field whose crossing
+ * particle trails read as scribble rather than as anything.
  *
- * Deliberately dependency-free: the "noise" is a sum of sines, which is
- * cheap, smooth, and good enough at this scale. Costs ~1ms/frame.
+ * It is also functional, not just alive: the cursor is its own emitter, so
+ * moving the pointer sets off rings under your hand. That's the page's only
+ * ambient signal that it's interactive.
  *
- * It stops completely when scrolled out of view, when the tab is hidden,
- * and when the reader prefers reduced motion (one static frame is drawn
- * instead, so the texture is still there — just frozen).
+ * Cleared every frame (no trail buffer), so the texture stays crisp at any
+ * DPR. Stops dead when scrolled out of view, when the tab is hidden, and
+ * under prefers-reduced-motion — where it paints one still frame instead,
+ * so the composition survives without the movement.
  */
 
 import { useEffect, useRef } from "react";
 
-const INK = "32, 30, 29";
-const ACCENT = "236, 48, 19";
+type Ring = {
+  x: number;
+  y: number;
+  born: number;
+  dur: number;
+  max: number;
+  accent: boolean;
+};
 
-type P = { x: number; y: number; life: number; max: number; accent: boolean };
+/** Emitter positions as fractions of the canvas, with their own periods. */
+const EMITTERS = [
+  { fx: 0.16, fy: 0.24, period: 3400, phase: 0 },
+  { fx: 0.78, fy: 0.18, period: 4300, phase: 1200 },
+  { fx: 0.62, fy: 0.82, period: 3900, phase: 2400 },
+  { fx: 0.28, fy: 0.71, period: 5200, phase: 600 },
+];
+
+const MAX_RINGS = 64;
 
 export function LivingCanvas({ className }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -29,117 +45,110 @@ export function LivingCanvas({ className }: { className?: string }) {
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: false });
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let w = 0;
     let h = 0;
-    let dpr = 1;
-    let particles: P[] = [];
+    let rings: Ring[] = [];
     let raf = 0;
     let t = 0;
     let visible = true;
-    const pointer = { x: -9999, y: -9999, on: false };
+    const nextAt = EMITTERS.map((e) => e.phase);
+    const pointer = { x: 0, y: 0, lastX: -9999, lastY: -9999, seen: false };
 
     const resize = () => {
       const r = canvas.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = Math.max(1, Math.floor(r.width));
       h = Math.max(1, Math.floor(r.height));
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.fillStyle = "#f3f2f2";
-      ctx.fillRect(0, 0, w, h);
-
-      // Density scales with area, capped so phones stay smooth.
-      const count = Math.min(560, Math.round((w * h) / 3400));
-      particles = Array.from({ length: count }, () => spawn());
     };
 
-    const spawn = (): P => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      life: 0,
-      max: 120 + Math.random() * 260,
-      accent: Math.random() < 0.07,
-    });
+    const emit = (x: number, y: number, scale = 1, accent = Math.random() < 0.2) => {
+      if (rings.length >= MAX_RINGS) rings.shift();
+      const span = Math.max(w, h);
+      rings.push({
+        x,
+        y,
+        born: t,
+        dur: (11000 + Math.random() * 7000) * scale,
+        max: span * (0.16 + Math.random() * 0.4) * scale,
+        accent,
+      });
+    };
 
-    // Smooth pseudo-noise → an angle. Three sine octaves at different
-    // scales, drifting on `t`, gives lazy braided currents.
-    const angleAt = (x: number, y: number) => {
-      const a =
-        Math.sin(x * 0.0032 + t * 0.00022) * 1.7 +
-        Math.sin(y * 0.0027 - t * 0.00019) * 1.7 +
-        Math.sin((x + y) * 0.0016 + t * 0.00013) * 1.1;
-      return a;
+    /** Ease-out: rings sprint outward then coast, like a real ripple. */
+    const ease = (p: number) => 1 - Math.pow(1 - p, 2.2);
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.lineWidth = 1;
+
+      for (let i = rings.length - 1; i >= 0; i--) {
+        const ring = rings[i];
+        const p = (t - ring.born) / ring.dur;
+        if (p >= 1) {
+          rings.splice(i, 1);
+          continue;
+        }
+        // In fast, out slow — so the field always has faint old rings in it.
+        const alpha = p < 0.1 ? p / 0.1 : 1 - (p - 0.1) / 0.9;
+        const r = ease(p) * ring.max;
+        ctx.strokeStyle = ring.accent
+          ? `rgba(236, 48, 19, ${(alpha * 0.3).toFixed(3)})`
+          : `rgba(32, 30, 29, ${(alpha * 0.13).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(ring.x, ring.y, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     };
 
     const step = () => {
       t += 16;
-
-      // Fade the previous frame toward the ground colour instead of
-      // clearing — this is what turns dots into silky trails.
-      ctx.fillStyle = "rgba(243, 242, 242, 0.055)";
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.lineWidth = 1;
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        let ang = angleAt(p.x, p.y);
-
-        // Cursor: swirl the field around the pointer, falling off fast.
-        if (pointer.on) {
-          const dx = p.x - pointer.x;
-          const dy = p.y - pointer.y;
-          const d2 = dx * dx + dy * dy;
-          if (d2 < 42000) {
-            const f = 1 - Math.sqrt(d2) / 205;
-            ang += Math.atan2(dy, dx) * f * 1.5;
-          }
+      EMITTERS.forEach((e, i) => {
+        if (t >= nextAt[i]) {
+          emit(e.fx * w, e.fy * h);
+          nextAt[i] = t + e.period * (0.75 + Math.random() * 0.5);
         }
-
-        const nx = p.x + Math.cos(ang) * 0.85;
-        const ny = p.y + Math.sin(ang) * 0.85;
-
-        ctx.strokeStyle = p.accent
-          ? `rgba(${ACCENT}, 0.22)`
-          : `rgba(${INK}, 0.085)`;
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(nx, ny);
-        ctx.stroke();
-
-        p.x = nx;
-        p.y = ny;
-        p.life++;
-
-        if (p.life > p.max || p.x < -20 || p.x > w + 20 || p.y < -20 || p.y > h + 20) {
-          particles[i] = spawn();
-        }
-      }
-
+      });
+      draw();
       if (visible) raf = requestAnimationFrame(step);
     };
 
     const onPointer = (e: PointerEvent) => {
       const r = canvas.getBoundingClientRect();
-      pointer.x = e.clientX - r.left;
-      pointer.y = e.clientY - r.top;
-      pointer.on = true;
-    };
-    const offPointer = () => {
-      pointer.on = false;
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      if (x < 0 || y < 0 || x > w || y > h) return;
+      pointer.x = x;
+      pointer.y = y;
+      // Only emit once the pointer has actually travelled, so a resting
+      // hand doesn't machine-gun rings.
+      const dx = x - pointer.lastX;
+      const dy = y - pointer.lastY;
+      if (!pointer.seen || dx * dx + dy * dy > 12000) {
+        pointer.lastX = x;
+        pointer.lastY = y;
+        pointer.seen = true;
+        emit(x, y, 0.5, Math.random() < 0.42);
+      }
     };
 
     resize();
 
     if (reduced) {
-      // One static pass — texture without motion.
-      for (let k = 0; k < 260; k++) step();
-      cancelAnimationFrame(raf);
+      // One still frame: a composed set of rings, mid-life, no motion.
+      EMITTERS.forEach((e, i) => {
+        emit(e.fx * w, e.fy * h, 1, i === 1);
+        const r = rings[rings.length - 1];
+        r.born = -r.dur * 0.42;
+      });
+      draw();
       return () => {};
     }
 
@@ -162,8 +171,14 @@ export function LivingCanvas({ className }: { className?: string }) {
       if (visible) raf = requestAnimationFrame(step);
     };
 
+    // Seed the field so the first paint isn't an empty canvas.
+    EMITTERS.forEach((e, i) => {
+      emit(e.fx * w, e.fy * h, 1, i === 2);
+      const r = rings[rings.length - 1];
+      r.born = -r.dur * (0.2 + i * 0.18);
+    });
+
     window.addEventListener("pointermove", onPointer, { passive: true });
-    window.addEventListener("pointerleave", offPointer);
     document.addEventListener("visibilitychange", onVis);
     raf = requestAnimationFrame(step);
 
@@ -172,7 +187,6 @@ export function LivingCanvas({ className }: { className?: string }) {
       ro.disconnect();
       io.disconnect();
       window.removeEventListener("pointermove", onPointer);
-      window.removeEventListener("pointerleave", offPointer);
       document.removeEventListener("visibilitychange", onVis);
     };
   }, []);
