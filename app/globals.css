@@ -260,6 +260,153 @@ button:disabled,
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* ================================================================
+   KINETIC ORBIT — landing-page motion system
+   Built from the palatify mark's geometry: an open ring with a short
+   accent arc. Everything here degrades to a static composition under
+   prefers-reduced-motion (see the block at the end of this section).
+   ================================================================ */
+
+@layer utilities {
+  /* --- Film grain overlay. Pointer-events-none, sits above the ground. --- */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  }
+
+  /* --- Line-mask type reveal. Each line clips its own text. --- */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+  }
+  .line-mask > span {
+    display: block;
+    transform: translateY(110%);
+    animation: lineRise 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--d, 0ms);
+  }
+
+  /* --- Orbit rig --- */
+  .orbit-spin { animation: orbitSpin var(--dur, 44s) linear infinite; }
+  .orbit-spin-rev { animation: orbitSpin var(--dur, 44s) linear infinite reverse; }
+  .orbit-rig[data-paused="true"] .orbit-spin,
+  .orbit-rig[data-paused="true"] .orbit-spin-rev { animation-play-state: paused; }
+
+  .arc-draw {
+    stroke-dasharray: var(--len, 200);
+    stroke-dashoffset: var(--len, 200);
+    animation: arcDraw 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+  }
+
+  .drift { animation: drift 9s ease-in-out infinite; }
+
+  /* Plate tilts toward the cursor in 3D. JS writes --rx/--ry in degrees. */
+  .tilt-rig {
+    transform: rotateX(calc(var(--rx, 0) * 1deg)) rotateY(calc(var(--ry, 0) * 1deg));
+    transform-style: preserve-3d;
+    transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Slow push-in on the dish that's currently showing. */
+  .kenburns { animation: kenburns 9s ease-out both; }
+
+  /* Word-by-word entrance for display type. */
+  .word { display: inline-block; overflow: hidden; vertical-align: bottom; }
+  .word > span {
+    display: inline-block;
+    transform: translateY(105%) rotate(4deg);
+    animation: wordRise 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--d, 0ms);
+  }
+
+  /* Ink band that scrolls its own type. */
+  .band-track { animation: marquee 42s linear infinite; }
+
+  /* --- Magnetic / cursor-parallax host. JS writes --mx/--my in px. --- */
+  .magnetic {
+    transform: translate3d(calc(var(--mx, 0) * 1px), calc(var(--my, 0) * 1px), 0);
+    transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* --- Underline-on-hover link --- */
+  .link-wipe {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1.5px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-wipe:hover { background-size: 100% 1.5px; }
+
+  /* --- Slide-in auth panel --- */
+  .panel-in { animation: panelIn 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .scrim-in { animation: scrimIn 320ms ease both; }
+
+  .stagger > * { animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+
+/* Mark draw-in. The ring animates its dash *pattern*, so the 54° cut-out
+   survives the animation — animating stroke-dashoffset or setting a single
+   dasharray value would erase it. */
+@keyframes markRing {
+  from { stroke-dasharray: 0 100; }
+  to { stroke-dasharray: var(--drawn, 85) var(--cut, 15); }
+}
+@keyframes markArc {
+  from { stroke-dasharray: 0 100; }
+  to { stroke-dasharray: 100 0; }
+}
+
+@keyframes lineRise {
+  from { transform: translateY(110%); }
+  to { transform: translateY(0); }
+}
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes arcDraw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.09); }
+}
+@keyframes wordRise {
+  to { transform: translateY(0) rotate(0deg); }
+}
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes scrimIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line-mask > span { transform: none; animation: none; }
+  .word > span { transform: none; animation: none; }
+  .orbit-spin, .orbit-spin-rev, .drift, .kenburns, .band-track, .mark-draw {
+    animation: none !important;
+  }
+  .arc-draw { stroke-dashoffset: 0; animation: none; }
+  .magnetic, .tilt-rig { transform: none; transition: none; }
+  .panel-in, .scrim-in, .stagger > * { animation: none; }
+  .grain::after { display: none; }
+}
+
 /* Leaflet polish */
 .leaflet-container {
   font-family: var(--font-sans);
