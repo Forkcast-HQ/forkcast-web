@@ -1,7 +1,7 @@
 import { LegalPage, LSection } from "@/components/LegalPage";
 
 export const metadata = {
-  title: "Privacy Policy — Palatify",
+  title: "Privacy Policy",
   description: "How Palatify collects, uses, protects, and deletes your data.",
 };
 

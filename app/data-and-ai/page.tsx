@@ -2,7 +2,7 @@ import { LegalPage, LSection } from "@/components/LegalPage";
 import { BadgeCheck } from "lucide-react";
 
 export const metadata = {
-  title: "Source of Data & AI — Palatify",
+  title: "Source of Data & AI",
   description: "Where every number in Palatify comes from, and how our AI works.",
 };
 

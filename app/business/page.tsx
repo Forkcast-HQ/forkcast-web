@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "The opportunity — Palatify",
+  title: "The opportunity",
   description: "Why Palatify, the market, the model, and the ask.",
 };
 

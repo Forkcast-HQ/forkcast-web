@@ -1,7 +1,7 @@
 import { LegalPage, LSection } from "@/components/LegalPage";
 
 export const metadata = {
-  title: "Terms and Conditions — Palatify",
+  title: "Terms and Conditions",
   description: "The terms that govern use of Palatify.",
 };
 

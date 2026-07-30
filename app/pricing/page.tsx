@@ -89,7 +89,7 @@ export default function PricingPage() {
             <span className="ml-1 text-sm text-ink/50">forever</span>
           </p>
           <p className="mt-2 text-sm text-ink/60">
-            Includes {FREE_DAILY_MESSAGES} coach messages/day during your trial.
+            Everything you need to decide what to order. No time limit.
           </p>
           <ul className="mt-5 space-y-2.5">
             {FREE_FEATURES.map((f) => (
@@ -98,6 +98,16 @@ export default function PricingPage() {
               </li>
             ))}
           </ul>
+          {/* This used to read "includes N coach messages/day during your
+              trial" as a bullet-adjacent line on the Free card, which reads
+              as a free-tier allowance. It isn't one: CoachChat gates on
+              `hasAccess = isPremium || trialActive`, so a free account past
+              its trial gets no coach at all. Stated as the boundary it
+              actually is. */}
+          <p className="mt-4 border-t border-ink/10 pt-4 text-xs leading-relaxed text-ink/50">
+            The AI coach and photo logging run during your {TRIAL_DAYS}-day trial
+            ({FREE_DAILY_MESSAGES} messages a day), then become Premium.
+          </p>
           {hydrated && !user ? (
             <Link href="/signup" className="mt-6 flex w-full items-center justify-center rounded-full border border-black/10 px-5 py-3 font-semibold text-ink/70 transition hover:border-black/25">
               Get started free
@@ -140,13 +150,55 @@ export default function PricingPage() {
         </div>
       </div>
 
-      <p className="mt-10 text-center text-sm text-ink/50">
+      {/* The four questions a pricing page has to answer. Written against
+          what the code actually does — billing genuinely does not exist in
+          this build, and saying so is better than implying a subscription
+          nobody can buy. */}
+      <section className="mt-14 border-t border-ink/10 pt-12">
+        <h2 className="text-center font-display text-2xl font-bold text-ink">
+          Before you start
+        </h2>
+        <dl className="mx-auto mt-8 grid max-w-3xl gap-x-10 gap-y-7 sm:grid-cols-2">
+          <Faq q={`What happens when the ${TRIAL_DAYS} days are up?`}>
+            Nothing you rely on disappears. Fit Scores, discovery, ordering and
+            confirmed meal logging stay free forever. The AI coach, unlimited
+            photo logging and metabolic calibration become Premium.
+          </Faq>
+          <Faq q="Do I need a card to start?">
+            No — and there is nowhere to enter one.{" "}
+            {cloud
+              ? "Purchases are not open yet; Premium is granted on request in the meantime."
+              : "This build has no billing at all; Premium is a demo switch."}
+          </Faq>
+          <Faq q="Can I cancel?">
+            Any time, and you drop to the free plan rather than losing your
+            account. Since there is no billing yet, there is nothing to cancel
+            today.
+          </Faq>
+          <Faq q="What happens to my meal log?">
+            It stays yours. Your logged meals, weights and daily targets remain
+            visible on the free plan — Premium adds coaching on top of that
+            history, it does not hold it hostage.
+          </Faq>
+        </dl>
+      </section>
+
+      <p className="mt-12 text-center text-sm text-ink/50">
         Run a restaurant?{" "}
         <Link href="/for-restaurants" className="font-semibold text-brand-700 hover:underline">
           Partner plans live here
         </Link>
         {" "}— free forever, pay only for orders we bring you.
       </p>
+    </div>
+  );
+}
+
+function Faq({ q, children }: { q: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <dt className="font-display text-base font-bold text-ink">{q}</dt>
+      <dd className="mt-1.5 text-sm leading-relaxed text-ink/65">{children}</dd>
     </div>
   );
 }

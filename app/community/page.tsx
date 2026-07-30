@@ -4,9 +4,9 @@
 // an event, partner, or RSVP exists.
 
 import Link from "next/link";
-import { CalendarDays, ChefHat, Footprints, HeartPulse, Store, Users } from "lucide-react";
+import { ArrowRight, CalendarDays, ChefHat, Footprints, HeartPulse, Store, Users } from "lucide-react";
 
-export const metadata = { title: "Community — Palatify" };
+export const metadata = { title: "Community" };
 
 const PLANNED = [
   {
@@ -75,9 +75,29 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      <p className="mt-8 text-xs text-ink/45">
-        Interested in hearing when events go live? Create an account — members will be invited first.
-      </p>
+      {/* This page's whole job is to collect interest, and until now the
+          only line inviting anyone to do so was plain text with nothing to
+          click. An account is the list — members get invited first — so the
+          invitation now goes somewhere. */}
+      <div className="mt-10 rounded-2xl border border-ink/10 bg-white p-6 sm:p-7">
+        <div className="flex flex-wrap items-center justify-between gap-5">
+          <div>
+            <p className="font-display text-lg font-bold text-ink">
+              Want to know when the first event lands?
+            </p>
+            <p className="mt-1 max-w-md text-sm text-ink/60">
+              Members are invited first. An account is free and takes about a
+              minute — no card, and we&apos;ll only write to you about Boston.
+            </p>
+          </div>
+          <Link
+            href="/signup"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-base font-bold text-cream transition hover:bg-brand-600"
+          >
+            Create an account <ArrowRight className="h-4.5 w-4.5" />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
