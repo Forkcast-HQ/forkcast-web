@@ -521,7 +521,7 @@ export default function Dashboard() {
                   width={52}
                 />
                 <Tooltip
-                  cursor={{ fill: "rgba(32,30,29,0.04)" }}
+                  cursor={{ fill: "rgba(20, 16, 15,0.04)" }}
                   contentStyle={{ borderRadius: 12, border: "1px solid rgba(0,0,0,0.08)", fontSize: 13 }}
                   formatter={(v: number, _n, entry) => [`${v.toLocaleString()} cal${(entry?.payload as { sample?: boolean })?.sample ? " (sample)" : ""}`, "Calories"]}
                 />

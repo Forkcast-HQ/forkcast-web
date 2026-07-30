@@ -105,7 +105,7 @@ export function CoachChat() {
         <button
           onClick={() => setOpen(true)}
           aria-label="Open Palatify Coach"
-          className="fixed bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))] right-4 z-50 grid h-14 w-14 place-items-center rounded-full bg-ink text-white shadow-[0_8px_30px_-6px_rgba(32,30,29,0.5)] transition hover:scale-105 hover:bg-black"
+          className="fixed bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))] right-4 z-50 grid h-14 w-14 place-items-center rounded-full bg-ink text-white shadow-[0_8px_30px_-6px_rgba(20, 16, 15,0.5)] transition hover:scale-105 hover:bg-black"
         >
           <MessageCircle className="h-6 w-6" />
         </button>

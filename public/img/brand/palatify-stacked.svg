@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 250" width="360" height="250">
+  <title>Palatify stacked lockup</title>
+  
+  <g transform="translate(130,6) scale(1.0)"><path d="M57.76,23.02 A30,30 0 1 0 78.98,44.24" fill="none" stroke="#14100F" stroke-width="7" stroke-linecap="round"></path><path d="M67.33,14.84 A41,41 0 0 1 87.16,34.67" fill="none" stroke="#EC3013" stroke-width="7" stroke-linecap="round"></path></g>
+  <g transform="translate(37,208)"><text x="0" y="0" font-family="DM Sans, sans-serif" font-size="72" letter-spacing="-2.52" fill="#14100F"><tspan font-weight="500">palat</tspan><tspan font-weight="400" fill="#14100F">ify</tspan></text></g>
+</svg>
