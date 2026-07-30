@@ -61,7 +61,13 @@ export function HeroDemo() {
 
   return (
     <div
-      className="relative w-full max-w-md"
+      /* Centred, and capped wider than it used to be. At max-w-md the card
+         was 448px inside a 662px column and pinned to the left edge, leaving
+         214px of dead space to its right at every viewport width — the
+         section read as if the layout had failed. mx-auto splits whatever
+         slack is left into two even gutters, which also gives the floating
+         "daily target" badge (-left-6) somewhere to overhang. */
+      className="relative mx-auto w-full max-w-xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
