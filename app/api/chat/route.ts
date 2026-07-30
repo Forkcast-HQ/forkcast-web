@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server";
 
 // POST /api/chat  { messages: [{role:"user"|"assistant", content}], context? }
-// AI nutrition coach. Providers: Gemini (GEMINI_API_KEY, preferred) then
-// Groq (GROQ_API_KEY). Keys stay server-side. Never runs on the static export.
+//
+// The Palatify Coach. One provider: Anthropic Claude, reached through the
+// DataRobot LLM gateway (OpenAI-compatible wire format) with the key held
+// server-side. The Gemini and Groq fallbacks that used to live here are gone
+// — neither was ever configured in production, so they were dead branches
+// that made the file read as if the coach were model-agnostic when every
+// answer the app has ever given came from Claude.
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/** Anthropic model served through the gateway. */
+const DEFAULT_MODEL = "anthropic/claude-opus-4-8";
 
 const SYSTEM = `You are the Palatify Coach — a friendly, evidence-minded nutrition assistant inside Palatify, an app that scores restaurant dishes against a person's daily calorie/macro targets and lets them order and log meals.
 
@@ -25,51 +33,13 @@ function contextLine(ctx: Record<string, unknown> | undefined): string {
   return `User context: ${JSON.stringify(ctx)}`;
 }
 
-async function callGemini(key: string, messages: ChatMessage[], ctx?: Record<string, unknown>) {
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-  const contents = messages.map((m) => ({
-    role: m.role === "assistant" ? "model" : "user",
-    parts: [{ text: m.content }],
-  }));
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-    method: "POST",
-    headers: { "x-goog-api-key": key, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: `${SYSTEM}\n\n${contextLine(ctx)}` }] },
-      generationConfig: { temperature: 0.4, maxOutputTokens: 400 },
-      contents,
-    }),
-  });
-  if (!res.ok) return null;
-  const body = await res.json();
-  const text = (body?.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? "").join("");
-  return text || null;
-}
-
-// DataRobot LLM Gateway (OpenAI-compatible) — routes to GPT/Claude/etc.
-async function callDataRobot(token: string, messages: ChatMessage[], ctx?: Record<string, unknown>) {
+async function callClaude(token: string, messages: ChatMessage[], ctx?: Record<string, unknown>) {
   const base = (process.env.DATAROBOT_ENDPOINT ?? "https://app.datarobot.com/api/v2").replace(/\/$/, "");
   const res = await fetch(`${base}/genai/llmgw/chat/completions/`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8",
-      temperature: 0.4,
-      max_tokens: 400,
-      messages: [{ role: "system", content: `${SYSTEM}\n\n${contextLine(ctx)}` }, ...messages],
-    }),
-  });
-  if (!res.ok) return null;
-  const body = await res.json();
-  return body?.choices?.[0]?.message?.content ?? null;
-}
-
-async function callGroq(key: string, messages: ChatMessage[], ctx?: Record<string, unknown>) {
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: process.env.GROQ_CHAT_MODEL || "llama-3.3-70b-versatile",
+      model: process.env.DATAROBOT_CHAT_MODEL || DEFAULT_MODEL,
       temperature: 0.4,
       max_tokens: 400,
       messages: [{ role: "system", content: `${SYSTEM}\n\n${contextLine(ctx)}` }, ...messages],
@@ -81,10 +51,8 @@ async function callGroq(key: string, messages: ChatMessage[], ctx?: Record<strin
 }
 
 export async function POST(req: Request) {
-  const datarobot = process.env.DATAROBOT_API_TOKEN;
-  const gemini = process.env.GEMINI_API_KEY;
-  const groq = process.env.GROQ_API_KEY;
-  if (!datarobot && !gemini && !groq) {
+  const token = process.env.DATAROBOT_API_TOKEN;
+  if (!token) {
     return NextResponse.json({ error: "No AI key configured on the server." }, { status: 500 });
   }
 
@@ -100,14 +68,9 @@ export async function POST(req: Request) {
   if (!messages.length) return NextResponse.json({ error: "No messages." }, { status: 400 });
 
   try {
-    // Provider priority: DataRobot gateway → Gemini → Groq
-    let reply: string | null = null;
-    let provider = "";
-    if (datarobot) { reply = await callDataRobot(datarobot, messages, context); if (reply) provider = "datarobot"; }
-    if (!reply && gemini) { reply = await callGemini(gemini, messages, context); if (reply) provider = "gemini"; }
-    if (!reply && groq) { reply = await callGroq(groq, messages, context); if (reply) provider = "groq"; }
-    if (!reply) return NextResponse.json({ error: "AI providers unavailable." }, { status: 502 });
-    return NextResponse.json({ reply, provider });
+    const reply = await callClaude(token, messages, context);
+    if (!reply) return NextResponse.json({ error: "The coach is unavailable." }, { status: 502 });
+    return NextResponse.json({ reply, provider: "anthropic" });
   } catch {
     return NextResponse.json({ error: "Chat request failed." }, { status: 502 });
   }

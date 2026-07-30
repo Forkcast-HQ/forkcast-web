@@ -1,19 +1,26 @@
 import { NextResponse } from "next/server";
 
-// POST /api/analyze  { image: "data:image/jpeg;base64,..." } -> nutrition estimate.
+// POST /api/analyze  { image?: "data:image/jpeg;base64,...", note?, prior? }
+//   -> structured nutrition estimate
 // GET  /api/analyze  -> provider/model debug info.
 //
-// Providers (server-side keys only, set in .env.local — never committed):
-//   1. Google Gemini vision — preferred when GEMINI_API_KEY is set.
-//      Optional: GEMINI_MODEL (default gemini-2.5-flash, falls back to older flash models).
-//   2. Groq vision (OpenAI-compatible) — used when GROQ_API_KEY is set.
-//      Auto-discovers an accessible vision model and remembers what worked.
-// Never runs on the static export build.
+// One provider: Anthropic Claude, reached through the DataRobot LLM gateway
+// (OpenAI-compatible wire format), key held server-side and never exposed.
+//
+// The Gemini and Groq paths that used to sit behind this — including a
+// runtime model-discovery dance that probed the Groq account for anything
+// vision-capable — are gone. Neither was ever configured in production, so
+// every estimate the app has produced came from Claude; the fallbacks only
+// made the file read as if the answer might come from somewhere else.
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const GROQ_BASE = "https://api.groq.com/openai/v1";
+/** Anthropic model served through the gateway. */
+const DEFAULT_MODEL = "anthropic/claude-opus-4-8";
+
+const visionModel = () =>
+  process.env.DATAROBOT_VISION_MODEL || process.env.DATAROBOT_CHAT_MODEL || DEFAULT_MODEL;
 
 const SCHEMA = `Return ONLY a JSON object (no prose, no code fences) with exactly these keys:
 {"name": string, "confidence": number 0-1, "calories": integer kcal, "protein": integer grams, "carbs": integer grams, "fat": integer grams, "fiber": integer grams, "sodium": integer mg, "sugar": integer grams, "items": string[] of the main components}
@@ -35,9 +42,6 @@ function buildPrompt(note?: string, prior?: string, hasImage = true): string {
   return p + "\n" + SCHEMA;
 }
 
-// Remember the model that worked (persists for the life of the dev server).
-let cachedModel: string | null = null;
-
 function num(v: unknown, fallback = 0): number {
   const n = typeof v === "string" ? parseFloat(v) : (v as number);
   return Number.isFinite(n) ? Math.max(0, Math.round(n)) : fallback;
@@ -56,36 +60,13 @@ function extractJson(text: string): Record<string, unknown> | null {
   }
 }
 
-async function listModels(key: string): Promise<string[]> {
-  const res = await fetch(`${GROQ_BASE}/models`, { headers: { Authorization: `Bearer ${key}` } });
-  if (!res.ok) return [];
-  const body = await res.json();
-  return (body?.data ?? []).map((m: { id: string }) => m.id);
-}
-
-// Rank accessible model ids by how likely they are to be a good vision model.
-function pickVisionModel(ids: string[]): string | undefined {
-  const score = (id: string) => {
-    const l = id.toLowerCase();
-    if (l.includes("maverick")) return 7;
-    if (l.includes("scout")) return 6;
-    if (l.includes("-vl") || l.includes("vl-") || l.includes("vision")) return 5;
-    if (l.includes("llama-4")) return 4;
-    if (l.includes("llava")) return 3;
-    return 0;
-  };
-  return ids.filter((id) => score(id) > 0).sort((a, b) => score(b) - score(a))[0];
-}
-
-// ---- DataRobot LLM Gateway (OpenAI-compatible, multimodal) ---------
-
-async function callDataRobotVision(token: string, image: string | undefined, prompt: string) {
+async function callClaudeVision(token: string, image: string | undefined, prompt: string) {
   const base = (process.env.DATAROBOT_ENDPOINT ?? "https://app.datarobot.com/api/v2").replace(/\/$/, "");
   const res = await fetch(`${base}/genai/llmgw/chat/completions/`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: process.env.DATAROBOT_VISION_MODEL || process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8",
+      model: visionModel(),
       temperature: 0.2,
       max_tokens: 700,
       messages: [
@@ -102,92 +83,6 @@ async function callDataRobotVision(token: string, image: string | undefined, pro
     }),
   });
   return { ok: res.ok, status: res.status, raw: await res.text() };
-}
-
-// ---- Gemini -------------------------------------------------------
-
-const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
-const GEMINI_FALLBACKS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
-
-function splitDataUrl(image: string): { mime: string; data: string } | null {
-  const m = image.match(/^data:(image\/[a-z+.-]+);base64,(.+)$/i);
-  return m ? { mime: m[1], data: m[2] } : null;
-}
-
-async function callGemini(key: string, model: string, image: string | undefined, prompt: string) {
-  const img = image ? splitDataUrl(image) : null;
-  if (image && !img) return { ok: false, status: 400, raw: "Unsupported image data URL" };
-  const res = await fetch(`${GEMINI_BASE}/models/${model}:generateContent`, {
-    method: "POST",
-    headers: { "x-goog-api-key": key, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      generationConfig: { temperature: 0.2, maxOutputTokens: 700 },
-      contents: [
-        {
-          parts: img
-            ? [{ text: prompt }, { inline_data: { mime_type: img.mime, data: img.data } }]
-            : [{ text: prompt }],
-        },
-      ],
-    }),
-  });
-  return { ok: res.ok, status: res.status, raw: await res.text() };
-}
-
-function geminiText(raw: string): string {
-  try {
-    const body = JSON.parse(raw);
-    const parts = body?.candidates?.[0]?.content?.parts ?? [];
-    return parts.map((p: { text?: string }) => p.text ?? "").join("");
-  } catch {
-    return "";
-  }
-}
-
-async function analyzeWithGemini(key: string, image: string | undefined, prompt: string) {
-  const preferred = process.env.GEMINI_MODEL;
-  const models = preferred ? [preferred, ...GEMINI_FALLBACKS.filter((m) => m !== preferred)] : GEMINI_FALLBACKS;
-  let last = { ok: false, status: 0, raw: "" };
-  for (const model of models) {
-    const r = await callGemini(key, model, image, prompt);
-    if (r.ok) return { r, model };
-    last = r;
-    // Only fall through on model-availability errors; real errors surface immediately.
-    if (!(r.status === 404 || r.status === 400)) return { r, model };
-  }
-  return { r: last, model: models[models.length - 1] };
-}
-
-// ---- Groq ---------------------------------------------------------
-
-async function callVision(key: string, model: string, image: string | undefined, prompt: string) {
-  const res = await fetch(`${GROQ_BASE}/chat/completions`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model,
-      temperature: 0.2,
-      max_tokens: 700,
-      messages: [
-        {
-          role: "user",
-          content: image
-            ? [
-                { type: "text", text: prompt },
-                { type: "image_url", image_url: { url: image } },
-              ]
-            : prompt,
-        },
-      ],
-    }),
-  });
-  return { ok: res.ok, status: res.status, raw: await res.text() };
-}
-
-function isModelError(status: number, raw: string) {
-  if (status === 404) return true;
-  const l = raw.toLowerCase();
-  return status === 400 && (l.includes("model") && (l.includes("does not exist") || l.includes("decommission") || l.includes("not found") || l.includes("access")));
 }
 
 function shapeResponse(parsed: Record<string, unknown>, model: string) {
@@ -207,35 +102,23 @@ function shapeResponse(parsed: Record<string, unknown>, model: string) {
 }
 
 export async function GET() {
-  const datarobot = Boolean(process.env.DATAROBOT_API_TOKEN);
-  const gemini = Boolean(process.env.GEMINI_API_KEY);
-  const groqKey = process.env.GROQ_API_KEY;
-  const groqModels = groqKey ? await listModels(groqKey) : [];
+  const configured = Boolean(process.env.DATAROBOT_API_TOKEN);
   return NextResponse.json({
-    providers: {
-      datarobot: datarobot
-        ? {
-            configured: true,
-            endpoint: process.env.DATAROBOT_ENDPOINT ?? "https://app.datarobot.com/api/v2",
-            visionModel: process.env.DATAROBOT_VISION_MODEL || process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8",
-            chatModel: process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8",
-          }
-        : { configured: false },
-      gemini: gemini ? { configured: true, model: process.env.GEMINI_MODEL || GEMINI_FALLBACKS[0] } : { configured: false },
-      groq: groqKey
-        ? { configured: true, available: groqModels.sort(), suggestedVisionModel: pickVisionModel(groqModels) ?? null }
-        : { configured: false },
-    },
-    active: datarobot ? "datarobot" : gemini ? "gemini" : groqKey ? "groq" : null,
+    provider: "anthropic",
+    configured,
+    endpoint: process.env.DATAROBOT_ENDPOINT ?? "https://app.datarobot.com/api/v2",
+    visionModel: visionModel(),
+    chatModel: process.env.DATAROBOT_CHAT_MODEL || DEFAULT_MODEL,
   });
 }
 
 export async function POST(req: Request) {
-  const drToken = process.env.DATAROBOT_API_TOKEN;
-  const geminiKey = process.env.GEMINI_API_KEY;
-  const key = process.env.GROQ_API_KEY;
-  if (!drToken && !geminiKey && !key) {
-    return NextResponse.json({ error: "No AI key configured. Set DATAROBOT_API_TOKEN, GEMINI_API_KEY, or GROQ_API_KEY in .env.local." }, { status: 500 });
+  const token = process.env.DATAROBOT_API_TOKEN;
+  if (!token) {
+    return NextResponse.json(
+      { error: "No AI key configured. Set DATAROBOT_API_TOKEN in .env.local." },
+      { status: 500 },
+    );
   }
 
   let image: string | undefined;
@@ -255,91 +138,29 @@ export async function POST(req: Request) {
   if (!image && (!note || note.length < 3)) {
     return NextResponse.json({ error: "Provide a meal photo or a description." }, { status: 400 });
   }
+
   const prompt = buildPrompt(note, prior, Boolean(image));
 
-  const failures: string[] = []; // per-provider reasons, surfaced if everything fails
-
-  // ---- DataRobot gateway path (first priority) ----
-  if (drToken) {
-    try {
-      const r = await callDataRobotVision(drToken, image, prompt);
-      if (r.ok) {
-        const content: string = JSON.parse(r.raw)?.choices?.[0]?.message?.content ?? "";
-        const parsed = extractJson(content);
-        if (parsed) return shapeResponse(parsed, `datarobot:${process.env.DATAROBOT_VISION_MODEL || process.env.DATAROBOT_CHAT_MODEL || "anthropic/claude-opus-4-8"}`);
-        failures.push("datarobot: responded but not with valid JSON nutrition");
-      } else {
-        let detail = r.raw.slice(0, 200);
-        try { detail = JSON.parse(r.raw)?.error?.message ?? detail; } catch { /* keep raw */ }
-        failures.push(`datarobot ${r.status}: ${detail}`);
-      }
-      // fall through to Gemini/Groq if configured
-    } catch (e) {
-      failures.push(`datarobot: request failed (${e instanceof Error ? e.message : "network"})`);
-    }
-  }
-
-  // ---- Gemini path ----
-  if (geminiKey) {
-    try {
-      const { r, model } = await analyzeWithGemini(geminiKey, image, prompt);
-      if (r.ok) {
-        const parsed = extractJson(geminiText(r.raw));
-        if (parsed) return shapeResponse(parsed, `gemini:${model}`);
-        failures.push("gemini: responded but not with valid JSON nutrition");
-      } else {
-        let detail = r.raw.slice(0, 200);
-        try { detail = JSON.parse(r.raw)?.error?.message ?? detail; } catch { /* keep raw */ }
-        failures.push(`gemini ${r.status}: ${detail}`);
-      }
-      // fall through to Groq if configured
-    } catch (e) {
-      failures.push(`gemini: request failed (${e instanceof Error ? e.message : "network"})`);
-    }
-  }
-
-  if (!key) {
-    return NextResponse.json({ error: `All providers failed — ${failures.join(" | ") || "no provider configured"}` }, { status: 502 });
-  }
-
   try {
-    let model = cachedModel || process.env.GROQ_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
-    let r = await callVision(key, model, image, prompt);
-
-    // If the configured model isn't accessible, discover one that is and retry.
-    if (!r.ok && isModelError(r.status, r.raw)) {
-      const ids = await listModels(key);
-      const picked = pickVisionModel(ids);
-      if (!picked) {
-        failures.push(`groq: no vision-capable model on this account`);
-        return NextResponse.json(
-          { error: `All providers failed — ${failures.join(" | ")}` },
-          { status: 502 },
-        );
-      }
-      model = picked;
-      r = await callVision(key, model, image, prompt);
-    }
-
+    const r = await callClaudeVision(token, image, prompt);
     if (!r.ok) {
-      let detail = r.raw.slice(0, 300);
+      let detail = r.raw.slice(0, 200);
       try {
         detail = JSON.parse(r.raw)?.error?.message ?? detail;
       } catch {
         /* keep raw */
       }
-      failures.push(`groq ${r.status}: ${detail}`);
-      return NextResponse.json({ error: `All providers failed — ${failures.join(" | ")}` }, { status: 502 });
+      return NextResponse.json({ error: `Estimator unavailable (${r.status}): ${detail}` }, { status: 502 });
     }
 
     const content: string = JSON.parse(r.raw)?.choices?.[0]?.message?.content ?? "";
     const parsed = extractJson(content);
-    if (!parsed) return NextResponse.json({ error: "Model did not return valid JSON." }, { status: 502 });
-
-    cachedModel = model; // remember what worked
-    return shapeResponse(parsed, model);
+    if (!parsed) {
+      return NextResponse.json({ error: "The model did not return valid JSON." }, { status: 502 });
+    }
+    return shapeResponse(parsed, visionModel());
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Unknown error";
-    return NextResponse.json({ error: `Request to Groq failed: ${msg}` }, { status: 502 });
+    return NextResponse.json({ error: `Estimator request failed: ${msg}` }, { status: 502 });
   }
 }

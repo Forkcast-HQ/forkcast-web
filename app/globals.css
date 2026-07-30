@@ -405,6 +405,28 @@ button:disabled,
     transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* --- The scan between "what went in" and "what came out" in AiReadout.
+         The rail is a hairline; the dot is what actually travels. Runs on
+         both axes so the metaphor survives the mobile column stack. --- */
+  .scan-rail {
+    position: relative;
+    overflow: hidden;
+    background: rgb(var(--ink-rgb) / 0.1);
+  }
+  .scan-dot {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: linear-gradient(90deg, transparent, var(--color-brand-600), transparent);
+    animation: scanX 5.2s cubic-bezier(0.66, 0, 0.34, 1) infinite;
+  }
+  @media (min-width: 768px) {
+    .scan-dot {
+      background: linear-gradient(180deg, transparent, var(--color-brand-600), transparent);
+      animation-name: scanY;
+    }
+  }
+
   /* --- Underline-on-hover link --- */
   .link-wipe {
     background-image: linear-gradient(currentColor, currentColor);
@@ -463,6 +485,14 @@ button:disabled,
 }
 @keyframes wordRise {
   to { transform: translateY(0) rotate(0deg); }
+}
+@keyframes scanX {
+  0% { transform: translateX(-100%); }
+  55%, 100% { transform: translateX(100%); }
+}
+@keyframes scanY {
+  0% { transform: translateY(-100%); }
+  55%, 100% { transform: translateY(100%); }
 }
 @keyframes panelIn {
   from { opacity: 0; transform: translateY(24px) scale(0.98); }

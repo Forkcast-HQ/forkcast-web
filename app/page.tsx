@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { AiReadout } from "@/components/AiReadout";
 import { KineticHero } from "@/components/KineticHero";
 import { HeroDemo } from "@/components/HeroDemo";
 import { LiquidField } from "@/components/LiquidField";
 import { ClosingCtas } from "@/components/LandingCtas";
 import { PalatifyMark } from "@/components/PalatifyMark";
+import { fetchCatalog } from "@/lib/catalog";
 
 const BAND_PHRASES = [
   "a fit score on every dish",
@@ -16,28 +18,18 @@ const BAND_PHRASES = [
 ];
 
 /**
- * Where the AI actually is.
+ * Where the AI is, in three phrases rather than three paragraphs.
  *
- * Stated at this level of precision on purpose. All three of these run a
- * real vision/language model server-side (app/api/analyze, app/api/chat) —
- * but the Fit Score does not, and calling it "AI" would be both untrue and
- * self-defeating: the reason a Palatify number can show its working is that
- * a published formula produced it. So the AI reads, and the arithmetic
- * ranks, and the page says which is which.
+ * The prose version of this ran ~90 words per column and nobody was going to
+ * read it. The demonstration above them (AiReadout) now carries the argument;
+ * these are captions, not copy. Note what is deliberately absent: the Fit
+ * Score. It is a formula, not a model, and claiming otherwise would trade the
+ * one thing that lets a Palatify number show its working for a buzzword.
  */
 const AI_WORK = [
-  {
-    t: "It reads any menu",
-    b: "A restaurant's own ingredient list becomes per-dish calories, protein, sodium and fibre — no lab bill, and the kitchen corrects anything off before it publishes.",
-  },
-  {
-    t: "It reads your plate",
-    b: "Photograph what you actually ate, or just describe it. You get an estimate with a confidence level, and you confirm or fix it in a tap.",
-  },
-  {
-    t: "It answers in plain language",
-    b: "Ask what to order and why, against the numbers left in your day. It won't diagnose, prescribe, or invent a dish that doesn't exist.",
-  },
+  { t: "Menus", b: "An ingredient list becomes per-dish macros." },
+  { t: "Plates", b: "Photograph dinner. Confirm or correct in a tap." },
+  { t: "Questions", b: "Ask what to order, against today's numbers." },
 ];
 
 const STEPS = [
@@ -62,7 +54,13 @@ export const metadata = {
  * reason: they argue that the problem is real, which is a thing you read
  * *after* you have decided to care.
  */
-export default function Home() {
+export default async function Home() {
+  // Real counts, read at build time. The closing band used to restate the
+  // hero's pitch in different words; it now says something the hero can't.
+  const catalog = await fetchCatalog();
+  const kitchens = catalog.length;
+  const dishes = catalog.reduce((n, r) => n + r.menu.length, 0);
+
   return (
     <>
       <KineticHero />
@@ -101,20 +99,21 @@ export default function Home() {
       {/* ---------------- THE ENGINE, LIVE ---------------- */}
       <section id="engine" className="scroll-mt-24 border-b-2 border-ink/40 bg-neutral-100">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-            {/* Left column carries the three steps, so it stands as tall as
-                the demo card instead of leaving a hole beneath a headline. */}
+          {/* items-center, not the default stretch: the left column is
+              shorter than the demo card, and stretching pooled ~270px of dead
+              space under the card. The sub-paragraph that used to sit here
+              said what the heading already says. */}
+          <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-16">
             <div>
               <p className="kicker text-brand-700">Not a mockup</p>
               <h2 className="mt-4 font-display text-[clamp(2rem,4.4vw,3.25rem)] font-extrabold leading-[0.98] tracking-[-0.025em] text-ink text-balance">
-                This is the real engine, running here.
+                The real engine, running here.
               </h2>
-              <p className="mt-5 max-w-sm text-lg leading-relaxed text-ink/65">
-                Change the goal on the card. Watch every dish re-rank. Nothing
-                is pre-computed for the demo.
+              <p className="mt-4 max-w-sm text-lg leading-relaxed text-ink/65">
+                Change the goal. Everything re-ranks.
               </p>
 
-              <ol className="mt-10 space-y-0">
+              <ol className="mt-8 space-y-0">
                 {STEPS.map((s) => (
                   <li
                     key={s.n}
@@ -146,44 +145,36 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------------- THE AI ---------------- */}
+      {/* ---------------- THE AI ----------------
+          Shown, not explained. The demonstration is the section; the three
+          captions under it exist only so the scope is unambiguous. */}
       <section className="border-b-2 border-ink/40 bg-cream">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <p className="kicker text-brand-700">The engine underneath</p>
-            <h2 className="mt-4 font-display text-[clamp(2rem,4.4vw,3.25rem)] font-extrabold leading-[0.98] tracking-[-0.025em] text-ink text-balance">
-              AI does the reading. A formula does the ranking.
-            </h2>
-            <p className="mt-5 text-lg leading-relaxed text-ink/65">
-              Turning a menu, a photograph or a question into real numbers is
-              the part that needs a model. Deciding what fits your day is the
-              part that needs to be explainable.
-            </p>
+        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+          <p className="kicker text-brand-700">The engine underneath</p>
+          <h2 className="mt-4 max-w-3xl font-display text-[clamp(2rem,4.4vw,3.25rem)] font-extrabold leading-[0.98] tracking-[-0.025em] text-ink text-balance">
+            AI does the reading. A formula does the ranking.
+          </h2>
+
+          <div className="mt-10">
+            <AiReadout />
           </div>
 
-          <div className="mt-14 grid gap-10 sm:grid-cols-3 sm:gap-0">
-            {AI_WORK.map((a, i) => (
-              <div
-                key={a.t}
-                className="border-t-2 border-ink/15 pt-7 sm:border-l sm:border-t-0 sm:px-8 sm:pt-0 sm:first:border-l-0 sm:first:pl-0"
-              >
-                <span className="font-display text-sm font-extrabold tabular-nums text-brand-600">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="mt-3 font-display text-xl font-bold text-ink">{a.t}</h3>
-                <p className="mt-2 max-w-[34ch] text-[15px] leading-relaxed text-ink/65">
-                  {a.b}
-                </p>
+          <div className="mt-10 flex flex-wrap items-start gap-x-12 gap-y-6">
+            {AI_WORK.map((a) => (
+              <div key={a.t} className="min-w-[13rem] flex-1">
+                <h3 className="font-display text-sm font-extrabold uppercase tracking-[0.08em] text-ink">
+                  {a.t}
+                </h3>
+                <p className="mt-1.5 text-[15px] leading-snug text-ink/60">{a.b}</p>
               </div>
             ))}
           </div>
 
-          <p className="mt-12 max-w-3xl border-l-2 border-brand-600 pl-5 text-[15px] leading-relaxed text-ink/70">
-            <strong className="text-ink">The Fit Score itself is not AI.</strong>{" "}
-            It&apos;s five weighted sub-scores from a published formula, which is
-            exactly why a dish can always tell you why it ranked where it did.{" "}
+          <p className="mt-10 border-l-2 border-brand-600 pl-5 text-[15px] leading-relaxed text-ink/70">
+            <strong className="text-ink">The Fit Score is not AI</strong> — it&apos;s a
+            formula, which is why a dish can always tell you why it ranked where it did.{" "}
             <Link href="/how-it-works" className="font-bold text-brand-700 hover:underline">
-              See the whole calculation
+              See the calculation
             </Link>
             .
           </p>
@@ -208,10 +199,18 @@ export default function Home() {
           className="pointer-events-none absolute -right-[3%] top-1/2 aspect-square h-[132%] -translate-y-1/2 overflow-visible"
         />
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <p className="kicker text-brand-500">Boston first</p>
+          <div className="max-w-3xl">
+            <p className="kicker text-brand-500">Boston, first</p>
             <h2 className="mt-4 font-display text-[clamp(2.25rem,5.6vw,4.25rem)] font-extrabold leading-[0.94] tracking-[-0.035em] text-cream text-balance">
-              Know before you order.
+              {kitchens > 0 ? (
+                <>
+                  {kitchens} kitchens. {dishes} dishes.
+                  <br />
+                  Every number sourced.
+                </>
+              ) : (
+                <>Every number sourced.</>
+              )}
             </h2>
             <ClosingCtas />
           </div>

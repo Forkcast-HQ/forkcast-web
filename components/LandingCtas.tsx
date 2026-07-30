@@ -84,38 +84,39 @@ export function HeroCtas({ onSignIn }: { onSignIn: () => void }) {
 }
 
 /**
- * Closing pair, on ink. Carries its own supporting line because "Free to
- * start, no card" is a claim aimed at someone who has not signed up.
+ * Closing band, on ink.
+ *
+ * This used to be the hero's pitch a second time — "Know before you order",
+ * Build my plan / Browse Boston first — the same two actions in different
+ * words, one screen after the other. The two screens now split the job: the
+ * hero asks you to start, and the closer, having just told you how much of
+ * Boston is actually verified, asks you to go look at it. Signing up is still
+ * one line away, just not a second identical button.
  */
 export function ClosingCtas() {
   const { signedIn, isRestaurant, href, label } = useLandingTarget();
 
   return (
     <>
-      <p className="mt-5 max-w-md text-lg text-cream/60">
-        {!signedIn
-          ? "Sixty seconds to a plan. Free to start, no card."
-          : isRestaurant
-            ? // Restaurant accounts have no nutrition targets of their own.
-              "Your menu, your numbers, reviewed by you."
-            : "Your targets are already set. Pick up where you left off."}
+      <p className="mt-5 max-w-lg text-lg text-cream/60">
+        {isRestaurant
+          ? "Your menu, your numbers, reviewed by you."
+          : "We'd rather verify one city properly than guess at fifty."}
       </p>
-      <div className="mt-9 flex flex-wrap items-center gap-3">
+      <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
         <Link
-          href={href}
+          href="/discover"
           className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-brand-600 px-8 py-4 text-base font-bold text-white"
         >
           <span className="absolute inset-0 -translate-x-full bg-cream transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0" />
           <span className="relative transition-colors group-hover:text-ink">
-            {signedIn ? label : "Build my plan"}
+            Browse Boston
           </span>
           <ArrowRight className="relative h-4.5 w-4.5 transition group-hover:translate-x-1 group-hover:text-ink" />
         </Link>
-        <Link
-          href="/discover"
-          className="inline-flex items-center rounded-full border-2 border-cream/35 px-8 py-4 text-base font-bold text-cream transition hover:border-cream"
-        >
-          {signedIn ? "Browse Boston" : "Browse Boston first"}
+
+        <Link href={href} className="link-wipe text-base font-bold text-cream/70 hover:text-cream">
+          {signedIn ? label : "or start free — sixty seconds, no card"}
         </Link>
       </div>
     </>
