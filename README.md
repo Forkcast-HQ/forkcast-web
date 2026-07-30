@@ -1,12 +1,12 @@
-# Forkcast 🍴
+# Palatify
 
 **Know before you go.** A nutrition-aware restaurant recommendation app that tells you *what to order* at nearby restaurants — matched to your body and goals — **before** you eat, then closes the loop with a quick photo. GrubHub-grade UX, but nutrition-AI-recommendation-first.
 
-> The core insight: passive menu calorie labels barely change behavior (~24 cal/order), and every nutrition app makes you log *after* you've eaten. Forkcast steers you to the right dish *before* you order — and gets restaurants to pay to be the recommendation.
+> The core insight: passive menu calorie labels barely change behavior (~24 cal/order), and every nutrition app makes you log *after* you've eaten. Palatify steers you to the right dish *before* you order — and gets restaurants to pay to be the recommendation.
 
-**🔗 Live demo:** https://seymurhh.github.io/forkcast-live/ (static build on GitHub Pages — source stays here, private).
+**🔗 Live:** https://palatify.com — deployed by Vercel from `main` on every push.
 
-**This repo** (`forkcast-web`) is the app only. Business plan, financial model, architecture, and research docs live in a sibling repo, [`Forkcast-HQ/forkcast-docs`](https://github.com/Forkcast-HQ/forkcast-docs) *(currently empty — docs are being cleaned up and will be pushed there soon)*; the mobile handoff spec lives in [`Forkcast-HQ/forkcast-mobile`](https://github.com/Forkcast-HQ/forkcast-mobile).
+**This repo** (`Forkcast-HQ/forkcast-web` — the org and repo still carry the pre-rename name) is the app only. Business plan, financial model, architecture, and research docs live in a sibling repo, [`Forkcast-HQ/forkcast-docs`](https://github.com/Forkcast-HQ/forkcast-docs) *(currently empty — docs are being cleaned up and will be pushed there soon)*; the mobile handoff spec lives in [`Forkcast-HQ/forkcast-mobile`](https://github.com/Forkcast-HQ/forkcast-mobile).
 
 ---
 
@@ -18,7 +18,12 @@ npm run dev          # http://localhost:3000
 npm run build        # production build
 ```
 
-Node 18+ (built/tested on Node 25). No API keys needed — the AI is realistically mocked behind a clean swap-in seam.
+Node 18+. The app runs with no keys at all. Without Supabase it falls back to
+the seed catalog in `data/restaurants.ts`. Without an AI key the coach returns
+an error, and the photo logger says "AI unavailable" and shows a sample
+estimate badged **sample** rather than **AI estimate** — it never passes a
+canned number off as a real one. See **Configuration** below for what each key
+switches on.
 
 ---
 
@@ -29,7 +34,7 @@ A full, working Next.js app — not a mockup:
 
 | Route | What it does |
 |---|---|
-| `/` | Marketing landing page (investor-facing, cited problem stats) |
+| `/` | Landing page — the hero plate, the live Fit Score demo, and what the AI does |
 | `/onboarding` | **Health cabinet** — live BMI / BMR / TDEE / macro targets as you type |
 | `/discover` | Goal-ranked restaurants & dishes with personal **Fit Scores** |
 | `/restaurant/[slug]` | Restaurant menu with per-dish nutrition + "sorted for you" |
@@ -58,7 +63,7 @@ The defensible core is the **nutrition layer**: chain-exact data (USDA FoodData 
 
 ## Tech stack
 
-Next.js 15 (App Router) · React 19 · Tailwind v4 · Recharts · Claude (Anthropic) multimodal for meal recognition (mocked in the demo, real-implementation seam in `lib/ai.ts` + `app/api/analyze/route.ts`).
+Next.js 15 (App Router) · React 19 · Tailwind v4 · Recharts · Supabase (auth + catalog) · Anthropic Claude via the DataRobot gateway for meal recognition and the coach (`app/api/analyze`, `app/api/chat`, seam in `lib/ai.ts`).
 
 ## Project structure
 
@@ -88,10 +93,33 @@ broken for a week without anyone noticing.
 `netlify.toml` is still present if you ever want an SSR host other than
 Vercel; connecting the repo is all it takes.
 
-## Turning on real AI
+## Configuration
 
-In `lib/ai.ts` set `USE_REAL_AI = true`, install `@anthropic-ai/sdk`, set `ANTHROPIC_API_KEY`, and uncomment the Claude Opus 4.8 vision + structured-output block in `app/api/analyze/route.ts`. No other changes.
+Everything below goes in `.env.local` (never committed) and in the Vercel
+project settings for production.
+
+| Variable | Switches on | Required |
+|---|---|---|
+| `DATAROBOT_API_TOKEN` | The AI coach (`/api/chat`), photo + description meal estimation and restaurant menu reading (`/api/analyze`) | For any AI feature |
+| `DATAROBOT_ENDPOINT` | Gateway base URL. Defaults to `https://app.datarobot.com/api/v2` | No |
+| `DATAROBOT_CHAT_MODEL` | Model id. Defaults to `anthropic/claude-opus-4-8` | No |
+| `DATAROBOT_VISION_MODEL` | Vision model, if you want it to differ from the chat model | No |
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Real accounts, the live catalog, cloud sync. Without them the app runs on device-local accounts and the seed catalog | No |
+| `SUPABASE_SERVICE_ROLE_KEY` | Seeding scripts only — server-side, never shipped to the browser | No |
+
+### About the AI
+
+One provider: **Anthropic's Claude**, reached through the DataRobot LLM
+gateway, keys held server-side. There is no `@anthropic-ai/sdk` dependency —
+the gateway speaks the OpenAI-compatible wire format, so the two route
+handlers call it with `fetch`. Earlier versions of this file described a
+`USE_REAL_AI` flag and a commented-out SDK block; neither exists.
+
+The **Fit Score is not AI**. It is a fixed formula in `lib/nutrition.ts` —
+five weighted sub-scores over the nutrition values — which is what lets every
+ranking show its working. The model reads menus, photographs and questions;
+the arithmetic does the ranking.
 
 ---
 
-*Demonstration prototype. Nutrition values are realistic estimates, not clinical figures. Built for the Forkcast pre-seed pitch.*
+*Nutrition values are estimates, not clinical figures. Palatify is not medical advice — confirm allergens with the restaurant.*

@@ -1,10 +1,10 @@
 // ---------------------------------------------------------------------------
 // Palatify AI layer (swappable).
 //
-// REAL AI: analyzeMeal always POSTs to /api/analyze, which calls a vision
-// model server-side. On deployments without the API (static export) or
-// without keys, the request fails and the caller falls back to the clearly
-// labeled sample below — no build flag involved.
+// REAL AI: analyzeMeal always POSTs to /api/analyze, which calls Anthropic's
+// Claude server-side through the DataRobot gateway. Without a key the request
+// fails and the caller falls back to the clearly labeled sample below — no
+// build flag involved.
 //
 // MOCK: deterministic, realistic estimates so the demo works with no key.
 // ---------------------------------------------------------------------------
