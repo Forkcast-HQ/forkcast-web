@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { KineticHero } from "@/components/KineticHero";
 import { HeroDemo } from "@/components/HeroDemo";
 import { LiquidField } from "@/components/LiquidField";
+import { ClosingCtas } from "@/components/LandingCtas";
 import { PalatifyMark } from "@/components/PalatifyMark";
 
 const BAND_PHRASES = [
@@ -141,25 +142,7 @@ export default function Home() {
             <h2 className="mt-4 font-display text-[clamp(2.25rem,5.6vw,4.25rem)] font-extrabold leading-[0.94] tracking-[-0.035em] text-cream text-balance">
               Know before you order.
             </h2>
-            <p className="mt-5 max-w-md text-lg text-cream/60">
-              Sixty seconds to a plan. Free to start, no card.
-            </p>
-            <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Link
-                href="/signup"
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-brand-600 px-8 py-4 text-base font-bold text-white"
-              >
-                <span className="absolute inset-0 -translate-x-full bg-cream transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0" />
-                <span className="relative transition-colors group-hover:text-ink">Build my plan</span>
-                <ArrowRight className="relative h-4.5 w-4.5 transition group-hover:translate-x-1 group-hover:text-ink" />
-              </Link>
-              <Link
-                href="/discover"
-                className="inline-flex items-center rounded-full border-2 border-cream/35 px-8 py-4 text-base font-bold text-cream transition hover:border-cream"
-              >
-                Browse Boston first
-              </Link>
-            </div>
+            <ClosingCtas />
           </div>
         </div>
       </section>

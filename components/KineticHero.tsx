@@ -14,9 +14,9 @@
  */
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowRight, ArrowDown } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { LiquidField } from "@/components/LiquidField";
+import { HeroCtas } from "@/components/LandingCtas";
 import { PlateOrbit } from "@/components/PlateOrbit";
 import { SignInPanel } from "@/components/SignInPanel";
 
@@ -91,26 +91,10 @@ export function KineticHero() {
               />
             </p>
 
-            <div className="stagger mt-10 flex flex-wrap items-center gap-3">
-              <Link
-                href="/signup"
-                style={{ animationDelay: "780ms" }}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-ink px-8 py-4 text-base font-bold text-cream"
-              >
-                {/* Accent wipes across on hover rather than a colour swap */}
-                <span className="absolute inset-0 -translate-x-full bg-brand-600 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0" />
-                <span className="relative">Start free</span>
-                <ArrowRight className="relative h-4.5 w-4.5 transition group-hover:translate-x-1" />
-              </Link>
-              <button
-                type="button"
-                onClick={() => setSignIn(true)}
-                style={{ animationDelay: "850ms" }}
-                className="inline-flex items-center rounded-full border-2 border-ink/15 bg-cream/60 px-8 py-4 text-base font-bold text-ink backdrop-blur-sm transition hover:border-ink"
-              >
-                Sign in
-              </button>
-            </div>
+            {/* Auth-aware — see components/LandingCtas.tsx. The SignInPanel
+                stays mounted here, outside the animated .stagger row, so it
+                keeps its position in the tree as a section-level overlay. */}
+            <HeroCtas onSignIn={() => setSignIn(true)} />
           </div>
 
           {/* ---- The object ----
