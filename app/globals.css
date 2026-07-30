@@ -62,8 +62,20 @@
   --shadow-soft: 0 1px 2px rgb(45 43 43 / 0.06), 0 12px 32px -24px rgb(45 43 43 / 0.28);
 }
 
-* {
-  border-color: rgb(32 30 29 / 0.1);
+/*
+  The default border colour, so a bare `border` renders a hairline.
+
+  This MUST stay inside @layer base. Written unlayered it outranks every
+  Tailwind utility — cascade layers lose to unlayered rules regardless of
+  specificity — and silently flattens the colour of every `border-*` class
+  in the app to this one hairline. `border-ink`, `border-brand-500`,
+  `border-cream/35` and the 2px section dividers were all resolving to
+  rgba(32,30,29,0.1) because of it.
+*/
+@layer base {
+  * {
+    border-color: rgb(32 30 29 / 0.1);
+  }
 }
 
 html {
