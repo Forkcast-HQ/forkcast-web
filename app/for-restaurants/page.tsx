@@ -37,7 +37,7 @@ const NEEDED = [
   "Your name, cuisine, neighbourhood and address",
   "A one-line description of the place",
   "Each dish: name, price, and what's in it",
-  "Nutrition — press Estimate and correct what's off",
+  "Nutrition — AI fills it in from the ingredients; you correct it",
 ];
 
 export default function ForRestaurants() {
@@ -91,8 +91,8 @@ export default function ForRestaurants() {
         <div className="grid gap-6 md:grid-cols-3">
           <Benefit
             icon={<Utensils className="h-6 w-6" />}
-            title="Menu nutrition, computed"
-            body="Per-dish calories and macros for your whole menu, estimated from your own ingredient lists. You review every number before it goes live."
+            title="AI reads your menu"
+            body="Paste a dish and its ingredients; AI returns calories, protein, carbs, fat, fibre, sodium and sugar. You review and correct every number before it goes live."
           />
           <Benefit
             icon={<Users className="h-6 w-6" />}

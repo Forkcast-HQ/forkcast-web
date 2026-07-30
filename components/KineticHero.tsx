@@ -85,9 +85,9 @@ export function KineticHero() {
                 is narrow instead of at a hard-coded midpoint. */}
             <p className="mt-7 max-w-md text-lg leading-relaxed text-ink/65">
               <Words
-                text="Set your goals once. Every menu near you re-ranks around what's left of your day."
+                text="Set your goals once. AI reads the menus near you, and every dish is scored against what's left of your day."
                 from={600}
-                step={38}
+                step={34}
               />
             </p>
 

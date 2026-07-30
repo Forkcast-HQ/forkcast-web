@@ -42,17 +42,17 @@ const STEPS = [
   {
     n: "02",
     t: "Menus re-rank",
-    b: "Every dish nearby scored 0–100 against what's left of your day.",
+    b: "AI reads each kitchen's menu into real numbers; every dish is scored against what's left of your day.",
   },
   {
     n: "03",
     t: "Order knowing",
-    b: "Protein, sodium, calories — and where each number came from.",
+    b: "Protein, sodium, calories — and where each number came from. Ask the coach if you're torn.",
   },
   {
     n: "04",
     t: "Snap to close the loop",
-    b: "Photograph what you actually ate. Your day updates.",
+    b: "Photograph what you actually ate. AI estimates it, you confirm, your day updates.",
   },
 ];
 
@@ -140,12 +140,18 @@ export default function HowItWorks() {
       <section id="architecture" className="scroll-mt-24">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-ink/10 bg-white p-6 sm:p-7">
-            <h2 className="font-display text-lg font-bold text-ink">Honesty by design</h2>
+            <h2 className="font-display text-lg font-bold text-ink">
+              Where the AI is, and where it isn&apos;t
+            </h2>
             <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-ink/65">
-              Every number carries a source and a ± range. Estimates are labelled
-              as estimates, restaurants review and correct their own menus, and
-              corrections are versioned and public. Sponsored placement never
-              changes a score. Nothing here is medical advice.
+              A model reads menus, photographs and questions — that is the part
+              that needs one. The Fit Score above is not a model: it is the five
+              weighted sub-scores you just watched, which is why a dish can
+              always show why it ranked where it did. Every number carries a
+              source and a ± range, estimates are labelled as estimates,
+              restaurants correct their own menus, and corrections are versioned
+              and public. Sponsored placement never changes a score. The coach
+              does not diagnose or prescribe, and nothing here is medical advice.
             </p>
             <Link
               href="/data-and-ai"

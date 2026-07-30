@@ -8,9 +8,36 @@ import { PalatifyMark } from "@/components/PalatifyMark";
 
 const BAND_PHRASES = [
   "a fit score on every dish",
+  "an ai coach that knows your day",
   "every number shows its source",
+  "photograph a plate, get the macros",
   "independent kitchens, not just chains",
   "free to start",
+];
+
+/**
+ * Where the AI actually is.
+ *
+ * Stated at this level of precision on purpose. All three of these run a
+ * real vision/language model server-side (app/api/analyze, app/api/chat) —
+ * but the Fit Score does not, and calling it "AI" would be both untrue and
+ * self-defeating: the reason a Palatify number can show its working is that
+ * a published formula produced it. So the AI reads, and the arithmetic
+ * ranks, and the page says which is which.
+ */
+const AI_WORK = [
+  {
+    t: "It reads any menu",
+    b: "A restaurant's own ingredient list becomes per-dish calories, protein, sodium and fibre — no lab bill, and the kitchen corrects anything off before it publishes.",
+  },
+  {
+    t: "It reads your plate",
+    b: "Photograph what you actually ate, or just describe it. You get an estimate with a confidence level, and you confirm or fix it in a tap.",
+  },
+  {
+    t: "It answers in plain language",
+    b: "Ask what to order and why, against the numbers left in your day. It won't diagnose, prescribe, or invent a dish that doesn't exist.",
+  },
 ];
 
 const STEPS = [
@@ -116,6 +143,50 @@ export default function Home() {
               <HeroDemo />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ---------------- THE AI ---------------- */}
+      <section className="border-b-2 border-ink/40 bg-cream">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="kicker text-brand-700">The engine underneath</p>
+            <h2 className="mt-4 font-display text-[clamp(2rem,4.4vw,3.25rem)] font-extrabold leading-[0.98] tracking-[-0.025em] text-ink text-balance">
+              AI does the reading. A formula does the ranking.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-ink/65">
+              Turning a menu, a photograph or a question into real numbers is
+              the part that needs a model. Deciding what fits your day is the
+              part that needs to be explainable.
+            </p>
+          </div>
+
+          <div className="mt-14 grid gap-10 sm:grid-cols-3 sm:gap-0">
+            {AI_WORK.map((a, i) => (
+              <div
+                key={a.t}
+                className="border-t-2 border-ink/15 pt-7 sm:border-l sm:border-t-0 sm:px-8 sm:pt-0 sm:first:border-l-0 sm:first:pl-0"
+              >
+                <span className="font-display text-sm font-extrabold tabular-nums text-brand-600">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-3 font-display text-xl font-bold text-ink">{a.t}</h3>
+                <p className="mt-2 max-w-[34ch] text-[15px] leading-relaxed text-ink/65">
+                  {a.b}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-12 max-w-3xl border-l-2 border-brand-600 pl-5 text-[15px] leading-relaxed text-ink/70">
+            <strong className="text-ink">The Fit Score itself is not AI.</strong>{" "}
+            It&apos;s five weighted sub-scores from a published formula, which is
+            exactly why a dish can always tell you why it ranked where it did.{" "}
+            <Link href="/how-it-works" className="font-bold text-brand-700 hover:underline">
+              See the whole calculation
+            </Link>
+            .
+          </p>
         </div>
       </section>
 
