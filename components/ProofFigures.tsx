@@ -38,7 +38,14 @@ function useInView<T extends HTMLElement>() {
           io.disconnect();
         }
       },
-      { threshold: 0.35 },
+      // Not a ratio. The strip is one row on desktop (~384px) and a stack on
+      // mobile (~1041px), so a fractional threshold means something entirely
+      // different at each size: 0.35 of the mobile stack is taller than a
+      // phone viewport can show at the point it scrolls in, and the figures
+      // sat at "0.0%" and "~0 cal" while you were looking straight at them.
+      // Fire on first contact instead, held back far enough from the fold
+      // that the count is not already over by the time it is on screen.
+      { threshold: 0, rootMargin: "0px 0px -12% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();

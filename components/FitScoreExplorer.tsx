@@ -11,7 +11,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, Ban, Check, HeartPulse } from "lucide-react";
+import { AlertTriangle, Ban, Check, ChevronDown, HeartPulse } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
 import { useCatalog } from "@/lib/catalogContext";
 import { categoryImg } from "@/lib/images";
@@ -266,27 +266,47 @@ export function FitScoreExplorer() {
           </div>
         </div>
 
-        <div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.09em] text-white/40">Health conditions</p>
-          <div className="flex flex-wrap gap-1.5">
-            {CONDITIONS.map((c) => (
-              <ToggleChip key={c} on={conditions.includes(c)} onClick={() => toggle(conditions, setConditions, c)}>
-                {c}
-              </ToggleChip>
-            ))}
-          </div>
-        </div>
+        {/* Conditions and allergens are the advanced half of this control
+            panel — fourteen chips that most readers never touch, and they
+            do not even move the score (they add advisories). Folded away by
+            default so the first thing you see is goal + dish, which is the
+            idea the page is actually here to explain. The summary reports
+            how many are on, so the state is never hidden. */}
+        <details className="group rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 open:pb-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[11px] font-bold uppercase tracking-[0.09em] text-white/45 transition hover:text-white/80 [&::-webkit-details-marker]:hidden">
+            <span>Conditions &amp; allergens</span>
+            <span className="flex items-center gap-2 normal-case tracking-normal text-white/35">
+              {conditions.length + allergens.length > 0
+                ? `${conditions.length + allergens.length} on`
+                : "optional"}
+              <ChevronDown className="h-3.5 w-3.5 transition group-open:rotate-180" />
+            </span>
+          </summary>
 
-        <div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.09em] text-white/40">Avoid allergens</p>
-          <div className="flex flex-wrap gap-1.5">
-            {COMMON_ALLERGENS.map((a) => (
-              <ToggleChip key={a} on={allergens.includes(a)} onClick={() => toggle(allergens, setAllergens, a)}>
-                {a}
-              </ToggleChip>
-            ))}
+          <div className="mt-4 space-y-4">
+            <div>
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.09em] text-white/40">Health conditions</p>
+              <div className="flex flex-wrap gap-1.5">
+                {CONDITIONS.map((c) => (
+                  <ToggleChip key={c} on={conditions.includes(c)} onClick={() => toggle(conditions, setConditions, c)}>
+                    {c}
+                  </ToggleChip>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.09em] text-white/40">Avoid allergens</p>
+              <div className="flex flex-wrap gap-1.5">
+                {COMMON_ALLERGENS.map((a) => (
+                  <ToggleChip key={a} on={allergens.includes(a)} onClick={() => toggle(allergens, setAllergens, a)}>
+                    {a}
+                  </ToggleChip>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        </details>
       </div>
 
       {/* Result panel */}
