@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Archivo, DM_Sans } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import { AuthProvider } from "@/lib/auth";
@@ -11,15 +12,64 @@ import { TodayBar } from "@/components/TodayBar";
 import { CartBar } from "@/components/CartBar";
 import { CoachChat } from "@/components/CoachChat";
 
+/**
+ * Fonts are self-hosted through next/font rather than pulled in with an
+ * `@import` at the top of globals.css. The old arrangement cost a DNS
+ * lookup, a TLS handshake and two round trips to fonts.googleapis.com
+ * *before* the first paint — on the landing page that was the single
+ * largest thing standing between the visitor and the headline.
+ */
+const archivo = Archivo({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
+  variable: "--font-archivo",
+  display: "swap",
+});
+
+/** Wordmark only — see components/Logo.tsx and the .wordmark rule. */
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Palatify — Know before you go",
+  metadataBase: new URL("https://palatify.com"),
+  title: {
+    default: "Palatify — Eat out. Stay on plan.",
+    template: "%s · Palatify",
+  },
   description:
-    "Nutrition-aware restaurant recommendations. Plan what you'll eat out before you go, match dishes to your goals, and track every meal.",
+    "Set your goals once and every restaurant menu near you re-ranks around what's left of your day. Nutrition-aware dining for Boston, with a source behind every number.",
+  applicationName: "Palatify",
+  keywords: [
+    "restaurant nutrition",
+    "calorie tracking",
+    "healthy eating out",
+    "Boston restaurants",
+    "macro tracking",
+    "menu nutrition",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "Palatify",
+    title: "Palatify — Eat out. Stay on plan.",
+    description:
+      "Every menu near you, re-ranked around what's left of your day. Boston first.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Palatify — Eat out. Stay on plan.",
+    description:
+      "Every menu near you, re-ranked around what's left of your day. Boston first.",
+  },
 };
 
 export const viewport: Viewport = {
   colorScheme: "light",
-  themeColor: "#f7f4ec",
+  themeColor: "#f7f4f0",
 };
 
 export default function RootLayout({
@@ -28,7 +78,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${archivo.variable} ${dmSans.variable}`}>
       <body className="min-h-screen">
         <a href="#main-content" className="skip-link">
           Skip to main content

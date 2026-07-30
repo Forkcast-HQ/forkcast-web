@@ -21,6 +21,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { PalatifyMark } from "@/components/PalatifyMark";
 import { SmartImage } from "@/components/SmartImage";
 import { categoryImg } from "@/lib/images";
+import { MARK_CX, MARK_CY } from "@/lib/mark";
 import { cls } from "@/lib/format";
 
 type Chip = {
@@ -47,25 +48,59 @@ const DISHES = [
   { key: "mediterranean", name: "Mezze plate", score: 86 },
 ];
 
-/** Plate radius and chip-orbit radius, in viewBox units (box is 100 wide). */
-const PLATE_R = 32;
-const ORBIT = 44;
+/**
+ * Plate radius and chip-orbit radius, in viewBox units (box is 100 wide).
+ *
+ * ORBIT is not a free choice. The brand's lift arc is concentric at 1.367×
+ * the plate radius — much further out than it looks in a 24px logo — so at
+ * PLATE_R 29 its outer edge lands at 43. Any chip ring inside ~46 puts
+ * nutrient chips straight through the one persimmon element in the
+ * identity, which is exactly what happened the first time these numbers
+ * were picked against the old (wrong) 1.13 ratio.
+ */
+const PLATE_R = 29;
+const ORBIT = 47.5;
+
+/**
+ * Rim weight. Deliberately lighter than the brand's own 0.233 ratio, which
+ * is tuned for a mark read at 24px — at 450px across it renders as a black
+ * tyre and buries the food it is supposed to be holding. Both arcs are
+ * thinned by the same amount, so the ring and the lift stay in the
+ * relationship the brand book fixes; only the absolute weight changes. The
+ * logo, favicon and share card all keep the exact brand ratio.
+ */
+const PLATE_SW = PLATE_R * 0.07;
+/** Food disc radius — tucked a hair under the rim's inner edge. */
+const FOOD_R = PLATE_R - PLATE_SW / 2 + 0.5;
+
+/**
+ * The mark's centre is (50, 52), not the box centre, so everything that has
+ * to register against the plate — the food, the orbit guides, the rotation
+ * origin of the chip rig — is offset by the same two units. As a percentage
+ * of a square box those units are percentages directly.
+ */
+const CENTRE = `${MARK_CX}% ${MARK_CY}%`;
 
 export function PlateOrbit({ className }: { className?: string }) {
   const rigRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<Chip | null>(null);
   const [dish, setDish] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [hover, setHover] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
-  // Crossfade dishes. Pauses while a chip is held, so the reader isn't
-  // chasing a moving target while inspecting a number.
+  // Crossfade dishes. Pauses while a chip is held or the pointer is over the
+  // rig, so the reader isn't chasing a moving target while inspecting a
+  // number — and holds completely still under prefers-reduced-motion, which
+  // the interval used to ignore even though every other animation here
+  // respected it.
   useEffect(() => {
-    if (active) return;
+    if (active || hover) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => setDish((d) => (d + 1) % DISHES.length), 4200);
     return () => clearInterval(id);
-  }, [active]);
+  }, [active, hover]);
 
   const frame = useRef<number | null>(null);
   const onMove = useCallback((e: React.MouseEvent) => {
@@ -89,6 +124,7 @@ export function PlateOrbit({ className }: { className?: string }) {
       el.style.setProperty("--ry", "0");
     }
     setActive(null);
+    setHover(false);
   }, []);
 
   useEffect(
@@ -104,17 +140,18 @@ export function PlateOrbit({ className }: { className?: string }) {
     <div
       className={cls("relative aspect-square w-full select-none [perspective:1400px]", className)}
       onMouseMove={onMove}
+      onMouseEnter={() => setHover(true)}
       onMouseLeave={onLeave}
     >
       <div
         ref={rigRef}
-        data-paused={active ? "true" : "false"}
+        data-paused={active || hover ? "true" : "false"}
         className="orbit-rig tilt-rig absolute inset-0"
       >
         {/* ---- The food, sitting in the plate ---- */}
         <div
-          className="absolute left-1/2 top-1/2 aspect-square -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full"
-          style={{ width: `${(PLATE_R - 3) * 2}%` }}
+          className="absolute left-1/2 aspect-square -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full"
+          style={{ width: `${FOOD_R * 2}%`, top: `${MARK_CY}%` }}
         >
           {DISHES.map((d, i) => (
             <div
@@ -128,26 +165,31 @@ export function PlateOrbit({ className }: { className?: string }) {
                 src={categoryImg(d.key, 900, 900)}
                 alt=""
                 label={d.name}
+                priority={i === 0}
                 className={cls("h-full w-full object-cover", i === dish && "kenburns")}
               />
             </div>
           ))}
           {/* Inner shadow — puts the food *in* the plate, not on top of it */}
-          <div className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_44px_rgba(32,30,29,0.36)]" />
+          <div className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_44px_rgba(20, 16, 15,0.36)]" />
         </div>
 
         {/* ---- The mark, as the plate's rim ---- */}
-        <PalatifyMark r={PLATE_R} className="absolute inset-0 h-full w-full overflow-visible" />
+        <PalatifyMark
+          r={PLATE_R}
+          stroke={PLATE_SW}
+          className="absolute inset-0 h-full w-full overflow-visible"
+        />
 
         {/* ---- Orbit guides ---- */}
         <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
-          <circle cx="50" cy="50" r={ORBIT} fill="none" stroke="rgb(32 30 29 / 0.1)" strokeWidth="0.28" />
+          <circle cx={MARK_CX} cy={MARK_CY} r={ORBIT} fill="none" stroke="rgb(var(--ink-rgb) / 0.1)" strokeWidth="0.28" />
           <circle
-            cx="50"
-            cy="50"
+            cx={MARK_CX}
+            cy={MARK_CY}
             r={ORBIT + 5}
             fill="none"
-            stroke="rgb(32 30 29 / 0.07)"
+            stroke="rgb(var(--ink-rgb) / 0.07)"
             strokeWidth="0.28"
             strokeDasharray="0.8 3"
           />
@@ -155,12 +197,16 @@ export function PlateOrbit({ className }: { className?: string }) {
 
         {/* ---- Chips on the upper arc ---- */}
         {mounted && (
-          <div className="orbit-sway absolute inset-0">
+          <div className="orbit-sway absolute inset-0" style={{ transformOrigin: CENTRE }}>
             {CHIPS.map((c, i) => (
-              <div key={c.id} className="absolute inset-0" style={{ transform: `rotate(${c.angle}deg)` }}>
+              <div
+                key={c.id}
+                className="absolute inset-0"
+                style={{ transform: `rotate(${c.angle}deg)`, transformOrigin: CENTRE }}
+              >
                 <div
                   className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
-                  style={{ top: `${50 - ORBIT}%` }}
+                  style={{ top: `${MARK_CY - ORBIT}%` }}
                 >
                   {/* Undo the group's sway, then this arm's fixed angle, so
                       the chip never tips as the ring breathes. */}
@@ -192,9 +238,15 @@ export function PlateOrbit({ className }: { className?: string }) {
           </div>
         )}
 
-        {/* ---- Readout. Lives in the bottom sector the chips never enter. ---- */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center">
-          <div className="rounded-2xl border border-black/10 bg-cream/92 px-6 py-3 text-center shadow-[0_2px_4px_rgba(45,43,43,0.06),0_24px_48px_-24px_rgba(45,43,43,0.4)] backdrop-blur-md">
+        {/* ---- Readout. Hung off the plate's own bottom edge rather than the
+             frame's, so it stays tucked under the rim at any PLATE_R instead
+             of drifting away as a floating card. Still inside the bottom
+             sector the chips never enter. ---- */}
+        <div
+          className="pointer-events-none absolute inset-x-0 flex -translate-y-1/2 justify-center"
+          style={{ top: `${MARK_CY + PLATE_R + 6}%` }}
+        >
+          <div className="rounded-2xl border border-black/10 bg-cream/92 px-6 py-3 text-center shadow-[0_2px_4px_rgba(20,16,15,0.06),0_24px_48px_-24px_rgba(20,16,15,0.4)] backdrop-blur-md">
             <p className="kicker text-ink/55">{active ? active.label : current.name}</p>
             <p
               key={active?.id ?? current.key}

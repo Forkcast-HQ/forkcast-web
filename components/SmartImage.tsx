@@ -18,11 +18,18 @@ export function SmartImage({
   alt,
   className,
   label,
+  priority = false,
 }: {
   src: string;
   alt: string;
   className?: string;
   label?: string;
+  /**
+   * Above-the-fold images. Lazy-loading the hero's own photograph pushes it
+   * behind the whole rest of the page in the fetch queue, which is exactly
+   * the wrong order for the one image that decides LCP.
+   */
+  priority?: boolean;
 }) {
   const [current, setCurrent] = useState(src);
   const [failed, setFailed] = useState(false);
@@ -60,7 +67,9 @@ export function SmartImage({
     <img
       src={current}
       alt={alt}
-      loading="lazy"
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : undefined}
+      decoding={priority ? "sync" : "async"}
       onError={handleError}
       className={className}
     />

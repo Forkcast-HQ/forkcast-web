@@ -1,9 +1,15 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 
+/**
+ * Bone, not white. The 6rem top margin is bone (the page ground), so a white
+ * footer turned every page into dark section → bone stripe → white slab, and
+ * the stripe read as a gap rather than as breathing room. Matching the ground
+ * makes the margin disappear into it.
+ */
 export function Footer() {
   return (
-    <footer className="mt-24 border-t border-black/5 bg-white">
+    <footer className="mt-24 border-t border-ink/10 bg-cream">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-1">

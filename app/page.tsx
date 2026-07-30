@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { KineticHero } from "@/components/KineticHero";
 import { HeroDemo } from "@/components/HeroDemo";
-import { ProofFigures } from "@/components/ProofFigures";
+import { LiquidField } from "@/components/LiquidField";
 import { PalatifyMark } from "@/components/PalatifyMark";
 
 const BAND_PHRASES = [
@@ -18,14 +18,21 @@ const STEPS = [
   { n: "03", t: "Order knowing", b: "Protein, sodium, calories — and where each number came from." },
 ];
 
+export const metadata = {
+  title: "Palatify — Eat out. Stay on plan.",
+  alternates: { canonical: "/" },
+};
+
 /**
  * Landing page — deliberately ultra-minimal.
  *
- * Four beats: the hero object, one live proof that the engine is real, the
- * evidence, and one CTA. The stats band, problem section, four-step
- * explainer and catalog carousel that used to live here all still exist on
- * /how-it-works, /impact and /discover — this page's job is to make someone
- * want to click, not to brief them.
+ * Three beats: the hero object, one live proof that the engine is real, and
+ * one CTA. The stats band, problem section, four-step explainer and catalog
+ * carousel that used to live here all still exist on /how-it-works, /impact
+ * and /discover — this page's job is to make someone want to click, not to
+ * brief them. The three evidence figures moved to /how-it-works for the same
+ * reason: they argue that the problem is real, which is a thing you read
+ * *after* you have decided to care.
  */
 export default function Home() {
   return (
@@ -34,9 +41,18 @@ export default function Home() {
 
       {/* ---------------- INK BAND ----------------
           A moving seam between the hero and the proof, and the only place
-          the promise is stated as a flat claim. */}
-      <section className="overflow-hidden border-y-2 border-ink bg-ink py-5" aria-hidden="true">
-        <div className="marquee">
+          the promise is stated as a flat claim. The visual track is hidden
+          from assistive tech — a scrolling duplicated list is noise to read
+          through — and the same four claims are given once, in order, to
+          screen readers instead. */}
+      <section className="overflow-hidden border-y-2 border-ink bg-ink py-5">
+        <h2 className="sr-only">What you get</h2>
+        <ul className="sr-only">
+          {BAND_PHRASES.map((phrase) => (
+            <li key={phrase}>{phrase}</li>
+          ))}
+        </ul>
+        <div className="marquee" aria-hidden="true">
           <div className="band-track flex w-max items-center gap-10 whitespace-nowrap">
             {Array.from({ length: 2 }).map((_, dup) => (
               <div key={dup} className="flex items-center gap-10">
@@ -102,21 +118,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------------- THE EVIDENCE ---------------- */}
-      <section className="bg-cream">
-        <ProofFigures />
-      </section>
-
-      {/* ---------------- CTA ---------------- */}
+      {/* ---------------- CTA ----------------
+          The page opens and closes on the same material: the liquid ground
+          again, in ink, so the last screen is recognisably the first one
+          after dark rather than a flat slab. */}
       <section className="relative overflow-hidden border-t-2 border-ink bg-ink">
-        {/* The mark, oversized and cropped, as the only ornament */}
+        <LiquidField className="liquid" tone="ink" />
+        {/* The mark, oversized and cropped, as the only ornament. Pulled in
+            from -14% because at that offset the crop fell right through the
+            lift: what showed was an anonymous grey crescent with the one
+            persimmon element in the identity entirely off-canvas. */}
         <PalatifyMark
-          r={30}
-          stroke={1.1}
-          inkColor="rgba(243,242,242,0.16)"
+          stroke={2.2}
+          inkColor="rgba(247,244,240,0.14)"
           accentColor="rgba(236,48,19,0.85)"
           animate={false}
-          className="pointer-events-none absolute -right-[16%] top-1/2 aspect-square h-[150%] -translate-y-1/2 overflow-visible"
+          className="pointer-events-none absolute -right-[3%] top-1/2 aspect-square h-[132%] -translate-y-1/2 overflow-visible"
         />
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
@@ -138,7 +155,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/discover"
-                className="inline-flex items-center rounded-full border-2 border-cream/25 px-8 py-4 text-base font-bold text-cream transition hover:border-cream"
+                className="inline-flex items-center rounded-full border-2 border-cream/35 px-8 py-4 text-base font-bold text-cream transition hover:border-cream"
               >
                 Browse Boston first
               </Link>

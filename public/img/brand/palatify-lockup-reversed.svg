@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" width="520" height="120">
+  <title>Palatify horizontal lockup</title>
+  <rect width="520" height="120" fill="#14100F"></rect>
+  <g transform="translate(0,10) scale(1.1)"><path d="M57.76,23.02 A30,30 0 1 0 78.98,44.24" fill="none" stroke="#F7F4F0" stroke-width="7" stroke-linecap="round"></path><path d="M67.33,14.84 A41,41 0 0 1 87.16,34.67" fill="none" stroke="#EC3013" stroke-width="7" stroke-linecap="round"></path></g>
+  <g transform="translate(136,92)"><text x="0" y="0" font-family="DM Sans, sans-serif" font-size="84" letter-spacing="-2.94" fill="#F7F4F0"><tspan font-weight="500">palat</tspan><tspan font-weight="400" fill="#F7F4F0">ify</tspan></text></g>
+</svg>

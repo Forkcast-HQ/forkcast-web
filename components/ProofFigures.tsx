@@ -50,7 +50,7 @@ function useInView<T extends HTMLElement>() {
 function Gauge({ pct, on, size = 92 }: { pct: number; on: boolean; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" aria-hidden="true">
-      <circle cx="50" cy="50" r="40" stroke="rgb(32 30 29 / 0.12)" strokeWidth="9" />
+      <circle cx="50" cy="50" r="40" stroke="rgb(var(--ink-rgb) / 0.12)" strokeWidth="9" />
       <circle
         cx="50"
         cy="50"
@@ -75,7 +75,7 @@ function Plates({ filled, total, on }: { filled: number; total: number; on: bool
     <div className="flex items-center gap-2.5" aria-hidden="true">
       {Array.from({ length: total }).map((_, i) => (
         <svg key={i} width="30" height="30" viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="40" stroke="rgb(32 30 29 / 0.18)" strokeWidth="11" />
+          <circle cx="50" cy="50" r="40" stroke="rgb(var(--ink-rgb) / 0.18)" strokeWidth="11" />
           <circle
             cx="50"
             cy="50"
@@ -148,14 +148,16 @@ function Figure({
   );
 }
 
+/**
+ * Renders the grid only — no page gutter, no max-width. The section that
+ * places it owns those, so it can sit in a 5xl column here and a 7xl one
+ * somewhere else without fighting a second set of paddings.
+ */
 export function ProofFigures() {
   const [ref, on] = useInView<HTMLDivElement>();
 
   return (
-    <div
-      ref={ref}
-      className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:grid-cols-3 sm:gap-0 sm:px-6 lg:px-8"
-    >
+    <div ref={ref} className="grid gap-10 py-14 sm:grid-cols-3 sm:gap-0">
       <Figure
         visual={<Gauge pct={58.5} on={on} />}
         number={on ? <CountUp value={58.5} decimals={1} suffix="%" duration={1500} /> : "0.0%"}

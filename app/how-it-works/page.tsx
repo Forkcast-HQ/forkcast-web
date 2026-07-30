@@ -2,6 +2,7 @@ import Link from "next/link";
 import { HeartPulse, Sparkles, Utensils, Camera, ArrowRight } from "lucide-react";
 import { BudgetBuilder } from "@/components/BudgetBuilder";
 import { FitScoreExplorer } from "@/components/FitScoreExplorer";
+import { ProofFigures } from "@/components/ProofFigures";
 
 export const metadata = {
   title: "How it works — Palatify",
@@ -23,6 +24,25 @@ export default function HowItWorks() {
             dish against them, and closes the loop with a quick photo. No black boxes —
             here&apos;s exactly how each part works.
           </p>
+        </div>
+      </section>
+
+      {/* Why any of this needs to exist — three figures, each carrying the
+          shape of its own claim. These used to open the landing page, which
+          was the wrong room for them: a visitor who has not yet decided to
+          care does not read a citation. Here they sit directly in front of
+          the mechanism they justify. */}
+      <section className="border-b border-black/5 bg-neutral-100">
+        <div className="mx-auto max-w-5xl px-4 pt-14 sm:px-6 lg:px-8">
+          <span className="text-sm font-bold uppercase tracking-widest text-brand-600">
+            Why it&apos;s needed
+          </span>
+          <h2 className="mt-2 max-w-2xl font-display text-3xl font-bold tracking-tight text-ink text-balance">
+            Eating out is now the default, and nobody can eyeball it.
+          </h2>
+        </div>
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <ProofFigures />
         </div>
       </section>
 

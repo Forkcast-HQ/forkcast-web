@@ -3,8 +3,10 @@
 /**
  * KineticHero — the first screen.
  *
- * Ground: a live flow field (LivingCanvas) under a grain pass, so the page
- * is never static even when nothing is being interacted with.
+ * Ground: a liquid field (LiquidField) under a grain pass, so the page is
+ * never static even when nothing is being interacted with. The field is
+ * deliberately quietest on the left, behind the type, and fullest on the
+ * right around the plate.
  * Object: the palatify mark as an actual plate, with food in it.
  * Type: word-by-word entrance, and one accent word that stays in motion.
  *
@@ -14,7 +16,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowDown } from "lucide-react";
-import { LivingCanvas } from "@/components/LivingCanvas";
+import { LiquidField } from "@/components/LiquidField";
 import { PlateOrbit } from "@/components/PlateOrbit";
 import { SignInPanel } from "@/components/SignInPanel";
 
@@ -30,16 +32,24 @@ function Words({
   step?: number;
   accent?: boolean;
 }) {
+  const words = text.split(" ");
   return (
     <span className="block">
-      {text.split(" ").map((w, i) => (
-        <span key={`${w}-${i}`} className="word mr-[0.22em]">
-          <span
-            className={accent ? "text-brand-600" : undefined}
-            style={{ ["--d" as string]: `${from + i * step}ms` }}
-          >
-            {w}
+      {words.map((w, i) => (
+        <span key={`${w}-${i}`}>
+          <span className="word">
+            <span
+              className={accent ? "text-brand-600" : undefined}
+              style={{ ["--d" as string]: `${from + i * step}ms` }}
+            >
+              {w}
+            </span>
           </span>
+          {/* A real space, not a margin. The masked spans used to be spaced
+              with mr-[0.22em], which looks identical and reads as
+              "Eatout.Stayonplan." to a screen reader, to the clipboard and
+              to anything parsing the page. */}
+          {i < words.length - 1 ? " " : null}
         </span>
       ))}
     </span>
@@ -51,20 +61,22 @@ export function KineticHero() {
 
   return (
     <section className="grain relative overflow-hidden bg-cream">
-      <LivingCanvas className="pointer-events-none absolute inset-0 h-full w-full" />
+      <LiquidField className="liquid" />
       <div className="hero-grid pointer-events-none absolute inset-0 opacity-40" />
 
       {/* 4.5rem = the sticky Navbar's height. Keep these in sync. */}
       <div className="relative z-[2] mx-auto flex min-h-[calc(100svh-4.5rem)] max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 lg:px-8">
-        {/* The plate gets the larger share of the row — it's the argument. */}
-        <div className="grid items-center gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:gap-10">
+        {/* The columns are near-even. The plate wants to be the argument,
+            but "Stay on plan." has to hold one line at desktop — at the old
+            0.92fr it broke to three lines and left "plan." as a widow. */}
+        <div className="grid items-center gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
           {/* ---- Type ---- */}
           <div>
             <p className="kicker word text-brand-700">
               <span style={{ ["--d" as string]: "60ms" }}>Boston · live catalog</span>
             </p>
 
-            <h1 className="mt-6 font-display text-[clamp(2.9rem,8.6vw,6.75rem)] font-extrabold leading-[0.9] tracking-[-0.035em] text-ink">
+            <h1 className="mt-6 font-display text-[clamp(2.75rem,7.2vw,5.5rem)] font-extrabold leading-[0.9] tracking-[-0.035em] text-ink">
               <Words text="Eat out." from={160} />
               <Words text="Stay on plan." from={330} accent />
             </h1>
@@ -101,8 +113,12 @@ export function KineticHero() {
             </div>
           </div>
 
-          {/* ---- The object ---- */}
-          <div className="relative mx-auto w-full max-w-[680px] lg:justify-self-end">
+          {/* ---- The object ----
+               The chips orbit at 47.5% of the square, so they stick out
+               roughly half a chip beyond it on both sides. At desktop that
+               overhang lands in the page gutter; on a phone it ran off the
+               screen, hence the inset. */}
+          <div className="relative mx-auto w-full max-w-[680px] px-12 sm:px-14 lg:justify-self-end lg:px-0">
             <PlateOrbit />
           </div>
         </div>
