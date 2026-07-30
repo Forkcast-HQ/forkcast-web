@@ -88,11 +88,30 @@ export default function DataAndAiPage() {
 
       <LSection title="Reference data">
         <p>
-          Population-health context cited in the app comes from public federal sources:
-          CDC obesity surveillance (BRFSS, NCHS), USDA Economic Research Service food
-          expenditure data, and USDA FoodData Central for nutrient references. Links
-          appear in the footer and on the Impact page. Restaurant names and brands
-          remain the property of their owners; references are for identification only.
+          Population-health context cited in the app comes from public federal sources.
+          These are the primary ones, linked directly rather than paraphrased:
+        </p>
+        <ul className="my-4 space-y-2">
+          {[
+            ["CDC — Adult obesity facts (BRFSS, NCHS)", "https://www.cdc.gov/obesity/adult-obesity-facts/index.html"],
+            ["USDA ERS — Food expenditure series", "https://www.ers.usda.gov/data-products/food-expenditure-series/"],
+            ["USDA FoodData Central — nutrient reference", "https://fdc.nal.usda.gov/"],
+          ].map(([label, href]) => (
+            <li key={href}>
+              <a
+                className="font-semibold text-brand-700 underline"
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p>
+          Restaurant names and brands remain the property of their owners; references
+          are for identification only.
         </p>
       </LSection>
 

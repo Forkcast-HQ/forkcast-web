@@ -24,39 +24,36 @@ export function Footer() {
             links={[
               ["Discover restaurants", "/discover"],
               ["How it works", "/how-it-works"],
-              ["Membership & pricing", "/pricing"],
-              ["Your dashboard", "/dashboard"],
-              ["Set up profile", "/onboarding"],
+              ["Pricing", "/pricing"],
             ]}
           />
           <FooterCol
             title="Company"
             links={[
               ["For restaurants", "/for-restaurants"],
-              ["Partner terminal (demo)", "/partner"],
               ["Impact & evidence", "/impact"],
               ["The opportunity", "/business"],
-              ["Architecture", "/how-it-works#architecture"],
             ]}
           />
           <FooterCol
-            title="Built on real data"
+            title="Legal"
             links={[
-              ["Source of Data & AI", "/data-and-ai"],
-              ["CDC obesity facts", "https://www.cdc.gov/obesity/adult-obesity-facts/index.html"],
-              ["USDA ERS food spending", "https://www.ers.usda.gov/data-products/food-expenditure-series/"],
-              ["USDA FoodData Central", "https://fdc.nal.usda.gov/"],
+              ["Data & AI", "/data-and-ai"],
+              ["Privacy", "/privacy"],
+              ["Terms", "/terms"],
             ]}
           />
         </div>
-        <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-black/5 pt-6 text-xs text-ink/50 sm:flex-row sm:items-center">
+        <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-ink/10 pt-6 text-xs text-ink/50 sm:flex-row sm:items-center">
+          {/* The estimate disclaimer stays. "Demonstration prototype" and
+              "built for the pitch" were positioning and are gone, but people
+              make eating decisions on these numbers — telling them the
+              numbers are estimates is a consumer disclosure, not a hedge. */}
           <p>
-            © {2026} Palatify — demonstration prototype. Nutrition values are realistic estimates. ·{" "}
-            <Link href="/pricing" className="hover:text-brand-700">Pricing</Link> ·{" "}
-            <Link href="/privacy" className="hover:text-brand-700">Privacy</Link> ·{" "}
-            <Link href="/terms" className="hover:text-brand-700">Terms</Link>
+            © {new Date().getFullYear()} Palatify. Nutrition values are estimates —
+            confirm allergens with the restaurant.
           </p>
-          <p>Boston, MA · Built for the Palatify pitch.</p>
+          <p>Boston, Massachusetts</p>
         </div>
       </div>
     </footer>
