@@ -81,12 +81,11 @@ jobs:
             exit 1
           fi
           # A PAT pasted into the secret box usually carries a trailing
-          # newline. Interpolated into the push URL that produced
-          # "URL rejected: Malformed input to a URL function" from curl,
-          # which reads as a bad repo URL rather than a bad token and cost
-          # a while to place. Strip whitespace, and keep the credential out
-          # of the URL entirely so its contents can never break parsing.
+          # newline, which curl rejects with "URL rejected: Malformed input
+          # to a URL function" — an error that reads as a bad repo URL
+          # rather than a bad token.
           TOKEN="$(printf '%s' "$TOKEN" | tr -d '[:space:]')"
+          echo "token length after trim: ${#TOKEN}"
           cd out
           touch .nojekyll
           git init -q -b main
@@ -94,5 +93,7 @@ jobs:
           git config user.email "actions@github.com"
           git add -A
           git commit -q -m "Deploy $(date -u +%Y-%m-%dT%H:%MZ) from ${GITHUB_SHA::7}"
-          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$TOKEN" | base64 | tr -d '\n')" \
-            push -f "https://github.com/Seymurhh/forkcast-live.git" main
+          # Never prompt: without this a rejected credential surfaces as
+          # "could not read Username", which hides the actual 401/403.
+          export GIT_TERMINAL_PROMPT=0
+          git push -f "https://x-access-token:${TOKEN}@github.com/Seymurhh/forkcast-live.git" main
