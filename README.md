@@ -74,13 +74,19 @@ supabase/       migrations for the Postgres/Supabase backend
 
 ## Deploying
 
-The live demo is a **static export** published to GitHub Pages. To redeploy after changes:
+Production is **https://palatify.com**, served by Vercel straight from this
+repo — every push to `main` deploys. It is a normal SSR build, so
+`app/api/analyze/route.ts` runs as a real route handler.
 
-```bash
-bash scripts/deploy-pages.sh   # builds + pushes to the public forkcast-live repo
-```
+There used to be a second pipeline that published a static export to GitHub
+Pages (`Seymurhh/forkcast-live`) via `scripts/deploy-pages.sh` and a
+`deploy-live.yml` workflow. Both are gone. It was a strictly worse copy of
+the same site — the export has to strip `app/api` and pin `dynamicParams`
+off — and keeping two deploy paths in step was the reason the workflow sat
+broken for a week without anyone noticing.
 
-For an SSR host (Netlify/Vercel) instead, just connect this repo (`netlify.toml` is included) — `app/api/analyze/route.ts` runs as-is under SSR.
+`netlify.toml` is still present if you ever want an SSR host other than
+Vercel; connecting the repo is all it takes.
 
 ## Turning on real AI
 
