@@ -39,7 +39,10 @@ const STEPS = [
 ];
 
 export const metadata = {
-  title: "Palatify — Eat out. Stay on plan.",
+  title:
+    process.env.STATIC_EXPORT === "true"
+      ? "Palatify — Eat out. Stay on plan."
+      : "Palatify — Coming Soon",
   alternates: { canonical: "/" },
 };
 
