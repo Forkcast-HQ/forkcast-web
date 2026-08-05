@@ -1,8 +1,10 @@
 import { fetchCatalog } from "@/lib/catalog";
+import { RESTAURANTS } from "@/data/restaurants";
 import { RestaurantDetail } from "@/components/RestaurantDetail";
 
 export async function generateStaticParams() {
-  const restaurants = await fetchCatalog();
+  const liveRestaurants = await fetchCatalog();
+  const restaurants = liveRestaurants.length ? liveRestaurants : RESTAURANTS;
   return restaurants.map((r) => ({ slug: r.slug }));
 }
 

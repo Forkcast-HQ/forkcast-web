@@ -4,7 +4,9 @@
 
 > The core insight: passive menu calorie labels barely change behavior (~24 cal/order), and every nutrition app makes you log *after* you've eaten. Palatify steers you to the right dish *before* you order — and gets restaurants to pay to be the recommendation.
 
-**🔗 Live:** https://palatify.com — deployed by Vercel from `main` on every push.
+**Public cover:** https://palatify.com — a deliberately limited Coming Soon page.
+
+**Development build:** https://forkcast-hq.github.io/forkcast-web/ — the full reviewable product experience.
 
 **This repo** (`Forkcast-HQ/forkcast-web` — the org and repo still carry the pre-rename name) is the app only. Business plan, financial model, architecture, and research docs live in a sibling repo, [`Forkcast-HQ/forkcast-docs`](https://github.com/Forkcast-HQ/forkcast-docs) *(currently empty — docs are being cleaned up and will be pushed there soon)*; the mobile handoff spec lives in [`Forkcast-HQ/forkcast-mobile`](https://github.com/Forkcast-HQ/forkcast-mobile).
 
@@ -79,16 +81,21 @@ supabase/       migrations for the Postgres/Supabase backend
 
 ## Deploying
 
-Production is **https://palatify.com**, served by Vercel straight from this
-repo — every push to `main` deploys. It is a normal SSR build, so
-`app/api/analyze/route.ts` runs as a real route handler.
+The two deployments have intentionally different purposes:
 
-There used to be a second pipeline that published a static export to GitHub
-Pages (`Seymurhh/forkcast-live`) via `scripts/deploy-pages.sh` and a
-`deploy-live.yml` workflow. Both are gone. It was a strictly worse copy of
-the same site — the export has to strip `app/api` and pin `dynamicParams`
-off — and keeping two deploy paths in step was the reason the workflow sat
-broken for a week without anyone noticing.
+- **https://palatify.com** is served by the normal Vercel build and displays
+  only the public Coming Soon cover.
+- **https://forkcast-hq.github.io/forkcast-web/** is built with
+  `STATIC_EXPORT=true` and publishes the full development experience through
+  the GitHub Pages workflow in `.github/workflows/deploy-pages.yml`.
+
+Every push to `main` refreshes both surfaces. The static Pages build cannot
+run server-only AI endpoints; those features remain visibly unavailable when
+credentials or a server runtime are absent.
+
+To verify the Pages artifact locally, run `npm run build:pages`. The helper
+temporarily excludes server-only API routes and restores the source tree after
+the export completes.
 
 `netlify.toml` is still present if you ever want an SSR host other than
 Vercel; connecting the repo is all it takes.

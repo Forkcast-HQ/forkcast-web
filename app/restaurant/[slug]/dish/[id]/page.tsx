@@ -1,8 +1,10 @@
 import { fetchCatalog } from "@/lib/catalog";
+import { RESTAURANTS } from "@/data/restaurants";
 import { DishDetail } from "@/components/DishDetail";
 
 export async function generateStaticParams() {
-  const restaurants = await fetchCatalog();
+  const liveRestaurants = await fetchCatalog();
+  const restaurants = liveRestaurants.length ? liveRestaurants : RESTAURANTS;
   return restaurants.flatMap((r) => r.menu.map((m) => ({ slug: r.slug, id: m.id })));
 }
 

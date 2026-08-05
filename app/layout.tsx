@@ -11,6 +11,9 @@ import { Footer } from "@/components/Footer";
 import { TodayBar } from "@/components/TodayBar";
 import { CartBar } from "@/components/CartBar";
 import { CoachChat } from "@/components/CoachChat";
+import { ComingSoon } from "@/components/ComingSoon";
+
+const isDevelopmentExport = process.env.STATIC_EXPORT === "true";
 
 /**
  * Fonts are self-hosted through next/font rather than pulled in with an
@@ -38,11 +41,14 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://palatify.com"),
   title: {
-    default: "Palatify — Eat out. Stay on plan.",
+    default: isDevelopmentExport
+      ? "Palatify — Eat out. Stay on plan."
+      : "Palatify — Coming Soon",
     template: "%s · Palatify",
   },
-  description:
-    "Set your goals once and every restaurant menu near you re-ranks around what's left of your day. Nutrition-aware dining for Boston, with a source behind every number.",
+  description: isDevelopmentExport
+    ? "Set your goals once and every restaurant menu near you re-ranks around what's left of your day. Nutrition-aware dining for Boston, with a source behind every number."
+    : "Palatify is building a more personal way to discover restaurant meals that fit your goals.",
   applicationName: "Palatify",
   keywords: [
     "restaurant nutrition",
@@ -77,6 +83,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  if (!isDevelopmentExport) {
+    return (
+      <html lang="en" className={`${archivo.variable} ${dmSans.variable}`}>
+        <body>
+          <ComingSoon />
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang="en" className={`${archivo.variable} ${dmSans.variable}`}>
       <body className="min-h-screen">
