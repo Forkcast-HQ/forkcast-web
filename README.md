@@ -6,9 +6,9 @@
 
 **Public cover:** https://palatify.com — a deliberately limited Coming Soon page.
 
-**Development build:** https://forkcast-hq.github.io/forkcast-web/ — the full reviewable product experience.
+**Development build:** https://palatify-hq.github.io/palatify-web/ — the full reviewable product experience.
 
-**This repo** (`Forkcast-HQ/forkcast-web` — the org and repo still carry the pre-rename name) is the app only. Business plan, financial model, architecture, and research docs live in a sibling repo, [`Forkcast-HQ/forkcast-docs`](https://github.com/Forkcast-HQ/forkcast-docs) *(currently empty — docs are being cleaned up and will be pushed there soon)*; the mobile handoff spec lives in [`Forkcast-HQ/forkcast-mobile`](https://github.com/Forkcast-HQ/forkcast-mobile).
+**This repo** (`Palatify-HQ/palatify-web`) is the app only. Business plan, financial model, architecture, and research docs live in a sibling repo, [`Palatify-HQ/palatify-docs`](https://github.com/Palatify-HQ/palatify-docs) *(currently empty — docs are being cleaned up and will be pushed there soon)*; the mobile handoff spec lives in [`Palatify-HQ/palatify-mobile`](https://github.com/Palatify-HQ/palatify-mobile).
 
 ---
 
@@ -49,7 +49,7 @@ Everything is interactive and persists locally (profile, logged meals, weight) �
 
 ### Strategy & business docs
 
-Moved out of this repo — see [`Forkcast-HQ/forkcast-docs`](https://github.com/Forkcast-HQ/forkcast-docs) for the business plan, financial model, system architecture, research dossier, competitive audit, and NIW material *(repo is empty right now — docs are being cleaned up locally before they're pushed there)*.
+Moved out of this repo — see [`Palatify-HQ/palatify-docs`](https://github.com/Palatify-HQ/palatify-docs) for the business plan, financial model, system architecture, research dossier, competitive audit, and NIW material *(repo is empty right now — docs are being cleaned up locally before they're pushed there)*.
 
 > The NIW material is an evidence-development and product-planning aid, not legal advice. Immigration filings should be reviewed by qualified counsel.
 
@@ -85,7 +85,7 @@ The two deployments have intentionally different purposes:
 
 - **https://palatify.com** is served by the normal Vercel build and displays
   only the public Coming Soon cover.
-- **https://forkcast-hq.github.io/forkcast-web/** is built with
+- **https://palatify-hq.github.io/palatify-web/** is built with
   `STATIC_EXPORT=true` and publishes the full development experience through
   the GitHub Pages workflow in `.github/workflows/deploy-pages.yml`.
 

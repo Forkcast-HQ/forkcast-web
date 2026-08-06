@@ -31,9 +31,9 @@ jobs:
         run: npm run build:pages
         env:
           STATIC_EXPORT: "true"
-          PAGES_BASE_PATH: /forkcast-web
-          NEXT_PUBLIC_BASE_PATH: /forkcast-web
-          NEXT_PUBLIC_SITE_URL: https://forkcast-hq.github.io/forkcast-web
+          PAGES_BASE_PATH: /palatify-web
+          NEXT_PUBLIC_BASE_PATH: /palatify-web
+          NEXT_PUBLIC_SITE_URL: https://palatify-hq.github.io/palatify-web
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./out

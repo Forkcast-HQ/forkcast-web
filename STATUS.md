@@ -11,8 +11,8 @@ under its former name "Forkcast" and are left as written — they're the
 historical record of what actually happened, not retroactively renamed.*
 
 **Production:** https://palatify.com (custom domain; underlying Vercel project
-still deploys from the `forkcast-web` repo — see 2026-07-26 entry)
-**Repos:** `Forkcast-HQ/forkcast-web` (this app, public) · `Forkcast-HQ/forkcast-docs` (empty by choice) · `Forkcast-HQ/forkcast-mobile` (handoff spec only) — **org/repo rename to Palatify-HQ not yet done, see below**
+still deploys from the `palatify-web` repo — see 2026-07-26 entry)
+**Repos:** `Palatify-HQ/palatify-web` (this app, public) · `Palatify-HQ/palatify-docs` (empty by choice) · `Palatify-HQ/palatify-mobile` (handoff spec only)
 **Docs (local-only, not pushed):** `~/Desktop/DS:AI - Projects/Healthy_restaurant/Forkcast-Docs-Local/`
 
 ---
@@ -34,9 +34,10 @@ still deploys from the `forkcast-web` repo — see 2026-07-26 entry)
   Interest, and the Verified Partner Agreement template were all rebuilt
   under the new name, with the domain section of the business plan updated
   from "not yet selected" to "selected: palatify.com."
-- **GitHub org and repo names still say `Forkcast-HQ` / `forkcast-web`.**
-  Renaming those is a GitHub-side action (org settings) this session doesn't
-  have credentials for — left for the user.
+- **GitHub org and repos renamed to `Palatify-HQ` / `palatify-*` (2026-08-05).**
+  The org rename was done in the GitHub UI; the three repos were renamed via
+  the API, and `deploy-pages.yml` base paths were updated in the same commit
+  so the Pages build keeps resolving its assets.
 
 ### Still open, in order
 

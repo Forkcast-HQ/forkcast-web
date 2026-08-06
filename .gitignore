@@ -15,5 +15,5 @@ next-env.d.ts
 .api-stash
 docs/niw/~$*
 
-# local-only business docs (deliberately not in this repo, see forkcast-docs)
+# local-only business docs (deliberately not in this repo, see palatify-docs)
 /Forkcast-Docs-Local
